@@ -93,11 +93,11 @@ app.use(errorHandler_1.errorHandler);
 // ─── Start server ────────────────────────────────────────────────────────────
 process.on('uncaughtException', (err) => {
     console.error('[HATA] Yakalanmamış istisna:', err);
-    process.exit(1);
+    // Do NOT exit — let lsnode keep the process alive
 });
 process.on('unhandledRejection', (reason) => {
     console.error('[HATA] Yakalanmamış promise reddi:', reason);
-    process.exit(1);
+    // Do NOT exit — let lsnode keep the process alive
 });
 try {
     app.listen(PORT, () => {
@@ -108,7 +108,7 @@ try {
 }
 catch (err) {
     console.error('[HATA] Sunucu başlatılamadı:', err);
-    process.exit(1);
+    // Do NOT exit — log only
 }
 exports.default = app;
 //# sourceMappingURL=app.js.map
