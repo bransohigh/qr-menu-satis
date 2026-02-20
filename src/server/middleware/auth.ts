@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../services/prisma';
+import { env } from '../config/env';
 
 export interface AuthUser {
   id: string;
@@ -16,7 +17,7 @@ declare global {
   }
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'changeme_super_secret';
+const JWT_SECRET = env.JWT_SECRET;
 
 /**
  * Verifies JWT from httpOnly cookie and attaches user to req.user.
@@ -24,7 +25,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'changeme_super_secret';
  */
 export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const token = req.cookies?.token as string | undefined;
+    const token = req.cookies?.[env.COOKIE_NAME] as string | undefined;
     if (!token) {
       res.status(401).json({ error: { message: 'Authentication required' } });
       return;
@@ -46,7 +47,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 }
 
 /**
- * Same as requireAuth but redirects to /themes (login form) for HTML routes.
+ * Same as requireAuth but redirects to /temalar (login form) for HTML routes.
  */
 export async function requireAuthHtml(
   req: Request,
@@ -54,9 +55,9 @@ export async function requireAuthHtml(
   next: NextFunction
 ): Promise<void> {
   try {
-    const token = req.cookies?.token as string | undefined;
+    const token = req.cookies?.[env.COOKIE_NAME] as string | undefined;
     if (!token) {
-      res.redirect(`/themes?redirect=${encodeURIComponent(req.originalUrl)}`);
+      res.redirect(`/temalar?giris=${encodeURIComponent(req.originalUrl)}`);
       return;
     }
 
@@ -64,14 +65,14 @@ export async function requireAuthHtml(
     const user = await prisma.user.findUnique({ where: { id: payload.userId } });
 
     if (!user) {
-      res.redirect('/themes');
+      res.redirect('/temalar');
       return;
     }
 
     req.user = { id: user.id, email: user.email };
     next();
   } catch {
-    res.redirect('/themes');
+    res.redirect('/temalar');
   }
 }
 
@@ -84,7 +85,7 @@ export async function optionalAuth(
   next: NextFunction
 ): Promise<void> {
   try {
-    const token = req.cookies?.token as string | undefined;
+    const token = req.cookies?.[env.COOKIE_NAME] as string | undefined;
     if (token) {
       const payload = jwt.verify(token, JWT_SECRET) as { userId: string };
       const user = await prisma.user.findUnique({ where: { id: payload.userId } });

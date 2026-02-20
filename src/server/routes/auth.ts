@@ -5,6 +5,7 @@ import { prisma } from '../services/prisma';
 import { signToken, requireAuth } from '../middleware/auth';
 import { registerSchema, loginSchema } from '../validators/schemas';
 import { asyncHandler, createError } from '../middleware/errorHandler';
+import { env, cookieOptions } from '../config/env';
 
 export const authRouter = Router();
 
@@ -40,12 +41,7 @@ authRouter.post(
     });
 
     const token = signToken(user.id);
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    res.cookie(env.COOKIE_NAME, token, cookieOptions);
 
     res.status(201).json({ user: { id: user.id, email: user.email } });
   })
@@ -74,12 +70,7 @@ authRouter.post(
     }
 
     const token = signToken(user.id);
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie(env.COOKIE_NAME, token, cookieOptions);
 
     res.json({ user: { id: user.id, email: user.email } });
   })
@@ -87,8 +78,8 @@ authRouter.post(
 
 // POST /api/auth/logout
 authRouter.post('/logout', (_req, res) => {
-  res.clearCookie('token');
-  res.json({ message: 'Logged out successfully' });
+  res.clearCookie(env.COOKIE_NAME, { path: '/' });
+  res.json({ message: 'Çıkış yapıldı' });
 });
 
 // GET /api/auth/me

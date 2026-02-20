@@ -4,3 +4,6 @@ dist/
 uploads/*
 !uploads/.gitkeep
 *.js.map
+.DS_Store
+src/.DS_Store
+prisma/.DS_Store

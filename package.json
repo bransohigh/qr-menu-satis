@@ -8,9 +8,10 @@
     "build": "tsc",
     "start": "node dist/src/server/app.js",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "ts-node --project tsconfig.json prisma/seed.ts",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:seed": "prisma db seed",
     "prisma:studio": "prisma studio",
+    "deploy": "npm run prisma:generate && npm run prisma:migrate && npm start",
     "test:api": "node scripts/test-category-api.mjs"
   },
   "prisma": {

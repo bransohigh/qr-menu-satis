@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { env, isProd } from './config/env';
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
@@ -22,7 +23,12 @@ import { onizlemeRouter } from './routes/onizleme';
 import { odemeRouter } from './routes/odeme';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
+
+// ─── Reverse proxy (Hostinger, Nginx vb.) ───────────────────────────────────
+if (env.TRUST_PROXY) {
+  app.set('trust proxy', 1);
+}
 
 // ─── Security headers ───────────────────────────────────────────────────────
 app.use(
@@ -53,11 +59,21 @@ app.set('views', path.join(__dirname, '../views'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(morgan('dev'));
+// Production'da 'combined' (Apache formatı, log toplayıcılarla uyumlu)
+app.use(morgan(isProd ? 'combined' : 'dev'));
 
 // ─── Static files ────────────────────────────────────────────────────────────
 app.use('/public', express.static(path.join(__dirname, '../../public')));
-app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
+// UPLOAD_DIR env ile konfigüre edilir; mutlak ya da proje köküne göre göreli olabilir
+const uploadDir = path.isAbsolute(env.UPLOAD_DIR)
+  ? env.UPLOAD_DIR
+  : path.join(__dirname, '../../', env.UPLOAD_DIR);
+app.use('/uploads', express.static(uploadDir));
+
+// ─── Healthcheck ─────────────────────────────────────────────────────────────
+app.get('/saglik', (_req, res) => {
+  res.json({ durum: 'ok', ortam: env.NODE_ENV, zaman: new Date().toISOString() });
+});
 
 // ─── Redirect root to themes ─────────────────────────────────────────────────
 app.get('/', (_req, res) => res.redirect('/temalar'));
@@ -86,7 +102,7 @@ app.use(errorHandler);
 
 // ─── Start server ────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`🚀 QR Menu SaaS running at http://localhost:${PORT}`);
+  console.log(`🚀 QR Menü çalışıyor → ${env.APP_URL} (port ${PORT}) [${env.NODE_ENV}]`);
 });
 
 export default app;
