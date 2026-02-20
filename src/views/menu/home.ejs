@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head><%- include('../partials/menu-head') %></head>
+<body class="bg-slate-50 min-h-screen">
+
+  <% if (typeof isPreview !== 'undefined' && isPreview && typeof previewBannerTheme !== 'undefined' && previewBannerTheme) { %>
+  <div class="sticky top-0 z-[60] bg-amber-400 text-amber-900 text-xs font-semibold flex items-center justify-between px-4 py-2 shadow">
+    <span>👀 <strong>Önizleme Modu</strong> — Bu tema için demo içerik gösteriliyor.</span>
+    <div class="flex items-center gap-3">
+      <a href="/preview/<%= previewBannerTheme.slug %>" class="underline">Önizlemeyi Paylaş</a>
+      <a href="/themes/<%= previewBannerTheme.slug %>" class="bg-amber-900 text-amber-50 px-3 py-1 rounded-full hover:bg-amber-800 transition-colors no-underline">
+        Satın Al →
+      </a>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- ── Top Nav ─────────────────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="text-xl">🍽</span>
+        <span class="font-bold text-slate-800 truncate text-sm sm:text-base">
+          <%= menu.businessName || 'Our Menu' %>
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-slate-400 hidden sm:block"><%= categories.length %> categories</span>
+        <% if (categories.length > 0) { %>
+          <a href="#categories" class="text-xs font-semibold text-brand-600 bg-brand-50 px-3 py-1.5 rounded-full hover:bg-brand-100 transition-smooth">
+            Browse
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Hero ───────────────────────────────────────────────────────────── -->
+  <section class="bg-gradient-to-br from-brand-600 via-brand-700 to-violet-900 text-white pt-16 pb-20 px-4 text-center relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 20% 50%,white 1px,transparent 1px),radial-gradient(circle at 80% 20%,white 1px,transparent 1px);background-size:32px 32px;"></div>
+    <div class="relative max-w-2xl mx-auto">
+      <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white/90 text-xs font-semibold px-3 py-1 rounded-full mb-4 border border-white/20">
+        <span class="size-1.5 rounded-full bg-emerald-400 inline-block"></span>
+        Open Now
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">
+        <%= menu.businessName || 'Our Menu' %>
+      </h1>
+      <p class="text-white/70 text-sm">Tap a category to explore our dishes</p>
+    </div>
+  </section>
+
+  <!-- ── Categories ─────────────────────────────────────────────────────── -->
+  <main class="max-w-5xl mx-auto px-4 -mt-6 pb-20" id="categories">
+    <% if (categories.length === 0) { %>
+      <div class="bg-white rounded-3xl shadow-card p-10 text-center mt-8">
+        <div class="text-5xl mb-4">🍽</div>
+        <h2 class="text-xl font-bold text-slate-700 mb-2">Menu coming soon</h2>
+        <p class="text-slate-400 text-sm">This restaurant is still setting up their menu. Check back soon!</p>
+      </div>
+    <% } else { %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <% categories.forEach(function(cat, i) {
+          const catProducts = productsByCategory[cat.id] || [];
+          const heroProduct = catProducts.find(p => p.imageUrl) || catProducts[0];
+          const bgGradients = [
+            'from-violet-500 to-purple-700','from-rose-500 to-pink-700',
+            'from-emerald-500 to-teal-700','from-amber-500 to-orange-700',
+            'from-sky-500 to-blue-700','from-fuchsia-500 to-pink-700',
+            'from-lime-500 to-green-700','from-cyan-500 to-blue-700',
+            'from-red-500 to-rose-700','from-indigo-500 to-violet-700',
+          ];
+          const grad = bgGradients[i % bgGradients.length];
+        %>
+        <a href="<%= baseUrl %>/c/<%= cat.slug %>"
+           class="group relative block rounded-2xl overflow-hidden shadow-card hover-lift bg-white h-44">
+          <% if (heroProduct && heroProduct.imageUrl) { %>
+            <img src="<%= heroProduct.imageUrl %>" alt="<%= cat.name %>"
+                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+          <% } else { %>
+            <div class="absolute inset-0 bg-gradient-to-br <%= grad %>"></div>
+            <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:20px 20px;"></div>
+          <% } %>
+          <div class="absolute bottom-0 left-0 right-0 p-4">
+            <h3 class="text-white font-bold text-lg leading-tight drop-shadow-sm"><%= cat.name %></h3>
+            <p class="text-white/70 text-xs mt-0.5">
+              <%= catProducts.length %> <%= catProducts.length === 1 ? 'item' : 'items' %>
+            </p>
+          </div>
+          <div class="absolute top-3 right-3 bg-white/20 backdrop-blur-sm rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-smooth">
+            <svg class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/></svg>
+          </div>
+        </a>
+        <% }); %>
+      </div>
+
+      <!-- All products section (optional mini preview) -->
+      <% const allProducts = menu.products || [];
+         const featuredProducts = allProducts.slice(0, 6); %>
+      <% if (featuredProducts.length > 0) { %>
+        <div class="mt-10">
+          <h2 class="text-lg font-bold text-slate-800 mb-4">Featured Items</h2>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <% featuredProducts.forEach(function(p) { %>
+              <a href="<%= baseUrl %>/p/<%= p.slug %>"
+                 class="group bg-white rounded-2xl overflow-hidden shadow-card hover-lift">
+                <div class="relative h-32 bg-gradient-to-br from-slate-100 to-slate-200">
+                  <% if (p.imageUrl) { %>
+                    <img src="<%= p.imageUrl %>" alt="<%= p.name %>"
+                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"/>
+                  <% } else { %>
+                    <div class="w-full h-full flex items-center justify-center text-3xl text-slate-300">🍽</div>
+                  <% } %>
+                </div>
+                <div class="p-3">
+                  <p class="text-sm font-semibold text-slate-800 truncate"><%= p.name %></p>
+                  <p class="text-brand-600 font-bold text-sm mt-1">$<%= Number(p.price).toFixed(2) %></p>
+                </div>
+              </a>
+            <% }); %>
+          </div>
+        </div>
+      <% } %>
+    <% } %>
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <footer class="border-t border-slate-100 py-6 text-center text-xs text-slate-400">
+    Powered by <span class="font-semibold text-brand-600">QR Menu</span>
+  </footer>
+
+</body>
+</html>

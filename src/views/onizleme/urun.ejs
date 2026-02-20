@@ -1,0 +1,167 @@
+<%
+var d = konfig.duzen;
+var koyu = konfig.koyuMod;
+var onizlemeBase = '/onizleme/' + tema.slug;
+var kat = kategori;
+%><!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title><%= urun.name %> — <%= menu.businessName %> Önizleme</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    body{font-family:'Inter',system-ui,sans-serif;}.gecis{transition:all .2s ease;}
+    .thumb{cursor:pointer;transition:all .15s;}
+    .thumb:hover{opacity:1!important;transform:scale(1.04);}
+    .glass{background:rgba(255,255,255,.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);}
+  </style>
+</head>
+<body class="min-h-screen <% if(koyu){%>bg-slate-950 text-white<%}else{%>bg-slate-50 text-slate-900<%}%>">
+
+<!-- Önizleme bandı -->
+<div class="sticky top-0 z-[60] bg-amber-400 text-amber-950 text-xs font-bold flex items-center justify-between px-4 py-2.5">
+  <span>👀 ÖNİZLEME</span>
+  <a href="/temalar/<%= tema.slug %>" class="bg-amber-900 text-amber-50 px-3 py-1 rounded-full text-xs hover:bg-amber-800 gecis">Satın Al →</a>
+</div>
+
+<!-- Header -->
+<header class="sticky top-8 z-50 border-b shadow-sm
+  <% if(koyu){%>bg-slate-950 border-slate-800<%}else{%>bg-white border-slate-200<%}%>">
+  <div class="max-w-4xl mx-auto px-4 h-12 flex items-center gap-2 text-sm">
+    <a href="<%= onizlemeBase %>" class="<% if(koyu){%>text-slate-400 hover:text-white<%}else{%>text-slate-400 hover:text-slate-800<%}%> gecis">Ana Sayfa</a>
+    <span class="<% if(koyu){%>text-slate-700<%}else{%>text-slate-200<%}%>">/</span>
+    <a href="<%= onizlemeBase %>/k/<%= kat.slug||kat.id %>" class="<% if(koyu){%>text-slate-400 hover:text-white<%}else{%>text-slate-400 hover:text-slate-800<%}%> gecis"><%= kat.name %></a>
+    <span class="<% if(koyu){%>text-slate-700<%}else{%>text-slate-200<%}%>">/</span>
+    <span class="font-semibold truncate max-w-[160px] <% if(koyu){%>text-white<%}%>"><%= urun.name %></span>
+  </div>
+</header>
+
+<!-- Ana içerik: 2 sütun -->
+<main class="max-w-4xl mx-auto px-4 py-8">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+    <!-- Sol: Görsel + galeri -->
+    <div>
+      <!-- Ana görsel -->
+      <div class="rounded-2xl overflow-hidden aspect-square bg-slate-100
+        <% if(koyu){%>bg-slate-900<%}%>" id="mainImg">
+        <% if(urun.imageUrl){ %>
+        <img src="<%= urun.imageUrl %>" alt="<%= urun.name %>" class="w-full h-full object-cover" id="mainImgEl"/>
+        <% }else{ %>
+        <div class="w-full h-full flex items-center justify-center text-6xl"><%= kat.emoji %></div>
+        <% } %>
+      </div>
+      <!-- Galeri küçük resimler -->
+      <% if(urun.gallery && urun.gallery.length>1){ %>
+      <div class="flex gap-2 mt-3 overflow-x-auto pb-1">
+        <% urun.gallery.forEach(function(img,gi){ %>
+        <button onclick="document.getElementById('mainImgEl').src=this.dataset.src"
+                data-src="<%= img %>"
+                class="thumb w-16 h-16 rounded-lg overflow-hidden shrink-0 border-2 gecis
+                  <% if(gi===0){%>border-slate-400 opacity-100<%}else{%>border-transparent opacity-60<%}%>">
+          <img src="<%= img %>" alt="" class="w-full h-full object-cover"/>
+        </button>
+        <% }); %>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Sağ: Bilgi kartı (sticky) -->
+    <div class="lg:sticky lg:top-24 space-y-5">
+      <!-- Kategori badge -->
+      <span class="text-xs font-semibold px-3 py-1 rounded-full
+        <% if(d==='gece-modu'){%>bg-cyan-900/50 text-cyan-400<%}
+        else if(d==='premium'){%>bg-purple-900/50 text-purple-300<%}
+        else{%>bg-slate-100 text-slate-500<%}%>">
+        <%= kat.emoji %> <%= kat.name %>
+      </span>
+
+      <!-- Ürün adı -->
+      <h1 class="text-3xl font-black leading-tight
+        <% if(koyu){%>text-white<%}else{%>text-slate-900<%}%>"><%= urun.name %></h1>
+
+      <!-- Fiyat -->
+      <div class="flex items-center gap-3">
+        <span class="text-4xl font-black
+          <% if(d==='gece-modu'){%>text-cyan-400<%}
+          else if(d==='premium'){%>text-transparent bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text<%}
+          else if(d==='sol-menu'){%>text-emerald-600<%}
+          else if(d==='kompakt'){%>text-teal-600<%}
+          else if(d==='kapakli'){%>text-amber-600<%}
+          else if(d==='kategori-seridi'){%>text-rose-600<%}
+          else{%>text-slate-900<%}%>">₺<%= urun.price %></span>
+      </div>
+
+      <!-- Etiketler -->
+      <% if(urun.etiketler && urun.etiketler.length){ %>
+      <div class="flex flex-wrap gap-2">
+        <% urun.etiketler.forEach(function(e){ %>
+        <span class="text-xs px-2.5 py-1 rounded-full
+          <% if(koyu){%>bg-slate-800 text-slate-300<%}else{%>bg-slate-100 text-slate-600<%}%>"><%= e %></span>
+        <% }); %>
+      </div>
+      <% } %>
+
+      <!-- Açıklama -->
+      <p class="leading-relaxed <% if(koyu){%>text-slate-300<%}else{%>text-slate-600<%}%>"><%= urun.description %></p>
+
+      <!-- Butonlar -->
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <a href="<%= onizlemeBase %>/k/<%= kat.slug||kat.id %>"
+           class="flex-1 text-center py-3 rounded-xl font-semibold gecis text-sm
+             <% if(d==='gece-modu'){%>bg-slate-800 text-slate-200 hover:bg-slate-700<%}
+             else if(d==='premium'){%>glass text-purple-200 hover:border-purple-400/30<%}
+             else{%>bg-slate-100 text-slate-700 hover:bg-slate-200<%}%>">
+          ← Kategoriye Dön
+        </a>
+        <a href="/temalar/<%= tema.slug %>"
+           class="flex-1 text-center py-3 rounded-xl font-bold gecis text-sm text-white
+             <% if(d==='gece-modu'){%>bg-cyan-600 hover:bg-cyan-500<%}
+             else if(d==='premium'){%>bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500<%}
+             else if(d==='sol-menu'){%>bg-emerald-600 hover:bg-emerald-500<%}
+             else if(d==='kapakli'){%>bg-amber-500 hover:bg-amber-400<%}
+             else if(d==='kategori-seridi'){%>bg-rose-500 hover:bg-rose-400<%}
+             else if(d==='kompakt'){%>bg-teal-600 hover:bg-teal-500<%}
+             else{%>bg-slate-900 hover:bg-slate-700<%}%>">
+          Bu Temayı Satın Al
+        </a>
+      </div>
+
+      <!-- Menü bilgisi -->
+      <div class="pt-3 border-t <% if(koyu){%>border-slate-800<%}else{%>border-slate-100<%}%>">
+        <p class="text-xs <% if(koyu){%>text-slate-500<%}else{%>text-slate-400<%}%>">🍽 <%= menu.businessName %> · Demo Önizleme</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- İlgili Ürünler -->
+  <% if(kategoriUrunleri && kategoriUrunleri.length){ %>
+  <section class="mt-14">
+    <h2 class="text-lg font-bold mb-5 <% if(koyu){%>text-white<%}else{%>text-slate-800<%}%>">
+      <%= kat.emoji %> <%= kat.name %> kategorisinden diğerleri
+    </h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      <% kategoriUrunleri.forEach(function(r){ %>
+      <a href="<%= onizlemeBase %>/u/<%= r.slug %>"
+         class="group rounded-xl overflow-hidden gecis
+           <% if(koyu){%>bg-slate-900 border border-slate-800 hover:border-slate-600<%}else{%>bg-white border border-slate-100 hover:shadow-md<%}%>">
+        <div class="h-28 bg-slate-100 overflow-hidden">
+          <% if(r.imageUrl){ %>
+          <img src="<%= r.imageUrl %>" alt="<%= r.name %>" class="w-full h-full object-cover group-hover:scale-105 gecis"/>
+          <% }else{ %>
+          <div class="w-full h-full flex items-center justify-center text-3xl"><%= kat.emoji %></div>
+          <% } %>
+        </div>
+        <div class="p-3">
+          <p class="font-semibold text-sm truncate <% if(koyu){%>text-white<%}else{%>text-slate-800<%}%>"><%= r.name %></p>
+          <p class="font-bold text-sm <% if(koyu){%>text-slate-300<%}else{%>text-slate-600<%}%>">₺<%= r.price %></p>
+        </div>
+      </a>
+      <% }); %>
+    </div>
+  </section>
+  <% } %>
+</main>
+</body>
+</html>

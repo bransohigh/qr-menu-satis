@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Ödeme Başarılı 🎉</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>body{font-family:'Inter',sans-serif;} @keyframes pop{0%{transform:scale(.7);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}} .pop{animation:pop .5s cubic-bezier(.34,1.56,.64,1) both;}</style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 to-teal-50 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center space-y-6">
+    <!-- Başarı ikonu -->
+    <div class="pop">
+      <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
+        <span class="text-4xl">🎉</span>
+      </div>
+    </div>
+
+    <div>
+      <h1 class="text-2xl font-black text-slate-900 mb-2">Satın Alma Başarılı!</h1>
+      <p class="text-slate-500 text-sm">Temanız hesabınıza eklendi. Menünüz oluşturuldu ve yönetim panelinden düzenleyebilirsiniz.</p>
+    </div>
+
+    <% if (satinAlim) { %>
+    <div class="bg-slate-50 rounded-2xl p-4 text-left space-y-2 text-sm">
+      <div class="flex justify-between"><span class="text-slate-400">Sipariş No</span><span class="font-mono font-bold text-slate-700"><%= satinAlim.id.slice(0,8).toUpperCase() %></span></div>
+      <% if (satinAlim.theme) { %>
+      <div class="flex justify-between"><span class="text-slate-400">Tema</span><span class="font-semibold text-slate-700"><%= satinAlim.theme.name %></span></div>
+      <% } %>
+      <% if (satinAlim.amount) { %>
+      <div class="flex justify-between"><span class="text-slate-400">Tutar</span><span class="font-bold text-emerald-700">₺<%= Number(satinAlim.amount).toFixed(0) %></span></div>
+      <% } %>
+      <div class="flex justify-between"><span class="text-slate-400">Durum</span><span class="text-emerald-600 font-bold">✓ Tamamlandı</span></div>
+    </div>
+    <% } %>
+
+    <!-- CTA butonlar -->
+    <div class="space-y-3">
+      <a href="/admin" class="block w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-slate-700 transition">
+        Yönetim Paneline Git →
+      </a>
+      <a href="/temalar" class="block w-full border border-slate-200 text-slate-600 py-3 rounded-xl text-sm hover:bg-slate-50 transition">
+        Diğer Temalara Göz At
+      </a>
+    </div>
+    <p class="text-slate-300 text-xs">QR Menü · Kopyalanabilir demo ödeme</p>
+  </div>
+</body>
+</html>

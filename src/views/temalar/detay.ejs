@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= tema.name %> — QR Menü Teması</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>body{font-family:'Inter',system-ui,sans-serif;} .gecis{transition:all .2s ease;}</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+  <!-- NAV -->
+  <nav class="sticky top-0 z-50 bg-white border-b border-slate-100 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <a href="/temalar" class="flex items-center gap-2 text-slate-500 hover:text-slate-800 gecis text-sm font-medium">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        Tüm Temalar
+      </a>
+      <a href="/temalar" class="text-xl font-black bg-gradient-to-r from-violet-600 to-purple-500 bg-clip-text text-transparent">QR Menü</a>
+      <% if (kullanici) { %>
+        <a href="/admin" class="text-sm font-semibold text-violet-600 hover:text-violet-700 gecis">Panel →</a>
+      <% } else { %>
+        <a href="/admin" class="text-sm font-medium text-violet-600 gecis">Giriş Yap</a>
+      <% } %>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="bg-white border-b border-slate-100">
+    <div class="max-w-6xl mx-auto px-4 py-12 sm:py-16 flex flex-col md:flex-row gap-10 items-start">
+
+      <!-- Mockup önizleme -->
+      <div class="w-full md:w-[45%] shrink-0">
+        <div class="bg-gradient-to-br
+          <% if(konfig.koyuMod){ %>from-slate-800 to-slate-900<% } else { %>from-slate-100 to-slate-200<% } %>
+          rounded-2xl p-4 shadow-xl aspect-[4/3] flex items-center justify-center">
+          <div class="w-full h-full bg-white rounded-xl overflow-hidden shadow-inner flex flex-col">
+            <!-- browser chrome -->
+            <div class="h-6 bg-slate-100 border-b border-slate-200 flex items-center px-3 gap-1.5 shrink-0">
+              <div class="w-2 h-2 rounded-full bg-red-400"></div><div class="w-2 h-2 rounded-full bg-yellow-400"></div><div class="w-2 h-2 rounded-full bg-green-400"></div>
+              <div class="flex-1 h-2.5 bg-slate-200 rounded-full mx-2 text-center"></div>
+            </div>
+            <!-- mini theme preview -->
+            <div class="flex-1 overflow-hidden p-2
+              <% if(konfig.koyuMod){ %>bg-slate-900 text-white<% } else { %>bg-white<% } %>">
+              <% if(konfig.duzen==='klasik-liste'){ %>
+                <div class="h-4 bg-slate-200 rounded mb-2 w-2/3"></div>
+                <div class="space-y-1.5">
+                  <% for(let i=0;i<6;i++){ %><div class="flex justify-between items-center border-b border-slate-100 pb-1"><div class="h-2 bg-slate-100 rounded w-1/2"></div><div class="h-2 bg-slate-300 rounded w-10"></div></div><% } %>
+                </div>
+              <% } else if(konfig.duzen==='kart-duzen'){ %>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <% for(let i=0;i<4;i++){ %><div class="h-12 bg-violet-100 rounded-lg flex items-end p-1"><div class="h-2 bg-violet-300 rounded w-3/4"></div></div><% } %>
+                </div>
+              <% } else if(konfig.duzen==='minimal'){ %>
+                <div class="space-y-3">
+                  <div class="h-6 bg-stone-200 rounded w-1/2"></div>
+                  <div class="border-b border-stone-200"></div>
+                  <% for(let i=0;i<3;i++){ %><div class="h-2 bg-stone-100 rounded w-full"></div><% } %>
+                </div>
+              <% } else if(konfig.duzen==='gece-modu'){ %>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <% for(let i=0;i<4;i++){ %><div class="h-12 bg-slate-800 rounded-lg border border-cyan-500/30 flex items-end p-1"><div class="h-2 bg-cyan-400/50 rounded w-3/4"></div></div><% } %>
+                </div>
+              <% } else if(konfig.duzen==='kapakli'){ %>
+                <div class="h-12 bg-gradient-to-r from-amber-400 to-orange-500 rounded-lg mb-1.5 flex items-end p-2"><div class="h-2 bg-white/70 rounded w-1/2"></div></div>
+                <div class="flex gap-1 mb-1.5"><div class="h-2 bg-amber-300 rounded-full px-2"></div><div class="h-2 bg-slate-200 rounded-full px-2"></div><div class="h-2 bg-slate-200 rounded-full px-2"></div></div>
+                <div class="grid grid-cols-3 gap-1"><% for(let i=0;i<3;i++){ %><div class="h-8 bg-slate-100 rounded"></div><% } %></div>
+              <% } else if(konfig.duzen==='sol-menu'){ %>
+                <div class="flex gap-1.5 h-full">
+                  <div class="w-16 bg-emerald-50 rounded p-1 space-y-1"><div class="h-2 bg-emerald-300 rounded"></div><div class="h-2 bg-emerald-200 rounded"></div><div class="h-2 bg-emerald-200 rounded"></div><div class="h-2 bg-emerald-200 rounded"></div></div>
+                  <div class="flex-1 grid grid-cols-2 gap-1"><% for(let i=0;i<4;i++){ %><div class="h-9 bg-slate-100 rounded-lg"></div><% } %></div>
+                </div>
+              <% } else if(konfig.duzen==='kategori-seridi'){ %>
+                <div class="flex gap-1 mb-2 overflow-hidden"><div class="h-3 bg-rose-500 rounded-full px-3 shrink-0"></div><div class="h-3 bg-rose-100 rounded-full px-2 shrink-0"></div><div class="h-3 bg-rose-100 rounded-full px-2 shrink-0"></div></div>
+                <div class="grid grid-cols-3 gap-1"><% for(let i=0;i<6;i++){ %><div class="h-8 bg-slate-100 rounded-lg"></div><% } %></div>
+              <% } else if(konfig.duzen==='gorsel-odakli'){ %>
+                <div class="grid grid-cols-2 gap-1">
+                  <% for(let i=0;i<4;i++){ %><div class="h-12 rounded-lg bg-orange-<%= 100+i*50 %> relative"><div class="absolute bottom-1 left-1 right-1 h-2 bg-black/30 rounded"></div></div><% } %>
+                </div>
+              <% } else if(konfig.duzen==='kompakt'){ %>
+                <div class="space-y-0.5">
+                  <% for(let i=0;i<8;i++){ %><div class="flex justify-between items-center py-0.5 border-b border-teal-50"><div class="h-1.5 bg-teal-100 rounded w-1/2"></div><div class="h-1.5 bg-teal-400 rounded w-8"></div></div><% } %>
+                </div>
+              <% } else if(konfig.duzen==='premium'){ %>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <% for(let i=0;i<4;i++){ %><div class="h-12 bg-purple-900/40 rounded-lg border border-purple-400/20 backdrop-blur flex items-end p-1"><div class="h-2 bg-purple-300/50 rounded w-3/4"></div></div><% } %>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tema bilgisi -->
+      <div class="flex-1">
+        <div class="inline-flex items-center gap-1.5 bg-violet-50 text-violet-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-4">
+          <span>🎨</span> <%= konfig.duzen.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ') %> Düzeni
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl font-black text-slate-900 mb-3"><%= tema.name %></h1>
+        <p class="text-slate-500 text-lg mb-2"><%= tema.description %></p>
+        <p class="text-slate-400 text-sm italic mb-6">"<%= konfig.aciklama %>"</p>
+
+        <!-- Fiyat -->
+        <div class="flex items-baseline gap-3 mb-8">
+          <span class="text-5xl font-black text-slate-900">₺<%= Number(tema.price).toFixed(0) %></span>
+          <span class="text-slate-300 line-through text-2xl">₺<%= (Number(tema.price)*2).toFixed(0) %></span>
+          <span class="bg-green-100 text-green-700 text-sm font-bold px-2.5 py-0.5 rounded-full">%50 indirim</span>
+        </div>
+
+        <!-- Özellikler -->
+        <% if (tema.features && tema.features.length > 0) { %>
+        <ul class="space-y-2 mb-8">
+          <% tema.features.forEach(function(f){ %>
+          <li class="flex items-center gap-2 text-slate-700 text-sm">
+            <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+            <%= f %>
+          </li>
+          <% }); %>
+        </ul>
+        <% } %>
+
+        <!-- CTA butonlar -->
+        <% if (satin_alindi) { %>
+          <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3 mb-4">
+            <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <p class="text-green-700 text-sm font-medium">Bu temayı satın aldınız — Menünüz aktif!</p>
+          </div>
+          <a href="/admin" class="block w-full text-center bg-violet-600 hover:bg-violet-700 text-white font-bold py-4 rounded-xl gecis text-lg mb-3">
+            Menüyü Düzenle →
+          </a>
+        <% } else { %>
+          <div class="flex gap-3 mb-4">
+            <a href="/onizleme/<%= tema.slug %>"
+              class="flex-1 text-center border-2 border-violet-200 text-violet-700 hover:bg-violet-50 font-bold py-4 rounded-xl gecis">
+              Canlı Önizle →
+            </a>
+            <a href="/odeme/simule?temaSlug=<%= tema.slug %>"
+              class="flex-1 text-center bg-violet-600 hover:bg-violet-700 text-white font-bold py-4 rounded-xl gecis shadow-lg shadow-violet-200">
+              Satın Al — ₺<%= Number(tema.price).toFixed(0) %>
+            </a>
+          </div>
+        <% } %>
+        <p class="text-xs text-slate-400 text-center">🔒 Güvenli ödeme · Ömür boyu lisans · 30 gün iade</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÖZELLİK KARTLARI -->
+  <section class="max-w-6xl mx-auto px-4 py-14">
+    <h2 class="text-2xl font-black text-slate-900 mb-8 text-center">Bu Temada Neler Var?</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <%
+        var ozellikler = [
+          {ikon:'📱', baslik:'Mobil Öncelikli', aciklama:'Her cihazda mükemmel görünüm'},
+          {ikon:'🗂️', baslik:'Sınırsız Kategori', aciklama:'İstediğiniz kadar kategori'},
+          {ikon:'🍽️', baslik:'Sınırsız Ürün', aciklama:'Ürün sınırı yok'},
+          {ikon:'📸', baslik:'Fotoğraf Desteği', aciklama:'Her ürüne görsel ekleyin'},
+          {ikon:'🔗', baslik:'QR Kod', aciklama:'Anlık QR kod oluşturma'},
+          {ikon:'⚡', baslik:'Hızlı Yükleme', aciklama:'Hızlı müşteri deneyimi'},
+        ];
+        ozellikler.forEach(function(o){
+      %>
+      <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+        <div class="text-3xl mb-3"><%= o.ikon %></div>
+        <h3 class="font-bold text-slate-800 text-sm mb-1"><%= o.baslik %></h3>
+        <p class="text-xs text-slate-400"><%= o.aciklama %></p>
+      </div>
+      <% }); %>
+    </div>
+  </section>
+
+  <!-- ALT CTA (sadece satın alınmamışsa) -->
+  <% if (!satin_alindi) { %>
+  <section class="bg-gradient-to-r from-violet-600 to-purple-700 py-14 text-white text-center">
+    <div class="max-w-2xl mx-auto px-4">
+      <h2 class="text-3xl font-black mb-4"><%= tema.name %> ile Hemen Başlayın</h2>
+      <p class="text-violet-100 mb-8">Bugün satın al, bugün yayında ol. Ömür boyu lisans.</p>
+      <div class="flex justify-center gap-4 flex-wrap">
+        <a href="/onizleme/<%= tema.slug %>" class="bg-white/15 border border-white/30 text-white font-bold py-3 px-6 rounded-xl hover:bg-white/25 gecis">
+          Önce Önizle →
+        </a>
+        <a href="/odeme/simule?temaSlug=<%= tema.slug %>" class="bg-white text-violet-700 font-black py-3 px-8 rounded-xl hover:bg-violet-50 gecis shadow-lg">
+          Satın Al — ₺<%= Number(tema.price).toFixed(0) %>
+        </a>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+</body>
+</html>

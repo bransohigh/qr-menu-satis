@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard – QR Menu Admin</title>
+  <style>
+    <%- include('../partials/admin-styles') %>
+  </style>
+</head>
+<body>
+  <%- include('../partials/admin-nav', { active: 'dashboard' }) %>
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Dashboard</h1>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Categories</div>
+        <div class="stat-value"><%= categoryCount %></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Products</div>
+        <div class="stat-value"><%= productCount %></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Theme</div>
+        <div class="stat-value" style="font-size:1rem"><%= menu.theme.name %></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem">Your Public Menu URL</h2>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+        <a href="<%= publicUrl %>" target="_blank" class="menu-url"><%= publicUrl %></a>
+        <button class="btn btn-sm btn-outline" onclick="copyUrl()">Copy URL</button>
+        <a href="/api/qr" class="btn btn-sm btn-success" download="qr-code.png">Download QR Code</a>
+      </div>
+      <div style="margin-top:1.5rem">
+        <p style="font-size:.82rem;color:#64748b;margin-bottom:.75rem">QR Code preview (scan to open your menu):</p>
+        <img id="qr-img" src="/api/qr" alt="QR Code" style="width:180px;height:180px;border:1px solid #e2e8f0;border-radius:8px;display:block;"/>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem">Quick Actions</h2>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+        <a href="/admin/categories" class="btn btn-primary">Manage Categories</a>
+        <a href="/admin/products" class="btn btn-primary">Manage Products</a>
+        <a href="<%= publicUrl %>" target="_blank" class="btn btn-outline">Preview Menu</a>
+      </div>
+    </div>
+  </div><!-- /.main-content -->
+</div><!-- /.layout -->
+  <script>
+    function copyUrl() {
+      navigator.clipboard.writeText('<%= publicUrl %>').then(() => {
+        alert('URL copied to clipboard!');
+      });
+    }
+  </script>
+</body>
+</html>

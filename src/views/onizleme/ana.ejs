@@ -1,0 +1,586 @@
+<%
+// ─── Tema konfigürasyonu kısaltmaları ──────────────────────────────────────
+var d = konfig.duzen;
+var koyu = konfig.koyuMod;
+// Renk tokenleri
+var renkler = {
+  'klasik-liste':    { vurgu:'indigo', bg:'slate-50', yazi:'slate-800', kart:'white' },
+  'kart-duzen':      { vurgu:'violet', bg:'violet-50', yazi:'slate-900', kart:'white' },
+  'minimal':         { vurgu:'stone',  bg:'stone-50',  yazi:'stone-900', kart:'white' },
+  'gece-modu':       { vurgu:'cyan',   bg:'slate-950', yazi:'white',     kart:'slate-900' },
+  'kapakli':         { vurgu:'amber',  bg:'slate-50',  yazi:'slate-900', kart:'white' },
+  'sol-menu':        { vurgu:'emerald',bg:'slate-50',  yazi:'slate-900', kart:'white' },
+  'kategori-seridi': { vurgu:'rose',   bg:'slate-50',  yazi:'slate-900', kart:'white' },
+  'gorsel-odakli':   { vurgu:'orange', bg:'slate-100', yazi:'slate-900', kart:'white' },
+  'kompakt':         { vurgu:'teal',   bg:'white',     yazi:'slate-900', kart:'slate-50' },
+  'premium':         { vurgu:'purple', bg:'slate-950', yazi:'white',     kart:'slate-900' },
+}[d] || { vurgu:'indigo', bg:'slate-50', yazi:'slate-900', kart:'white' };
+%><!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title><%= baslik %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    body{font-family:'Inter',system-ui,sans-serif;} .gecis{transition:all .2s ease;}
+    .no-scrollbar::-webkit-scrollbar{display:none;} .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .4s ease both;}
+    .glass{background:rgba(255,255,255,.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);}
+    .glass-dark{background:rgba(0,0,0,.3);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);}
+  </style>
+</head>
+<body class="min-h-screen
+  <% if(d==='gece-modu'){%>bg-slate-950 text-white<%}else if(d==='premium'){%>bg-[#0a0a1a] text-white<%}else if(d==='kompakt'){%>bg-white text-slate-900<%}else if(d==='minimal'){%>bg-stone-50 text-stone-900<%}else{%>bg-slate-50 text-slate-900<%}%>">
+
+<!-- ── ÖNIZLEME BANTI ────────────────────────────────────────────────────── -->
+<div class="sticky top-0 z-[60] bg-amber-400 text-amber-950 text-xs font-bold flex items-center justify-between px-4 py-2.5 shadow-sm">
+  <span>👀 ÖNİZLEME — Demo içerik gösteriliyor, gerçek menü değil.</span>
+  <a href="/temalar/<%= tema.slug %>" class="bg-amber-900 text-amber-50 px-3 py-1 rounded-full text-xs hover:bg-amber-800 gecis">
+    ₺<%= Number(tema.price).toFixed(0) %> Satın Al →
+  </a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+ 1. KLASİK LİSTE
+══════════════════════════════════════════════════════════════════════════════ -->
+<% if (d === 'klasik-liste') { %>
+
+<header class="bg-white border-b border-slate-200 sticky top-8 z-50">
+  <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+    <div class="font-bold text-slate-800 text-base">🍽 <%= menu.businessName %></div>
+    <nav class="flex gap-3 text-xs text-slate-500">
+      <% kategoriler.forEach(function(k){ %><a href="#kat-<%= k.id %>" class="hover:text-indigo-600 gecis"><%= k.name %></a><% }); %>
+    </nav>
+  </div>
+</header>
+
+<div class="bg-indigo-700 text-white py-10 text-center">
+  <h1 class="text-3xl font-extrabold mb-1"><%= menu.businessName %></h1>
+  <p class="text-indigo-200 text-sm"><%= menu.aciklama %></p>
+</div>
+
+<main class="max-w-3xl mx-auto px-4 py-8 space-y-10">
+  <% kategoriler.forEach(function(kat){ var urunler = urunlerKategoriye[kat.id]||[]; %>
+  <section id="kat-<%= kat.id %>">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-2xl"><%= kat.emoji %></span>
+      <h2 class="text-xl font-bold text-indigo-800 border-b border-indigo-100 pb-1 flex-1"><%= kat.name %></h2>
+    </div>
+    <div class="space-y-0">
+      <% urunler.forEach(function(u){ %>
+      <a href="<%= baseUrl %>/u/<%= u.slug %>"
+         class="flex items-center gap-4 py-4 border-b border-slate-100 hover:bg-slate-50 gecis group px-2 -mx-2 rounded">
+        <% if (u.imageUrl) { %>
+          <img src="<%= u.imageUrl %>" alt="<%= u.name %>" class="w-16 h-16 rounded-lg object-cover shrink-0"/>
+        <% } else { %>
+          <div class="w-16 h-16 rounded-lg bg-slate-100 flex items-center justify-center text-2xl shrink-0">🍽</div>
+        <% } %>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-slate-800 truncate"><%= u.name %></p>
+          <p class="text-slate-400 text-xs line-clamp-2 mt-0.5"><%= u.description %></p>
+          <% if(u.etiketler&&u.etiketler.length){ %>
+          <div class="flex gap-1 mt-1.5">
+            <% u.etiketler.slice(0,2).forEach(function(e){ %><span class="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded"><%= e %></span><% }); %>
+          </div>
+          <% } %>
+        </div>
+        <span class="font-bold text-indigo-700 text-base shrink-0">₺<%= u.price %></span>
+      </a>
+      <% }); %>
+    </div>
+  </section>
+  <% }); %>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+ 2. KART DÜZENİ
+══════════════════════════════════════════════════════════════════════════════ -->
+<% } else if (d === 'kart-duzen') { %>
+
+<header class="bg-white border-b border-violet-100 sticky top-8 z-50 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <span class="font-bold text-violet-800">🍽 <%= menu.businessName %></span>
+    <span class="text-xs text-slate-400"><%= kategoriler.length %> kategori · <%= Object.values(urunlerKategoriye).reduce(function(a,b){return a+b.length;},0) %> ürün</span>
+  </div>
+</header>
+
+<div class="bg-gradient-to-r from-violet-600 to-purple-700 text-white py-12 text-center">
+  <h1 class="text-4xl font-black mb-2"><%= menu.businessName %></h1>
+  <p class="text-violet-200"><%= menu.aciklama %></p>
+</div>
+
+<main class="max-w-5xl mx-auto px-4 py-10">
+  <% kategoriler.forEach(function(kat){ var urunler = urunlerKategoriye[kat.id]||[]; %>
+  <section class="mb-12">
+    <h2 class="text-2xl font-bold text-violet-800 mb-6 flex items-center gap-2"><%= kat.emoji %> <%= kat.name %></h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <% urunler.forEach(function(u){ %>
+      <a href="<%= baseUrl %>/u/<%= u.slug %>"
+         class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl gecis border border-slate-100 flex flex-col">
+        <div class="h-44 bg-slate-100 overflow-hidden relative">
+          <% if(u.imageUrl){ %>
+          <img src="<%= u.imageUrl %>" alt="<%= u.name %>" class="w-full h-full object-cover group-hover:scale-105 gecis"/>
+          <% } else { %>
+          <div class="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-violet-100 to-purple-100">🍽</div>
+          <% } %>
+          <% if(u.etiketler&&u.etiketler.length){ %>
+          <div class="absolute top-2 left-2"><span class="bg-violet-600 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full"><%= u.etiketler[0] %></span></div>
+          <% } %>
+        </div>
+        <div class="p-4 flex-1 flex flex-col">
+          <p class="font-bold text-slate-900 mb-1"><%= u.name %></p>
+          <p class="text-xs text-slate-400 line-clamp-2 flex-1"><%= u.description %></p>
+          <div class="flex items-center justify-between mt-3">
+            <span class="text-violet-600 font-black text-lg">₺<%= u.price %></span>
+            <span class="text-xs text-violet-500 bg-violet-50 px-2 py-1 rounded-full group-hover:bg-violet-100 gecis">Detay →</span>
+          </div>
+        </div>
+      </a>
+      <% }); %>
+    </div>
+  </section>
+  <% }); %>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+ 3. MİNİMAL
+══════════════════════════════════════════════════════════════════════════════ -->
+<% } else if (d === 'minimal') { %>
+
+<header class="bg-stone-50 border-b border-stone-200 sticky top-8 z-50">
+  <div class="max-w-2xl mx-auto px-6 h-16 flex items-center justify-between">
+    <span class="font-light text-stone-400 tracking-widest text-xs uppercase"><%= menu.businessName %></span>
+  </div>
+</header>
+
+<div class="max-w-2xl mx-auto px-6 pt-16 pb-8">
+  <p class="text-stone-300 text-xs tracking-[0.3em] uppercase mb-3">Menü</p>
+  <h1 class="font-['Playfair_Display',serif] text-5xl font-bold text-stone-800 mb-2"><%= menu.businessName %></h1>
+  <p class="text-stone-400"><%= menu.aciklama %></p>
+</div>
+
+<main class="max-w-2xl mx-auto px-6 pb-20">
+  <% kategoriler.forEach(function(kat){ var urunler = urunlerKategoriye[kat.id]||[]; %>
+  <section class="mb-14 border-t-2 border-stone-200 pt-10">
+    <p class="text-stone-300 text-[11px] tracking-[0.3em] uppercase mb-2"><%= kat.emoji %></p>
+    <h2 class="font-['Playfair_Display',serif] text-3xl text-stone-700 font-bold mb-8"><%= kat.name %></h2>
+    <div class="space-y-8">
+      <% urunler.forEach(function(u){ %>
+      <a href="<%= baseUrl %>/u/<%= u.slug %>" class="flex gap-6 items-start group">
+        <% if(u.imageUrl){ %>
+        <img src="<%= u.imageUrl %>" alt="" class="w-20 h-20 object-cover rounded-lg shrink-0 opacity-90 group-hover:opacity-100 gecis"/>
+        <% } %>
+        <div class="flex-1 border-b border-stone-100 pb-8">
+          <div class="flex justify-between items-start">
+            <p class="font-semibold text-stone-800 text-base group-hover:text-stone-600 gecis"><%= u.name %></p>
+            <span class="font-light text-stone-500 ml-4 shrink-0">₺<%= u.price %></span>
+          </div>
+          <p class="text-stone-400 text-sm mt-1 leading-relaxed"><%= u.description %></p>
+        </div>
+      </a>
+      <% }); %>
+    </div>
+  </section>
+  <% }); %>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+ 4. GECE MODU
+══════════════════════════════════════════════════════════════════════════════ -->
+<% } else if (d === 'gece-modu') { %>
+
+<header class="bg-slate-950 border-b border-slate-800 sticky top-8 z-50">
+  <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <span class="font-bold text-cyan-400">⚡ <%= menu.businessName %></span>
+    <div class="flex gap-2">
+      <% kategoriler.forEach(function(k){ %><a href="#gece-<%= k.id %>" class="text-slate-400 hover:text-cyan-400 text-xs gecis"><%= k.name %></a><% }); %>
+    </div>
+  </div>
+</header>
+
+<div class="bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950 text-white py-16 text-center border-b border-slate-800">
+  <div class="max-w-2xl mx-auto px-4">
+    <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse inline-block mb-4"></div>
+    <h1 class="text-4xl font-black text-white mb-2"><%= menu.businessName %></h1>
+    <p class="text-slate-400"><%= menu.aciklama %></p>
+  </div>
+</div>
+
+<main class="max-w-5xl mx-auto px-4 py-10 space-y-12">
+  <% kategoriler.forEach(function(kat){ var urunler = urunlerKategoriye[kat.id]||[]; %>
+  <section id="gece-<%= kat.id %>">
+    <h2 class="text-lg font-bold text-cyan-400 mb-6 flex items-center gap-2 tracking-wider uppercase">
+      <span class="w-6 h-px bg-cyan-400 inline-block"></span><%= kat.emoji %> <%= kat.name %>
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% urunler.forEach(function(u){ %>
+      <a href="<%= baseUrl %>/u/<%= u.slug %>"
+         class="group bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-xl overflow-hidden gecis flex flex-col">
+        <% if(u.imageUrl){ %>
+        <div class="h-40 overflow-hidden relative">
+          <img src="<%= u.imageUrl %>" alt="<%= u.name %>" class="w-full h-full object-cover opacity-70 group-hover:opacity-90 gecis group-hover:scale-105"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+        </div>
+        <% } %>
+        <div class="p-4 flex-1 flex flex-col">
+          <p class="font-bold text-white mb-1"><%= u.name %></p>
+          <p class="text-slate-400 text-xs line-clamp-2 flex-1"><%= u.description %></p>
+          <div class="flex justify-between items-center mt-3">
+            <span class="text-cyan-400 font-black text-base">₺<%= u.price %></span>
+            <span class="text-[10px] text-slate-500 group-hover:text-cyan-400 gecis">incele →</span>
+          </div>
+        </div>
+      </a>
+      <% }); %>
+    </div>
+  </section>
+  <% }); %>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+ 5. KAPAKLI (HERO + SEKMELER)
+══════════════════════════════════════════════════════════════════════════════ -->
+<% } else if (d === 'kapakli') { %>
+
+<!-- Hero -->
+<div class="relative h-64 sm:h-80 overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-600"></div>
+  <div class="absolute inset-0 bg-black/30"></div>
+  <div class="relative h-full flex flex-col items-center justify-center text-white text-center px-4">
+    <span class="text-4xl mb-3"><%= kategoriler[0]?.emoji || '🍽' %></span>
+    <h1 class="text-4xl font-black mb-2"><%= menu.businessName %></h1>
+    <p class="text-white/80"><%= menu.aciklama %></p>
+  </div>
+</div>
+
+<!-- Sekme kategoriler -->
+<div class="sticky top-8 z-50 bg-white border-b border-slate-200 shadow-sm">
+  <div class="max-w-4xl mx-auto px-4">
+    <div class="flex gap-1 overflow-x-auto py-2 no-scrollbar">
+      <% kategoriler.forEach(function(kat,i){ %>
+      <a href="#kapak-<%= kat.id %>"
+         class="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold gecis
+           <%= i===0 ? 'bg-amber-500 text-white' : 'text-slate-600 hover:bg-slate-100' %>">
+        <span><%= kat.emoji %></span><span><%= kat.name %></span>
+      </a>
+      <% }); %>
+    </div>
+  </div>
+</div>
+
+<main class="max-w-4xl mx-auto px-4 py-8 space-y-14">
+  <% kategoriler.forEach(function(kat){ var urunler = urunlerKategoriye[kat.id]||[]; %>
+  <section id="kapak-<%= kat.id %>">
+    <!-- Kategori başlık balonu -->
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-xl"><%= kat.emoji %></div>
+      <div>
+        <h2 class="font-bold text-slate-900 text-xl"><%= kat.name %></h2>
+        <p class="text-xs text-slate-400"><%= urunler.length %> ürün</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <% urunler.forEach(function(u){ %>
+      <a href="<%= baseUrl %>/u/<%= u.slug %>"
+         class="flex gap-3 bg-white border border-slate-100 rounded-2xl p-3 hover:shadow-md gecis group">
+        <% if(u.imageUrl){ %>
+        <img src="<%= u.imageUrl %>" alt="<%= u.name %>" class="w-20 h-20 object-cover rounded-xl shrink-0"/>
+        <% } else { %>
+        <div class="w-20 h-20 bg-amber-50 rounded-xl flex items-center justify-center text-3xl shrink-0"><%= kat.emoji %></div>
+        <% } %>
+        <div class="flex-1 min-w-0 flex flex-col justify-center">
+          <p class="font-semibold text-slate-800 truncate"><%= u.name %></p>
+          <p class="text-xs text-slate-400 line-clamp-2 mt-0.5"><%= u.description %></p>
+          <span class="font-bold text-amber-600 mt-1.5">₺<%= u.price %></span>
+        </div>
+      </a>
+      <% }); %>
+    </div>
+  </section>
+  <% }); %>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+ 6. SOL MENÜ (SIDEBAR)
+══════════════════════════════════════════════════════════════════════════════ -->
+<% } else if (d === 'sol-menu') { %>
+
+<div class="sticky top-8 z-50 bg-white border-b border-slate-200 shadow-sm md:hidden">
+  <div class="px-4 h-12 flex items-center gap-3 overflow-x-auto no-scrollbar">
+    <% kategoriler.forEach(function(kat){ %><a href="#sidebar-<%= kat.id %>" class="shrink-0 text-sm font-medium text-slate-600 hover:text-emerald-700 gecis whitespace-nowrap"><%= kat.emoji %> <%= kat.name %></a><% }); %>
+  </div>
+</div>
+
+<div class="flex min-h-screen">
+  <!-- Sol sidebar -->
+  <aside class="hidden md:flex flex-col w-64 bg-emerald-900 text-white sticky top-8 h-[calc(100vh-2rem)] shrink-0">
+    <div class="p-6 border-b border-emerald-800">
+      <p class="text-emerald-300 text-xs tracking-wider uppercase mb-1">Menü</p>
+      <h1 class="font-bold text-xl"><%= menu.businessName %></h1>
+    </div>
+    <nav class="flex-1 overflow-y-auto p-4 space-y-1">
+      <% kategoriler.forEach(function(kat){ %>
+      <a href="#sidebar-<%= kat.id %>"
+         class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-emerald-200 hover:bg-emerald-800 hover:text-white gecis">
+        <span class="text-lg"><%= kat.emoji %></span>
+        <span><%= kat.name %></span>
+      </a>
+      <% }); %>
+    </nav>
+    <div class="p-4 border-t border-emerald-800">
+      <p class="text-emerald-400 text-[11px]"><%= menu.aciklama %></p>
+    </div>
+  </aside>
+
+  <!-- Ana içerik -->
+  <main class="flex-1 px-4 sm:px-8 py-8 max-w-3xl">
+    <% kategoriler.forEach(function(kat){ var urunler = urunlerKategoriye[kat.id]||[]; %>
+    <section id="sidebar-<%= kat.id %>" class="mb-14 scroll-mt-24">
+      <h2 class="text-xl font-bold text-emerald-800 mb-5 flex items-center gap-2 pb-2 border-b-2 border-emerald-100">
+        <span><%= kat.emoji %></span><span><%= kat.name %></span>
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <% urunler.forEach(function(u){ %>
+        <a href="<%= baseUrl %>/u/<%= u.slug %>"
+           class="flex gap-3 p-3 bg-white rounded-xl border border-slate-100 hover:border-emerald-200 hover:shadow-md gecis group">
+          <% if(u.imageUrl){ %>
+          <img src="<%= u.imageUrl %>" alt="<%= u.name %>" class="w-16 h-16 object-cover rounded-lg shrink-0"/>
+          <% }else{ %>
+          <div class="w-16 h-16 bg-emerald-50 rounded-lg flex items-center justify-center text-2xl shrink-0"><%= kat.emoji %></div>
+          <% } %>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-slate-800 text-sm truncate"><%= u.name %></p>
+            <p class="text-xs text-slate-400 line-clamp-2 mt-0.5"><%= u.description %></p>
+            <span class="text-emerald-700 font-bold text-sm mt-1 block">₺<%= u.price %></span>
+          </div>
+        </a>
+        <% }); %>
+      </div>
+    </section>
+    <% }); %>
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+ 7. KATEGORİ ŞERİDİ
+══════════════════════════════════════════════════════════════════════════════ -->
+<% } else if (d === 'kategori-seridi') { %>
+
+<header class="bg-white border-b border-slate-100 sticky top-8 z-50">
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="h-12 flex items-center justify-between mb-0">
+      <span class="font-bold text-rose-700">🍽 <%= menu.businessName %></span>
+    </div>
+    <!-- Kategori pill şeridi -->
+    <div class="flex gap-2 pb-3 overflow-x-auto no-scrollbar">
+      <% kategoriler.forEach(function(kat,i){ %>
+      <a href="#serit-<%= kat.id %>"
+         class="shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold gecis
+           <%= i===0 ? 'bg-rose-500 text-white shadow-sm' : 'bg-rose-50 text-rose-700 hover:bg-rose-100' %>">
+        <span><%= kat.emoji %></span><span><%= kat.name %></span>
+      </a>
+      <% }); %>
+    </div>
+  </div>
+</header>
+
+<div class="bg-gradient-to-br from-rose-600 to-pink-700 text-white py-10 text-center">
+  <h1 class="text-3xl font-black"><%= menu.businessName %></h1>
+  <p class="text-rose-200 text-sm mt-1"><%= menu.aciklama %></p>
+</div>
+
+<main class="max-w-5xl mx-auto px-4 py-8 space-y-12">
+  <% kategoriler.forEach(function(kat){ var urunler = urunlerKategoriye[kat.id]||[]; %>
+  <section id="serit-<%= kat.id %>" class="scroll-mt-28">
+    <div class="flex items-center gap-2 mb-5">
+      <span class="text-2xl"><%= kat.emoji %></span>
+      <h2 class="text-xl font-bold text-rose-700"><%= kat.name %></h2>
+      <span class="text-xs text-slate-300 font-medium">(<%= urunler.length %>)</span>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      <% urunler.forEach(function(u){ %>
+      <a href="<%= baseUrl %>/u/<%= u.slug %>"
+         class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg gecis border border-rose-50">
+        <div class="h-32 bg-rose-50 overflow-hidden">
+          <% if(u.imageUrl){ %>
+          <img src="<%= u.imageUrl %>" alt="<%= u.name %>" class="w-full h-full object-cover group-hover:scale-105 gecis"/>
+          <% }else{ %>
+          <div class="w-full h-full flex items-center justify-center text-3xl"><%= kat.emoji %></div>
+          <% } %>
+        </div>
+        <div class="p-3">
+          <p class="font-semibold text-slate-800 text-sm truncate"><%= u.name %></p>
+          <span class="font-bold text-rose-600 text-sm">₺<%= u.price %></span>
+        </div>
+      </a>
+      <% }); %>
+    </div>
+  </section>
+  <% }); %>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+ 8. GÖRSEL ODAKLI
+══════════════════════════════════════════════════════════════════════════════ -->
+<% } else if (d === 'gorsel-odakli') { %>
+
+<header class="bg-white border-b border-slate-200 sticky top-8 z-50 shadow-sm">
+  <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+    <span class="font-black text-orange-600">📸 <%= menu.businessName %></span>
+    <div class="flex gap-2 overflow-x-auto no-scrollbar">
+      <% kategoriler.forEach(function(k){ %><a href="#gorsel-<%= k.id %>" class="shrink-0 text-xs text-slate-500 hover:text-orange-600 gecis"><%= k.name %></a><% }); %>
+    </div>
+  </div>
+</header>
+
+<div class="bg-orange-600 text-white py-10 text-center">
+  <h1 class="text-4xl font-black"><%= menu.businessName %></h1>
+  <p class="text-orange-100 mt-1"><%= menu.aciklama %></p>
+</div>
+
+<main class="max-w-6xl mx-auto px-4 py-8 space-y-10">
+  <% kategoriler.forEach(function(kat){ var urunler = urunlerKategoriye[kat.id]||[]; %>
+  <section id="gorsel-<%= kat.id %>">
+    <h2 class="text-xl font-bold text-orange-700 mb-5 border-l-4 border-orange-400 pl-3"><%= kat.emoji %> <%= kat.name %></h2>
+    <!-- Görsel ağırlıklı grid: imlk ürün büyük, geri kalanlar küçük -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <% urunler.forEach(function(u, ui){ %>
+      <a href="<%= baseUrl %>/u/<%= u.slug %>"
+         class="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl gecis
+           <%= ui===0 ? 'row-span-2 sm:col-span-2' : '' %>"
+         style="min-height:<%= ui===0?'300px':'140px' %>;">
+        <!-- Görsel (tam alan kaplar) -->
+        <% if(u.imageUrl){ %>
+        <img src="<%= u.imageUrl %>" alt="<%= u.name %>" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 gecis"/>
+        <% }else{ %>
+        <div class="absolute inset-0 bg-gradient-to-br from-orange-200 to-amber-300 flex items-center justify-center text-4xl"><%= kat.emoji %></div>
+        <% } %>
+        <!-- Alt içerik bandı -->
+        <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+          <p class="text-white font-bold text-sm leading-tight truncate"><%= u.name %></p>
+          <div class="flex justify-between items-center mt-1">
+            <p class="text-white/70 text-[11px] line-clamp-1"><%= u.description.slice(0,40) %>...</p>
+            <span class="text-orange-300 font-black text-sm shrink-0 ml-2">₺<%= u.price %></span>
+          </div>
+        </div>
+      </a>
+      <% }); %>
+    </div>
+  </section>
+  <% }); %>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+ 9. KOMPAKT
+══════════════════════════════════════════════════════════════════════════════ -->
+<% } else if (d === 'kompakt') { %>
+
+<header class="bg-teal-900 text-white sticky top-8 z-50">
+  <div class="max-w-3xl mx-auto px-4 h-12 flex items-center justify-between text-sm">
+    <span class="font-bold"><%= menu.businessName %></span>
+    <div class="flex gap-3 text-teal-300 text-xs">
+      <% kategoriler.forEach(function(k){ %><a href="#kompakt-<%= k.id %>" class="hover:text-white gecis"><%= k.name %></a><% }); %>
+    </div>
+  </div>
+</header>
+
+<div class="bg-teal-800 text-white py-6 border-b border-teal-700">
+  <div class="max-w-3xl mx-auto px-4">
+    <h1 class="text-2xl font-black"><%= menu.businessName %></h1>
+    <p class="text-teal-300 text-sm"><%= menu.aciklama %></p>
+  </div>
+</div>
+
+<main class="max-w-3xl mx-auto px-4 py-6 space-y-8">
+  <% kategoriler.forEach(function(kat){ var urunler = urunlerKategoriye[kat.id]||[]; %>
+  <section id="kompakt-<%= kat.id %>">
+    <div class="flex items-center gap-2 mb-3 pb-1 border-b-2 border-teal-200">
+      <span class="text-lg"><%= kat.emoji %></span>
+      <h2 class="font-bold text-teal-800"><%= kat.name %></h2>
+      <span class="text-xs text-slate-400 ml-auto"><%= urunler.length %> ürün</span>
+    </div>
+    <div class="space-y-0">
+      <% urunler.forEach(function(u){ %>
+      <a href="<%= baseUrl %>/u/<%= u.slug %>"
+         class="flex items-center justify-between py-2.5 border-b border-slate-100 hover:bg-teal-50 gecis px-2 -mx-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <% if(u.imageUrl){ %>
+          <img src="<%= u.imageUrl %>" alt="" class="w-8 h-8 object-cover rounded shrink-0"/>
+          <% }else{ %>
+          <span class="text-base shrink-0"><%= kat.emoji %></span>
+          <% } %>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-slate-800 truncate"><%= u.name %></p>
+            <p class="text-xs text-slate-400 truncate"><%= u.description.slice(0,50) %>...</p>
+          </div>
+        </div>
+        <span class="font-bold text-teal-700 text-sm shrink-0 ml-3">₺<%= u.price %></span>
+      </a>
+      <% }); %>
+    </div>
+  </section>
+  <% }); %>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+ 10. PREMİUM (Glassmorphism)
+══════════════════════════════════════════════════════════════════════════════ -->
+<% } else if (d === 'premium') { %>
+
+<header class="bg-[#0a0a1a]/90 backdrop-blur border-b border-purple-900/50 sticky top-8 z-50">
+  <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+    <span class="font-black text-transparent bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-lg">✦ <%= menu.businessName %></span>
+    <div class="flex gap-3">
+      <% kategoriler.forEach(function(k){ %><a href="#prem-<%= k.id %>" class="text-purple-400 hover:text-purple-200 text-xs gecis"><%= k.name %></a><% }); %>
+    </div>
+  </div>
+</header>
+
+<div class="relative bg-gradient-to-br from-[#0a0a1a] via-purple-950 to-[#0a0a1a] py-20 text-white text-center overflow-hidden">
+  <div class="absolute inset-0" style="background-image:radial-gradient(circle at 50% 50%,rgba(139,92,246,.15) 0%,transparent 70%);"></div>
+  <div class="relative">
+    <div class="text-5xl mb-4">✦</div>
+    <h1 class="text-5xl font-black bg-gradient-to-r from-purple-200 via-pink-200 to-indigo-200 bg-clip-text text-transparent mb-3"><%= menu.businessName %></h1>
+    <p class="text-purple-300 text-sm tracking-widest uppercase"><%= menu.aciklama %></p>
+  </div>
+</div>
+
+<main class="max-w-6xl mx-auto px-4 py-12 space-y-14" style="background:linear-gradient(180deg,#0a0a1a 0%,#100a2a 100%)">
+  <% kategoriler.forEach(function(kat){ var urunler = urunlerKategoriye[kat.id]||[]; %>
+  <section id="prem-<%= kat.id %>">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="text-2xl"><%= kat.emoji %></span>
+      <h2 class="text-lg font-bold text-purple-300 tracking-wider uppercase"><%= kat.name %></h2>
+      <div class="flex-1 h-px bg-gradient-to-r from-purple-800 to-transparent"></div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% urunler.forEach(function(u){ %>
+      <a href="<%= baseUrl %>/u/<%= u.slug %>"
+         class="group glass rounded-2xl overflow-hidden hover:border-purple-500/30 gecis flex flex-col fade-up">
+        <% if(u.imageUrl){ %>
+        <div class="h-40 overflow-hidden relative">
+          <img src="<%= u.imageUrl %>" alt="<%= u.name %>" class="w-full h-full object-cover opacity-60 group-hover:opacity-80 gecis group-hover:scale-105"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        </div>
+        <% } %>
+        <div class="p-4 flex-1 flex flex-col">
+          <p class="font-bold text-white mb-1 group-hover:text-purple-200 gecis"><%= u.name %></p>
+          <p class="text-purple-300/70 text-xs line-clamp-2 flex-1"><%= u.description %></p>
+          <div class="flex justify-between items-center mt-3">
+            <span class="font-black text-transparent bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-sm">₺<%= u.price %></span>
+            <span class="text-purple-500 text-[10px] group-hover:text-purple-300 gecis">✦ incele</span>
+          </div>
+        </div>
+      </a>
+      <% }); %>
+    </div>
+  </section>
+  <% }); %>
+</main>
+
+<% } %>
+
+</body>
+</html>

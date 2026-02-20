@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  menu         Menu?
+  purchases    Purchase[]
+
+  @@map("users")
+}
+
+model Theme {
+  id           String     @id @default(cuid())
+  name         String
+  slug         String     @unique
+  templateKey  String     @unique @map("template_key")
+  previewImage String     @map("preview_image")
+  description  String     @default("")
+  price        Decimal    @default(29.99) @db.Decimal(10, 2)
+  currency     String     @default("USD")
+  features     String[]   @default([])
+  createdAt    DateTime   @default(now()) @map("created_at")
+  menus        Menu[]
+  purchases    Purchase[]
+
+  @@map("themes")
+}
+
+model Menu {
+  id           String     @id @default(cuid())
+  userId       String     @unique @map("user_id")
+  themeId      String     @map("theme_id")
+  slug         String     @unique
+  businessName String?    @map("business_name")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme        Theme      @relation(fields: [themeId], references: [id])
+  categories   Category[]
+  products     Product[]
+
+  @@map("menus")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  menuId    String    @map("menu_id")
+  name      String
+  slug      String    @default("") @map("slug")
+  sortOrder Int       @default(0) @map("sort_order")
+  createdAt DateTime  @default(now()) @map("created_at")
+  menu      Menu      @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  products  Product[]
+
+  @@unique([menuId, slug])
+  @@map("categories")
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  menuId      String    @map("menu_id")
+  categoryId  String    @map("category_id")
+  name        String
+  slug        String    @default("") @map("slug")
+  description String    @default("")
+  price       Decimal   @db.Decimal(10, 2)
+  imageUrl    String?   @map("image_url")
+  views       Int       @default(0)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  menu        Menu      @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([menuId, slug])
+  @@map("products")
+}
+
+model Purchase {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  themeId     String   @map("theme_id")
+  amount      Decimal  @db.Decimal(10, 2)
+  currency    String   @default("USD")
+  // status: pending | paid | failed | refunded
+  status      String   @default("pending")
+  // provider: fakepay | stripe | iyzico
+  provider    String   @default("fakepay")
+  providerRef String?  @map("provider_ref")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme       Theme    @relation(fields: [themeId], references: [id])
+
+  @@map("purchases")
+}

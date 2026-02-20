@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products – QR Menu Admin</title>
+  <style><%- include('../partials/admin-styles') %></style>
+</head>
+<body>
+  <%- include('../partials/admin-nav', { active: 'products' }) %>
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Products</h1>
+      <% if (categories.length > 0) { %>
+        <button class="btn btn-primary" onclick="openCreate()">+ Add Product</button>
+      <% } %>
+    </div>
+
+    <div id="flash-msg"></div>
+
+    <% if (categories.length === 0) { %>
+      <div class="card">
+        <div class="empty-state">
+          <p>You need at least one category before adding products.</p>
+          <a href="/admin/categories" class="btn btn-primary">Create a Category</a>
+        </div>
+      </div>
+    <% } else { %>
+      <!-- Category filter -->
+      <div class="card" style="padding:1rem 1.5rem">
+        <form method="GET" action="/admin/products" style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+          <label style="font-size:.85rem;font-weight:600;color:#374151">Filter by category:</label>
+          <select name="categoryId" class="form-control" style="width:auto" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat.id %>" <%= selectedCategoryId === cat.id ? 'selected' : '' %>><%= cat.name %></option>
+            <% }) %>
+          </select>
+          <% if (selectedCategoryId) { %>
+            <a href="/admin/products" class="btn btn-ghost btn-sm">Clear</a>
+          <% } %>
+        </form>
+      </div>
+
+      <div class="card">
+        <% if (products.length === 0) { %>
+          <div class="empty-state">
+            <p>No products<%= selectedCategoryId ? ' in this category' : '' %> yet.</p>
+            <button class="btn btn-primary" onclick="openCreate()">+ Add Product</button>
+          </div>
+        <% } else { %>
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width:60px">Photo</th>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th style="width:80px">Views</th>
+                <th style="width:160px">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% products.forEach(p => { %>
+                <tr>
+                  <td>
+                    <% if (p.imageUrl) { %>
+                      <img src="<%= p.imageUrl %>" alt="<%= p.name %>" class="img-thumb"/>
+                    <% } else { %>
+                      <div class="no-img-thumb">🍽</div>
+                    <% } %>
+                  </td>
+                  <td>
+                    <strong><%= p.name %></strong>
+                    <% if (p.description) { %>
+                      <br/><small style="color:#94a3b8;font-size:.78rem"><%= p.description.slice(0, 60) %><%= p.description.length > 60 ? '…' : '' %></small>
+                    <% } %>
+                  </td>
+                  <td><code style="font-size:.78rem;color:#6366f1;background:#ede9fe;padding:2px 6px;border-radius:4px"><%= p.slug || '—' %></code></td>
+                  <td><span class="badge badge-purple"><%= p.category ? p.category.name : '—' %></span></td>
+                  <td><strong>$<%= Number(p.price).toFixed(2) %></strong></td>
+                  <td style="text-align:center;font-size:.85rem;color:#64748b"><%= p.views ?? 0 %></td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" onclick='openEdit(<%- JSON.stringify(p) %>)'>Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick='deleteProduct("<%= p.id %>", "<%= p.name.replace(/"/g,"&quot;") %>")'>Delete</button>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Create Product Modal -->
+  <div class="modal-overlay" id="create-modal">
+    <div class="modal">
+      <h3>Add Product</h3>
+      <div id="create-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="c-name" class="form-control" placeholder="Product name"/>
+        </div>
+        <div class="form-group">
+          <label>Price *</label>
+          <input type="number" id="c-price" class="form-control" placeholder="0.00" min="0" step="0.01"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="c-category" class="form-control">
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat.id %>" <%= (selectedCategoryId === cat.id) ? 'selected' : '' %>><%= cat.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="c-desc" class="form-control" rows="2" placeholder="Short description (optional)"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Photo</label>
+        <input type="file" id="c-image" class="form-control" accept="image/*" onchange="previewImg(this,'c-preview')"/>
+        <div class="img-preview-wrap" id="c-preview" style="display:none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeCreate()">Cancel</button>
+        <button class="btn btn-primary" onclick="createProduct()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Product Modal -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <h3>Edit Product</h3>
+      <div id="edit-error" class="alert alert-error" style="display:none"></div>
+      <input type="hidden" id="e-id"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="e-name" class="form-control"/>
+        </div>
+        <div class="form-group">
+          <label>Price *</label>
+          <input type="number" id="e-price" class="form-control" min="0" step="0.01"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="e-category" class="form-control">
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat.id %>"><%= cat.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="e-desc" class="form-control" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Photo (leave empty to keep current)</label>
+        <input type="file" id="e-image" class="form-control" accept="image/*" onchange="previewImg(this,'e-preview')"/>
+        <div class="img-preview-wrap" id="e-current-preview"></div>
+        <div class="img-preview-wrap" id="e-preview" style="display:none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeEdit()">Cancel</button>
+        <button class="btn btn-primary" onclick="updateProduct()">Save Changes</button>
+      </div>
+    </div>
+  </div><!-- /.main-content -->
+</div><!-- /.layout -->
+
+  <script>
+    function previewImg(input, previewId) {
+      const wrap = document.getElementById(previewId);
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          wrap.innerHTML = `<img src="${e.target.result}" alt="Preview"/>`;
+          wrap.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // ── Create ────────────────────────────────────────────────────────────
+    function openCreate() {
+      document.getElementById('create-modal').classList.add('open');
+    }
+    function closeCreate() {
+      document.getElementById('create-modal').classList.remove('open');
+      document.getElementById('create-error').style.display = 'none';
+    }
+
+    async function createProduct() {
+      const name = document.getElementById('c-name').value.trim();
+      const price = document.getElementById('c-price').value;
+      const categoryId = document.getElementById('c-category').value;
+      const description = document.getElementById('c-desc').value.trim();
+      const imageFile = document.getElementById('c-image').files[0];
+      const err = document.getElementById('create-error');
+      err.style.display = 'none';
+
+      if (!name || !price || !categoryId) {
+        err.textContent = 'Name, price, and category are required.';
+        err.style.display = 'block';
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append('name', name);
+      fd.append('price', parseFloat(price).toFixed(2));
+      fd.append('categoryId', categoryId);
+      fd.append('description', description);
+      if (imageFile) fd.append('image', imageFile);
+
+      const res = await fetch('/api/products', { method: 'POST', credentials: 'include', body: fd });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        const data = await res.json();
+        err.textContent = data.error?.message || 'Failed to create product';
+        err.style.display = 'block';
+      }
+    }
+
+    // ── Edit ──────────────────────────────────────────────────────────────
+    function openEdit(p) {
+      document.getElementById('e-id').value = p.id;
+      document.getElementById('e-name').value = p.name;
+      document.getElementById('e-price').value = Number(p.price).toFixed(2);
+      document.getElementById('e-category').value = p.categoryId;
+      document.getElementById('e-desc').value = p.description || '';
+      document.getElementById('e-preview').style.display = 'none';
+      document.getElementById('e-preview').innerHTML = '';
+      document.getElementById('e-image').value = '';
+      const cp = document.getElementById('e-current-preview');
+      cp.innerHTML = p.imageUrl ? `<img src="${p.imageUrl}" alt="Current photo"/>` : '';
+      document.getElementById('edit-error').style.display = 'none';
+      document.getElementById('edit-modal').classList.add('open');
+    }
+    function closeEdit() {
+      document.getElementById('edit-modal').classList.remove('open');
+    }
+
+    async function updateProduct() {
+      const id = document.getElementById('e-id').value;
+      const name = document.getElementById('e-name').value.trim();
+      const price = document.getElementById('e-price').value;
+      const categoryId = document.getElementById('e-category').value;
+      const description = document.getElementById('e-desc').value.trim();
+      const imageFile = document.getElementById('e-image').files[0];
+      const err = document.getElementById('edit-error');
+      err.style.display = 'none';
+
+      if (!name || !price) {
+        err.textContent = 'Name and price are required.';
+        err.style.display = 'block';
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append('name', name);
+      fd.append('price', parseFloat(price).toFixed(2));
+      fd.append('categoryId', categoryId);
+      fd.append('description', description);
+      if (imageFile) fd.append('image', imageFile);
+
+      const res = await fetch(`/api/products/${id}`, { method: 'PATCH', credentials: 'include', body: fd });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        const data = await res.json();
+        err.textContent = data.error?.message || 'Failed to update product';
+        err.style.display = 'block';
+      }
+    }
+
+    // ── Delete ────────────────────────────────────────────────────────────
+    async function deleteProduct(id, name) {
+      if (!confirm(`Delete "${name}"?`)) return;
+      const res = await fetch(`/api/products/${id}`, { method: 'DELETE', credentials: 'include' });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        showFlash('Failed to delete product.', 'error');
+      }
+    }
+
+    function showFlash(msg, type = 'success') {
+      const el = document.getElementById('flash-msg');
+      el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+      setTimeout(() => { el.innerHTML = ''; }, 3000);
+    }
+
+    // Close on backdrop click
+    ['create-modal','edit-modal'].forEach(id => {
+      document.getElementById(id).addEventListener('click', e => {
+        if (e.target.id === id) document.getElementById(id).classList.remove('open');
+      });
+    });
+  </script>
+</body>
+</html>

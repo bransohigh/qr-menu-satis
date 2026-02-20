@@ -1,0 +1,178 @@
+<%
+var d = konfig.duzen;
+var koyu = konfig.koyuMod;
+var onizlemeBase = '/onizleme/' + tema.slug;
+%><!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title><%= kategori.name %> — <%= menu.businessName %> Önizleme</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>body{font-family:'Inter',system-ui,sans-serif;}.gecis{transition:all .2s ease;}.no-scrollbar::-webkit-scrollbar{display:none;}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}.glass{background:rgba(255,255,255,.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);}</style>
+</head>
+<body class="min-h-screen <% if(koyu){%>bg-slate-950 text-white<%}else{%>bg-slate-50 text-slate-900<%}%>">
+
+<!-- Önizleme bandı -->
+<div class="sticky top-0 z-[60] bg-amber-400 text-amber-950 text-xs font-bold flex items-center justify-between px-4 py-2.5">
+  <span>👀 ÖNİZLEME</span>
+  <a href="/temalar/<%= tema.slug %>" class="bg-amber-900 text-amber-50 px-3 py-1 rounded-full text-xs hover:bg-amber-800 gecis">Satın Al →</a>
+</div>
+
+<!-- Header -->
+<header class="sticky top-8 z-50 border-b shadow-sm
+  <% if(d==='gece-modu'||d==='premium'){%>bg-slate-950 border-slate-800<%}else if(d==='sol-menu'){%>bg-emerald-900 text-white border-emerald-800<%}else if(d==='kompakt'){%>bg-teal-900 text-white border-teal-700<%}else{%>bg-white border-slate-200<%}%>">
+  <div class="max-w-5xl mx-auto px-4 h-13 flex items-center gap-3 py-2">
+    <a href="<%= onizlemeBase %>" class="<% if(koyu){%>text-slate-400 hover:text-white<%}else{%>text-slate-400 hover:text-slate-700<%}%> gecis text-sm">← Menü</a>
+    <span class="<% if(koyu){%>text-slate-600<%}else{%>text-slate-200<%}%>">/</span>
+    <span class="font-semibold text-sm <% if(koyu){%>text-white<%}%>"><%= kategori.name %></span>
+  </div>
+  <!-- Kategori seçici şeridi -->
+  <div class="max-w-5xl mx-auto px-4 pb-2">
+    <div class="flex gap-2 overflow-x-auto no-scrollbar">
+      <% kategoriler.forEach(function(k){ %>
+      <a href="<%= onizlemeBase %>/k/<%= k.slug || k.id %>"
+         class="shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold gecis
+           <% if(k.id===kategori.id){
+             if(d==='gece-modu'){%>bg-cyan-500 text-white<%}
+             else if(d==='premium'){%>bg-purple-600 text-white<%}
+             else if(d==='sol-menu'){%>bg-white text-emerald-900<%}
+             else if(d==='kompakt'){%>bg-teal-400 text-teal-900<%}
+             else{%>bg-slate-800 text-white<%}
+           }else{
+             if(koyu){%>text-slate-400 hover:text-slate-200 hover:bg-slate-800<%}else{%>text-slate-600 hover:bg-slate-100<%}} %>">
+        <span><%= k.emoji %></span><span><%= k.name %></span>
+      </a>
+      <% }); %>
+    </div>
+  </div>
+</header>
+
+<!-- Kategori hero -->
+<div class="py-8 text-center
+  <% if(d==='gece-modu'){%>bg-slate-900 border-b border-slate-800<%}
+  else if(d==='premium'){%>bg-gradient-to-r from-purple-950 to-indigo-950 border-b border-purple-900/30<%}
+  else if(d==='sol-menu'){%>bg-emerald-700 text-white<%}
+  else if(d==='kompakt'){%>bg-teal-800 text-white<%}
+  else if(d==='kapakli'){%>bg-gradient-to-br from-amber-500 to-orange-500 text-white<%}
+  else if(d==='kategori-seridi'){%>bg-gradient-to-br from-rose-500 to-pink-600 text-white<%}
+  else if(d==='minimal'){%>bg-stone-50 border-b border-stone-200<%}
+  else{%>bg-white border-b border-slate-100<%}%>">
+  <span class="text-5xl block mb-2"><%= kategori.emoji %></span>
+  <h1 class="text-2xl font-bold
+    <% if(d==='minimal'){%>font-['Playfair_Display',serif] text-stone-800<%}
+    else if(koyu){%>text-white<%}else{%>text-slate-900<%}%>"><%= kategori.name %></h1>
+  <p class="text-sm mt-1 <% if(koyu){%>text-slate-400<%}else if(d==='kapakli'||d==='kategori-seridi'||d==='sol-menu'||d==='kompakt'){%>text-white/70<%}else{%>text-slate-400<%}%>">
+    <%= urunler.length %> ürün bulundu
+  </p>
+</div>
+
+<!-- Ürünler -->
+<main class="max-w-5xl mx-auto px-4 py-8">
+
+  <% if(d==='minimal'){ %>
+  <!-- MİNİMAL: büyük tipografi, liste -->
+  <div class="space-y-8 max-w-2xl mx-auto">
+    <% urunler.forEach(function(u){ %>
+    <a href="<%= onizlemeBase %>/u/<%= u.slug %>" class="flex items-start gap-5 group border-b border-stone-100 pb-8">
+      <% if(u.imageUrl){ %><img src="<%= u.imageUrl %>" alt="" class="w-24 h-24 object-cover rounded-lg opacity-90 group-hover:opacity-100 gecis"/>
+      <% }else{ %><div class="w-24 h-24 bg-stone-100 rounded-lg flex items-center justify-center text-3xl"><%= kategori.emoji %></div><% } %>
+      <div class="flex-1">
+        <div class="flex justify-between">
+          <p class="font-semibold text-stone-800 text-lg"><%= u.name %></p>
+          <span class="text-stone-500 font-light">₺<%= u.price %></span>
+        </div>
+        <p class="text-stone-400 text-sm mt-1 leading-relaxed"><%= u.description %></p>
+      </div>
+    </a>
+    <% }); %>
+  </div>
+
+  <% } else if(d==='kompakt'){ %>
+  <!-- KOMPAKT: yoğun tablo-liste -->
+  <div class="space-y-0">
+    <% urunler.forEach(function(u){ %>
+    <a href="<%= onizlemeBase %>/u/<%= u.slug %>"
+       class="flex items-center gap-3 py-3 border-b border-slate-100 hover:bg-teal-50 gecis px-2 -mx-2">
+      <% if(u.imageUrl){ %><img src="<%= u.imageUrl %>" alt="" class="w-10 h-10 object-cover rounded shrink-0"/>
+      <% }else{ %><span class="text-xl shrink-0"><%= kategori.emoji %></span><% } %>
+      <div class="flex-1 min-w-0">
+        <p class="font-semibold text-slate-800 text-sm truncate"><%= u.name %></p>
+        <p class="text-xs text-slate-400 truncate"><%= u.description.slice(0,60) %>...</p>
+      </div>
+      <span class="font-bold text-teal-700 text-sm shrink-0">₺<%= u.price %></span>
+    </a>
+    <% }); %>
+  </div>
+
+  <% } else if(d==='gorsel-odakli'){ %>
+  <!-- GÖRSEL ODAKLI: tam görsel kartlar -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    <% urunler.forEach(function(u,i){ %>
+    <a href="<%= onizlemeBase %>/u/<%= u.slug %>"
+       class="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl gecis"
+       style="height:<%= i%3===0?'260px':'180px' %>">
+      <% if(u.imageUrl){ %>
+      <img src="<%= u.imageUrl %>" alt="" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 gecis"/>
+      <% }else{ %><div class="absolute inset-0 bg-gradient-to-br from-orange-200 to-amber-300 flex items-center justify-center text-4xl"><%= kategori.emoji %></div><% } %>
+      <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+        <p class="text-white font-bold text-sm"><%= u.name %></p>
+        <span class="text-orange-300 font-black text-xs">₺<%= u.price %></span>
+      </div>
+    </a>
+    <% }); %>
+  </div>
+
+  <% } else if(d==='gece-modu'||d==='premium'){ %>
+  <!-- DARK TEMAlar: cam kartlar -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <% urunler.forEach(function(u){ %>
+    <a href="<%= onizlemeBase %>/u/<%= u.slug %>"
+       class="group rounded-xl overflow-hidden gecis flex flex-col
+         <% if(d==='premium'){%>glass hover:border-purple-500/30<%}else{%>bg-slate-900 border border-slate-800 hover:border-cyan-500/50<%}%>">
+      <% if(u.imageUrl){ %>
+      <div class="h-40 overflow-hidden relative">
+        <img src="<%= u.imageUrl %>" alt="" class="w-full h-full object-cover opacity-70 group-hover:opacity-90 gecis group-hover:scale-105"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+      </div>
+      <% } %>
+      <div class="p-4 flex-1 flex flex-col">
+        <p class="font-bold text-white mb-1"><%= u.name %></p>
+        <p class="text-slate-400 text-xs line-clamp-2 flex-1"><%= u.description %></p>
+        <span class="<% if(d==='premium'){%>text-transparent bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text<%}else{%>text-cyan-400<%}%> font-black text-sm mt-3 block">
+          ₺<%= u.price %>
+        </span>
+      </div>
+    </a>
+    <% }); %>
+  </div>
+
+  <% } else { %>
+  <!-- VARSAYILAN: 2-3 sütun kart grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <% urunler.forEach(function(u){ %>
+    <a href="<%= onizlemeBase %>/u/<%= u.slug %>"
+       class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg gecis border border-slate-100 flex flex-col">
+      <div class="h-40 bg-slate-100 overflow-hidden">
+        <% if(u.imageUrl){ %>
+        <img src="<%= u.imageUrl %>" alt="<%= u.name %>" class="w-full h-full object-cover group-hover:scale-105 gecis"/>
+        <% }else{ %>
+        <div class="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-slate-50 to-slate-100"><%= kategori.emoji %></div>
+        <% } %>
+      </div>
+      <div class="p-4 flex-1 flex flex-col">
+        <p class="font-bold text-slate-900 mb-1"><%= u.name %></p>
+        <p class="text-xs text-slate-400 line-clamp-2 flex-1"><%= u.description %></p>
+        <div class="flex justify-between items-center mt-3">
+          <span class="font-black text-slate-800 text-base">₺<%= u.price %></span>
+          <span class="text-[10px] text-slate-400 group-hover:text-slate-600 gecis">Detay →</span>
+        </div>
+      </div>
+    </a>
+    <% }); %>
+  </div>
+  <% } %>
+
+</main>
+</body>
+</html>

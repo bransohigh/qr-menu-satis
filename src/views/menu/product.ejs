@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head><%- include('../partials/menu-head') %></head>
+<body class="bg-slate-50 min-h-screen">
+
+  <% if (typeof isPreview !== 'undefined' && isPreview && typeof previewBannerTheme !== 'undefined' && previewBannerTheme) { %>
+  <div class="sticky top-0 z-[60] bg-amber-400 text-amber-900 text-xs font-semibold flex items-center justify-between px-4 py-2 shadow">
+    <span>👀 <strong>Önizleme Modu</strong> — Bu tema için demo içerik gösteriliyor.</span>
+    <div class="flex items-center gap-3">
+      <a href="/preview/<%= previewBannerTheme.slug %>" class="underline">Önizlemeyi Paylaş</a>
+      <a href="/themes/<%= previewBannerTheme.slug %>" class="bg-amber-900 text-amber-50 px-3 py-1 rounded-full hover:bg-amber-800 transition-colors no-underline">
+        Satın Al →
+      </a>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- ── Top Nav ─────────────────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-100 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
+      <!-- Back button -->
+      <a href="<%= category ? baseUrl + '/c/' + category.slug : baseUrl %>"
+         class="flex items-center justify-center size-9 rounded-full bg-slate-100 hover:bg-slate-200 transition-smooth flex-shrink-0" aria-label="Back">
+        <svg class="size-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6"/></svg>
+      </a>
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-1 text-xs text-slate-400 overflow-hidden flex-1 min-w-0">
+        <a href="<%= baseUrl %>" class="hover:text-brand-600 transition-smooth truncate flex-shrink-0"><%= menu.businessName || 'Menu' %></a>
+        <% if (category) { %>
+          <span class="mx-0.5 flex-shrink-0">/</span>
+          <a href="<%= baseUrl %>/c/<%= category.slug %>" class="hover:text-brand-600 transition-smooth truncate flex-shrink-0"><%= category.name %></a>
+        <% } %>
+        <span class="mx-0.5 flex-shrink-0">/</span>
+        <span class="text-slate-600 font-medium truncate"><%= product.name %></span>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Main Content ────────────────────────────────────────────────────── -->
+  <main class="max-w-6xl mx-auto px-4 py-6 pb-32 sm:pb-12">
+    <div class="lg:grid lg:grid-cols-[1fr_400px] lg:gap-10 lg:items-start">
+
+      <!-- LEFT: Image + Details ─────────────────────────────────────────── -->
+      <div>
+        <!-- Main image -->
+        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 shadow-card">
+          <% if (product.imageUrl) { %>
+            <img id="main-img" src="<%= product.imageUrl %>" alt="<%= product.name %>"
+                 class="w-full h-72 sm:h-96 object-cover"/>
+          <% } else { %>
+            <div class="w-full h-72 sm:h-96 flex items-center justify-center">
+              <span class="text-8xl opacity-20">🍽</span>
+            </div>
+          <% } %>
+
+          <!-- Category badge -->
+          <% if (category) { %>
+            <a href="<%= baseUrl %>/c/<%= category.slug %>"
+               class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm hover:bg-white transition-smooth">
+              <%= category.name %>
+            </a>
+          <% } %>
+        </div>
+
+        <!-- Description (desktop: shown below image) -->
+        <div class="hidden lg:block mt-8">
+          <h2 class="text-lg font-bold text-slate-800 mb-3">About this item</h2>
+          <% if (product.description) { %>
+            <p class="text-slate-600 leading-relaxed text-sm"><%= product.description %></p>
+          <% } else { %>
+            <p class="text-slate-400 text-sm italic">No description available.</p>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- RIGHT: Sticky Sidebar ─────────────────────────────────────────── -->
+      <div class="lg:sticky lg:top-20 mt-6 lg:mt-0">
+        <div class="bg-white rounded-3xl shadow-card p-6 lg:p-8">
+          <!-- Category pill -->
+          <% if (category) { %>
+            <a href="<%= baseUrl %>/c/<%= category.slug %>"
+               class="inline-block text-xs font-semibold text-brand-600 bg-brand-50 px-3 py-1 rounded-full mb-3 hover:bg-brand-100 transition-smooth">
+              <%= category.name %>
+            </a>
+          <% } %>
+
+          <!-- Product name -->
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight mb-2">
+            <%= product.name %>
+          </h1>
+
+          <!-- Price -->
+          <div class="flex items-baseline gap-2 my-4">
+            <span class="text-3xl font-extrabold text-brand-700">$<%= Number(product.price).toFixed(2) %></span>
+          </div>
+
+          <!-- Divider -->
+          <hr class="border-slate-100 my-4"/>
+
+          <!-- Description (mobile: shown in sidebar) -->
+          <div class="lg:hidden">
+            <h3 class="text-sm font-bold text-slate-700 mb-2">Description</h3>
+            <% if (product.description) { %>
+              <p class="text-slate-500 text-sm leading-relaxed"><%= product.description %></p>
+            <% } else { %>
+              <p class="text-slate-400 text-sm italic">No description available.</p>
+            <% } %>
+            <hr class="border-slate-100 my-4"/>
+          </div>
+
+          <!-- Quick info bullets -->
+          <ul class="space-y-2 mb-6">
+            <li class="flex items-center gap-2.5 text-sm text-slate-600">
+              <span class="size-7 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">✓</span>
+              Fresh ingredients
+            </li>
+            <li class="flex items-center gap-2.5 text-sm text-slate-600">
+              <span class="size-7 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">🕐</span>
+              Made to order
+            </li>
+          </ul>
+
+          <!-- CTA: back to category -->
+          <a href="<%= category ? baseUrl + '/c/' + category.slug : baseUrl %>"
+             class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-6 rounded-2xl transition-smooth text-sm shadow-sm">
+            <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6"/></svg>
+            Back to <%= category ? category.name : 'Menu' %>
+          </a>
+
+          <!-- Other items in category -->
+          <% const relatedProducts = (menu.products || []).filter(function(p) {
+               return category && p.categoryId === category.id && p.id !== product.id;
+             }).slice(0, 3); %>
+          <% if (relatedProducts.length > 0) { %>
+            <div class="mt-6 pt-5 border-t border-slate-100">
+              <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">More in <%= category ? category.name : 'this category' %></p>
+              <div class="space-y-3">
+                <% relatedProducts.forEach(function(rp) { %>
+                  <a href="<%= baseUrl %>/p/<%= rp.slug %>"
+                     class="flex items-center gap-3 rounded-xl p-2 hover:bg-slate-50 transition-smooth group">
+                    <div class="size-12 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0">
+                      <% if (rp.imageUrl) { %>
+                        <img src="<%= rp.imageUrl %>" alt="<%= rp.name %>" class="w-full h-full object-cover"/>
+                      <% } else { %>
+                        <div class="w-full h-full flex items-center justify-center text-xl text-slate-300">🍽</div>
+                      <% } %>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-semibold text-slate-800 truncate group-hover:text-brand-600 transition-smooth"><%= rp.name %></p>
+                      <p class="text-xs text-brand-600 font-bold">$<%= Number(rp.price).toFixed(2) %></p>
+                    </div>
+                    <svg class="size-4 text-slate-300 group-hover:text-brand-500 transition-smooth" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/></svg>
+                  </a>
+                <% }); %>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Mobile bottom sticky bar ───────────────────────────────────────── -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-4 py-3 flex items-center justify-between gap-4 z-50 sm:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+    <div>
+      <p class="text-xs text-slate-500 font-medium"><%= product.name %></p>
+      <p class="text-xl font-extrabold text-brand-700">$<%= Number(product.price).toFixed(2) %></p>
+    </div>
+    <a href="<%= category ? baseUrl + '/c/' + category.slug : baseUrl %>"
+       class="flex items-center gap-2 bg-brand-600 text-white text-sm font-bold px-5 py-3 rounded-2xl hover:bg-brand-700 transition-smooth">
+      ← Back
+    </a>
+  </div>
+
+</body>
+</html>

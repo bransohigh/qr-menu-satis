@@ -1,0 +1,473 @@
+/**
+ * Türkçe demo veri seti — önizleme sayfaları için (DB erişimi gerektirmez).
+ * /onizleme/:temaSlug/* rotaları bu veriyi kullanır.
+ */
+
+export interface DemoUrun {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: string;
+  imageUrl: string | null;
+  gallery: string[]; // ek fotoğraflar
+  etiketler: string[];
+  views: number;
+  categoryId: string;
+  menuId: string;
+  createdAt: Date;
+  category: { id: string; name: string; slug: string; sortOrder: number; menuId: string; createdAt: Date };
+}
+
+export interface DemoKategori {
+  id: string;
+  name: string;
+  slug: string;
+  emoji: string;
+  sortOrder: number;
+  menuId: string;
+  createdAt: Date;
+}
+
+export interface DemoMenu {
+  id: string;
+  slug: string;
+  businessName: string;
+  aciklama: string;
+  userId: string;
+  themeId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export const MENU_ID = 'demo-menu-tr';
+
+// ─── Unsplash görsel yardımcısı ──────────────────────────────────────────────
+const U = (id: string, w = 600, h = 420) =>
+  `https://images.unsplash.com/photo-${id}?w=${w}&h=${h}&fit=crop&auto=format&q=80`;
+
+// ─── Kategoriler ─────────────────────────────────────────────────────────────
+export const DEMO_KATEGORILER: DemoKategori[] = [
+  { id: 'kat-1', name: 'Kahveler',          slug: 'kahveler',         emoji: '☕', sortOrder: 0, menuId: MENU_ID, createdAt: new Date() },
+  { id: 'kat-2', name: 'Soğuk İçecekler',   slug: 'soguk-icecekler',  emoji: '🧋', sortOrder: 1, menuId: MENU_ID, createdAt: new Date() },
+  { id: 'kat-3', name: 'Tatlılar',          slug: 'tatlilar',         emoji: '🍰', sortOrder: 2, menuId: MENU_ID, createdAt: new Date() },
+  { id: 'kat-4', name: 'Kahvaltı',          slug: 'kahvalti',         emoji: '🥐', sortOrder: 3, menuId: MENU_ID, createdAt: new Date() },
+  { id: 'kat-5', name: 'Atıştırmalık',      slug: 'atistirmalik',     emoji: '🥪', sortOrder: 4, menuId: MENU_ID, createdAt: new Date() },
+  { id: 'kat-6', name: 'İmzalı Ürünler',   slug: 'imzali-urunler',   emoji: '⭐', sortOrder: 5, menuId: MENU_ID, createdAt: new Date() },
+];
+
+// ─── Ürünler ─────────────────────────────────────────────────────────────────
+const urunListesi: Omit<DemoUrun, 'category'>[] = [
+  // ── Kahveler ──────────────────────────────────────────────────────────────
+  {
+    id: 'u-1', categoryId: 'kat-1', menuId: MENU_ID,
+    name: 'Espresso', slug: 'espresso',
+    description: 'Ev karışımımızdan sıkıştırılmış tek shot espresso. Yoğun, kadifemsi dokusuyla günün başlangıcı için ideal.',
+    price: '30', imageUrl: U('1495474472287-4d71bcdd2085'),
+    gallery: [U('1509042238017-204e0ef1e14f'), U('1461023058943-07fcbe16d735')],
+    etiketler: ['Klasik', 'Vegan'], views: 142, createdAt: new Date(),
+  },
+  {
+    id: 'u-2', categoryId: 'kat-1', menuId: MENU_ID,
+    name: 'Sütlü Latte', slug: 'sutlu-latte',
+    description: 'Çift shot espresso üzerine ustaca yoğrulmuş buharla ısıtılmış tam yağlı süt. Hafif köpük ile servis edilir.',
+    price: '45', imageUrl: U('1570968915860-54d5c301fa9f'),
+    gallery: [U('1509042238017-204e0ef1e14f')],
+    etiketler: ['Sütlü', 'Sıcak'], views: 98, createdAt: new Date(),
+  },
+  {
+    id: 'u-3', categoryId: 'kat-1', menuId: MENU_ID,
+    name: 'Cappuccino', slug: 'cappuccino',
+    description: 'Eşit oranda espresso, buharlı süt ve yoğun süt köpüğünden oluşan İtalyan klasiği. Tarçınla servis.',
+    price: '45', imageUrl: U('1572442388796-11668a67e53d'),
+    gallery: [],
+    etiketler: ['Klasik', 'Sütlü'], views: 87, createdAt: new Date(),
+  },
+  {
+    id: 'u-4', categoryId: 'kat-1', menuId: MENU_ID,
+    name: 'Türk Kahvesi', slug: 'turk-kahvesi',
+    description: 'Geleneksel yöntemle cezve de demlenen ince çekilmiş Türk kahvesi. Lokum ile servis edilir.',
+    price: '35', imageUrl: U('1578374173830-7891e7f57e3f'),
+    gallery: [],
+    etiketler: ['Geleneksel', 'Vegan'], views: 201, createdAt: new Date(),
+  },
+  {
+    id: 'u-5', categoryId: 'kat-1', menuId: MENU_ID,
+    name: 'Flat White', slug: 'flat-white',
+    description: 'Küçük bir bardakta yoğun espresso ve çok ince akıcı köpük. Kahve tutkunlarının favorisi.',
+    price: '45', imageUrl: U('1461023058943-07fcbe16d735'),
+    gallery: [],
+    etiketler: ['Güçlü'], views: 76, createdAt: new Date(),
+  },
+  {
+    id: 'u-6', categoryId: 'kat-1', menuId: MENU_ID,
+    name: 'Mocha', slug: 'mocha',
+    description: 'Espresso, sıcak çikolata ve buharlı süt karışımı üzerine tatlı vanilyalı krem şanti.',
+    price: '55', imageUrl: U('1578278433-a84a5c0ea5b1'),
+    gallery: [],
+    etiketler: ['Çikolata', 'Tatlı'], views: 64, createdAt: new Date(),
+  },
+  {
+    id: 'u-7', categoryId: 'kat-1', menuId: MENU_ID,
+    name: 'Americano', slug: 'americano',
+    description: 'Uzun black kahve. Çift shot espresso üzerine sıcak su eklenerek hazırlanır.',
+    price: '35', imageUrl: U('1509042238017-204e0ef1e14f'),
+    gallery: [],
+    etiketler: ['Sade', 'Vegan'], views: 119, createdAt: new Date(),
+  },
+  {
+    id: 'u-8', categoryId: 'kat-1', menuId: MENU_ID,
+    name: 'Filtre Kahve', slug: 'filtre-kahve',
+    description: 'Yavaş demleme ile hazırlanan günün filtre kahvesi. Temiz ve dengeli tatlarıyla öne çıkar.',
+    price: '40', imageUrl: U('1495474472287-4d71bcdd2085'),
+    gallery: [],
+    etiketler: ['Yavaş Demleme', 'Vegan'], views: 55, createdAt: new Date(),
+  },
+
+  // ── Soğuk İçecekler ───────────────────────────────────────────────────────
+  {
+    id: 'u-9', categoryId: 'kat-2', menuId: MENU_ID,
+    name: 'Cold Brew', slug: 'cold-brew',
+    description: '16 saat soğuk demleme ile hazırlanan yoğun ve pürüzsüz kahve. Buz üzerinde servis edilir.',
+    price: '55', imageUrl: U('1544145945-f90425340c7e'),
+    gallery: [],
+    etiketler: ['Soğuk', 'Yoğun', 'Vegan'], views: 168, createdAt: new Date(),
+  },
+  {
+    id: 'u-10', categoryId: 'kat-2', menuId: MENU_ID,
+    name: 'Buzlu Latte', slug: 'buzlu-latte',
+    description: 'Çift shot espresso, soğuk süt ve buz. Sadeliğin zirvesi.',
+    price: '50', imageUrl: U('1461023058943-07fcbe16d735'),
+    gallery: [],
+    etiketler: ['Soğuk', 'Sütlü'], views: 142, createdAt: new Date(),
+  },
+  {
+    id: 'u-11', categoryId: 'kat-2', menuId: MENU_ID,
+    name: 'Limonata', slug: 'limonata',
+    description: 'Taze sıkılmış limon suyu, nane yaprakları ve az şeker ile hazırlanmış ev yapımı limonata.',
+    price: '40', imageUrl: U('1621263764928-df1444c5e859'),
+    gallery: [],
+    etiketler: ['Ferahlatıcı', 'Vegan'], views: 205, createdAt: new Date(),
+  },
+  {
+    id: 'u-12', categoryId: 'kat-2', menuId: MENU_ID,
+    name: 'Mango Smoothie', slug: 'mango-smoothie',
+    description: 'Taze mango, muz, portakal suyu ve hindistancevizi sütü ile hazırlanan tropikal smoothie.',
+    price: '55', imageUrl: U('1610970881699-44a5587cabec'),
+    gallery: [],
+    etiketler: ['Tropikal', 'Vegan', 'Vitamin'], views: 87, createdAt: new Date(),
+  },
+  {
+    id: 'u-13', categoryId: 'kat-2', menuId: MENU_ID,
+    name: 'Matcha Latte', slug: 'matcha-latte',
+    description: 'Japon seremonisi matcha tozu, buharlı badem sütü ile hazırlanmış. Soğuk veya sıcak.',
+    price: '60', imageUrl: U('1536935447-5e8071e95e0f'),
+    gallery: [],
+    etiketler: ['Matcha', 'Vegan'], views: 134, createdAt: new Date(),
+  },
+  {
+    id: 'u-14', categoryId: 'kat-2', menuId: MENU_ID,
+    name: 'Boba Çayı', slug: 'boba-cayi',
+    description: 'Siyah çay tabanı üzerine tapioka topları ve tatlı süt köpüğü. Sevilen Tayvan klasiği.',
+    price: '65', imageUrl: U('1558961363-fa8fdf82db35'),
+    gallery: [],
+    etiketler: ['Boba', 'Trendy'], views: 178, createdAt: new Date(),
+  },
+  {
+    id: 'u-15', categoryId: 'kat-2', menuId: MENU_ID,
+    name: 'Portakal Suyu', slug: 'portakal-suyu',
+    description: 'Günlük taze sıkılan portakal suyu. Katkısız, doğal, C vitamini deposu.',
+    price: '45', imageUrl: U('1534353436-9fa4ba73be39'),
+    gallery: [],
+    etiketler: ['Doğal', 'Vegan', 'Taze'], views: 93, createdAt: new Date(),
+  },
+  {
+    id: 'u-16', categoryId: 'kat-2', menuId: MENU_ID,
+    name: 'Karpuz Suyu', slug: 'karpuz-suyu',
+    description: 'Mevsiminde taze karpuz, nane ve limon ile yaz sıcağına en iyi cevap.',
+    price: '40', imageUrl: U('1527960669566-f882d0-c22b5d') ,
+    gallery: [],
+    etiketler: ['Sezonluk', 'Vegan'], views: 61, createdAt: new Date(),
+  },
+
+  // ── Tatlılar ──────────────────────────────────────────────────────────────
+  {
+    id: 'u-17', categoryId: 'kat-3', menuId: MENU_ID,
+    name: 'Tiramisu', slug: 'tiramisu',
+    description: 'Espresso ile ıslatılmış savoiardi bisküviler, maskarpone krem ve bol kakao tozu. Klasiğin en iyisi.',
+    price: '80', imageUrl: U('1542124948-dc391252a940'),
+    gallery: [U('1557979329-b8597b21ac26')],
+    etiketler: ['İtalyan', 'Alkol İçerir'], views: 189, createdAt: new Date(),
+  },
+  {
+    id: 'u-18', categoryId: 'kat-3', menuId: MENU_ID,
+    name: 'New York Cheesecake', slug: 'cheesecake',
+    description: 'Kremsi krem peyniri dolgusu ve narin bisküvi tabanı. Taze çilek sos ile servis.',
+    price: '90', imageUrl: U('1567620905732-2d1ec7ab7445'),
+    gallery: [],
+    etiketler: ['Kremalı', 'Meyveli'], views: 156, createdAt: new Date(),
+  },
+  {
+    id: 'u-19', categoryId: 'kat-3', menuId: MENU_ID,
+    name: 'Waffle', slug: 'waffle',
+    description: 'Çıtır sosisli waffle, üzerine akçaağaç şurubu, taze meyve ve vanilyalı dondurma.',
+    price: '85', imageUrl: U('1562376552-0d160a2f23d8'),
+    gallery: [],
+    etiketler: ['Sıcak', 'Dondurmalı'], views: 201, createdAt: new Date(),
+  },
+  {
+    id: 'u-20', categoryId: 'kat-3', menuId: MENU_ID,
+    name: 'Çikolatalı Kek', slug: 'cikolatali-kek',
+    description: 'Yoğun bitter çikolata, ıslak kek dokusu. Ganaj kaplı, yanında vanilyalı dondurma.',
+    price: '75', imageUrl: U('1578985545062-69928b1d9587'),
+    gallery: [],
+    etiketler: ['Çikolata', 'Vegan Seçenek Var'], views: 143, createdAt: new Date(),
+  },
+  {
+    id: 'u-21', categoryId: 'kat-3', menuId: MENU_ID,
+    name: 'Crème Brûlée', slug: 'creme-brulee',
+    description: 'Vanilyalı kremşanti üzerine karamelize şeker kabuğu. Masada kapatılan üfleci ile hazırlanır.',
+    price: '85', imageUrl: U('1519167758481-83f550bb49b3'),
+    gallery: [],
+    etiketler: ['Fransız', 'Klasik'], views: 112, createdAt: new Date(),
+  },
+  {
+    id: 'u-22', categoryId: 'kat-3', menuId: MENU_ID,
+    name: 'Macaron Tabağı', slug: 'macaron-tabagi',
+    description: '6 farklı aromada el yapımı Fransız macaronu. Ahududu, fıstık, çikolata, limon, lavanta, gül.',
+    price: '95', imageUrl: U('1486427944299-d1955d23e34d'),
+    gallery: [],
+    etiketler: ['Fransız', 'Hediye'], views: 98, createdAt: new Date(),
+  },
+  {
+    id: 'u-23', categoryId: 'kat-3', menuId: MENU_ID,
+    name: 'Profiterol', slug: 'profiterol',
+    description: 'Vanilyalı dondurma dolu şu hamuru topları üzerine sıcak çikolata sosu.',
+    price: '80', imageUrl: U('1549007994-bac44de8ed40'),
+    gallery: [],
+    etiketler: ['Fransız', 'Sıcak Sos'], views: 134, createdAt: new Date(),
+  },
+  {
+    id: 'u-24', categoryId: 'kat-3', menuId: MENU_ID,
+    name: 'Dondurma Tabağı', slug: 'dondurma-tabagi',
+    description: '3 top el yapımı dondurma. Fıstık, çilek, vanilyalı çikolata parçalı. Kruvasan ile servis.',
+    price: '70', imageUrl: U('1557985931-8a32e419c5ab'),
+    gallery: [],
+    etiketler: ['Serinletici', 'Minimal'], views: 167, createdAt: new Date(),
+  },
+
+  // ── Kahvaltı ──────────────────────────────────────────────────────────────
+  {
+    id: 'u-25', categoryId: 'kat-4', menuId: MENU_ID,
+    name: 'Avokado Toast', slug: 'avokado-toast',
+    description: 'Ekşi maya ekmeği üzerine ezilmiş avokado, poşe yumurta, cherry domates ve taze nane.',
+    price: '85', imageUrl: U('1541519227354-08fa5d50c627'),
+    gallery: [],
+    etiketler: ['Sağlıklı', 'Vejetaryen'], views: 178, createdAt: new Date(),
+  },
+  {
+    id: 'u-26', categoryId: 'kat-4', menuId: MENU_ID,
+    name: 'Taze Kruvasan', slug: 'taze-kruvasan',
+    description: 'Günlük fırından çıkmış tereyağlı kruvasan. Sade veya fıstık ezmesi/reçel seçeneği ile.',
+    price: '45', imageUrl: U('1555507036-ab1f4038808a'),
+    gallery: [],
+    etiketler: ['Fırından Taze', 'Vejetaryen'], views: 134, createdAt: new Date(),
+  },
+  {
+    id: 'u-27', categoryId: 'kat-4', menuId: MENU_ID,
+    name: 'Eggs Benedict', slug: 'eggs-benedict',
+    description: 'İngiliz mufin üzerine pastırma, poşe yumurta ve kadife hollandaise sos. Zamanın test ettiği bir klasik.',
+    price: '110', imageUrl: U('1525351484163-7529414344d8'),
+    gallery: [],
+    etiketler: ['Premium', 'Doyurucu'], views: 145, createdAt: new Date(),
+  },
+  {
+    id: 'u-28', categoryId: 'kat-4', menuId: MENU_ID,
+    name: 'Granola Kasesi', slug: 'granola-kasesi',
+    description: 'Ev yapımı fırında granola, taze meyveler, yoğurt ve bal ile. Hafif ve enerjik başlangıç.',
+    price: '75', imageUrl: U('1511690656952-34342bb7c2f2'),
+    gallery: [],
+    etiketler: ['Sağlıklı', 'Vejetaryen'], views: 89, createdAt: new Date(),
+  },
+  {
+    id: 'u-29', categoryId: 'kat-4', menuId: MENU_ID,
+    name: 'Pancake Tabağı', slug: 'pancake-tabagi',
+    description: 'Harika kabarık Amerikan pancake. Akçaağaç şurubu, taze çilek ve krem şanti ile 3 adet.',
+    price: '90', imageUrl: U('1484723091739-30a097e8f929'),
+    gallery: [],
+    etiketler: ['Tatlı', 'Klasik'], views: 212, createdAt: new Date(),
+  },
+  {
+    id: 'u-30', categoryId: 'kat-4', menuId: MENU_ID,
+    name: 'Serpme Kahvaltı', slug: 'serpme-kahvalti',
+    description: 'Peynir çeşitleri, zeytin, bal, reçel, tereyağı, domates, salatalık ile tam Türk kahvaltısı.',
+    price: '150', imageUrl: U('1533089860892-a7c6116e5c5f'),
+    gallery: [],
+    etiketler: ['Türk', 'Paylaşımlık', 'Tam'], views: 267, createdAt: new Date(),
+  },
+  {
+    id: 'u-31', categoryId: 'kat-4', menuId: MENU_ID,
+    name: 'Menemen', slug: 'menemen',
+    description: 'Taze domates, yeşil biber, yumurta ile pişirilmiş geleneksel Türk kahvaltılık yemeği.',
+    price: '75', imageUrl: U('1565299624946-b28f40a0ae38'),
+    gallery: [],
+    etiketler: ['Türk', 'Geleneksel', 'Vejetaryen'], views: 198, createdAt: new Date(),
+  },
+  {
+    id: 'u-32', categoryId: 'kat-4', menuId: MENU_ID,
+    name: 'French Toast', slug: 'french-toast',
+    description: 'Yumurtalı sütte bekletilmiş, tereyağında kızartılmış brioche. Fırın domates ve reçel ile.',
+    price: '85', imageUrl: U('1484723091739-30a097e8f929'),
+    gallery: [],
+    etiketler: ['Klasik', 'Tatlı'], views: 156, createdAt: new Date(),
+  },
+
+  // ── Atıştırmalık ─────────────────────────────────────────────────────────
+  {
+    id: 'u-33', categoryId: 'kat-5', menuId: MENU_ID,
+    name: 'Club Sandviç', slug: 'club-sandvic',
+    description: 'Tavuk, pastırma, domates, marul ve çedar peyniri. Ekşi maya ekmeği arasında, patates ile.',
+    price: '95', imageUrl: U('1528736235-9f6e80e4d8a5'),
+    gallery: [],
+    etiketler: ['Doyurucu', 'Klasik'], views: 143, createdAt: new Date(),
+  },
+  {
+    id: 'u-34', categoryId: 'kat-5', menuId: MENU_ID,
+    name: 'Bagel & Krem Peynir', slug: 'bagel-krem-peynir',
+    description: 'Susamlı NY stili bagel, krem peynir, somon, kapari, kırmızı soğan ile.',
+    price: '85', imageUrl: U('1571091718767-18b5b1457add'),
+    gallery: [],
+    etiketler: ['NY Stili', 'Somon'], views: 89, createdAt: new Date(),
+  },
+  {
+    id: 'u-35', categoryId: 'kat-5', menuId: MENU_ID,
+    name: 'Nachos', slug: 'nachos',
+    description: 'Çıtır mısır cips üzerine peynir sosu, jalapeno, sour cream, guacamole ve salsa.',
+    price: '75', imageUrl: U('1513456852971-8c10c71a4ea0'),
+    gallery: [],
+    etiketler: ['Paylaşımlık', 'Baharatlı'], views: 112, createdAt: new Date(),
+  },
+  {
+    id: 'u-36', categoryId: 'kat-5', menuId: MENU_ID,
+    name: 'Bruschetta', slug: 'bruschetta-atistirmalik',
+    description: 'Zeytinyağlı, sarımsaklı, domates ve fesleğen ile üç dilim kızarmış ekmek.',
+    price: '60', imageUrl: U('1572966850541-894c70bf9eec'),
+    gallery: [],
+    etiketler: ['İtalyan', 'Vegan'], views: 78, createdAt: new Date(),
+  },
+  {
+    id: 'u-37', categoryId: 'kat-5', menuId: MENU_ID,
+    name: 'Peynirlü Quesadilla', slug: 'peynirlü-quesadilla',
+    description: 'Tavuk ve çedar peyniri dolu kızarmış wrep. Guacamole ve sour cream ile.',
+    price: '80', imageUrl: U('1513456852971-8c10c71a4ea0'),
+    gallery: [],
+    etiketler: ['Meksika', 'Doyurucu'], views: 95, createdAt: new Date(),
+  },
+  {
+    id: 'u-38', categoryId: 'kat-5', menuId: MENU_ID,
+    name: 'Humus & Pide', slug: 'humus-pide',
+    description: 'Ev yapımı sade ve acılı humus. Fırından taze ince pide ve havuç-salatalık çubuklarıyla.',
+    price: '65', imageUrl: U('1536935447-5e8071e95e0f'),
+    gallery: [],
+    etiketler: ['Vegan', 'Orta Doğu'], views: 67, createdAt: new Date(),
+  },
+  {
+    id: 'u-39', categoryId: 'kat-5', menuId: MENU_ID,
+    name: 'Akdeniz Tabağı', slug: 'akdeniz-tabagi',
+    description: 'Humus, baba ganuş, labneh, tahin, zeytin ve taze pita ekmeği ile zengin bir paylaşım tabağı.',
+    price: '110', imageUrl: U('1546069901-ba9599a7f5f2'),
+    gallery: [],
+    etiketler: ['Vegan Seçenek', 'Paylaşımlık', 'Akdeniz'], views: 134, createdAt: new Date(),
+  },
+  {
+    id: 'u-40', categoryId: 'kat-5', menuId: MENU_ID,
+    name: 'Patates Cipsi', slug: 'patates-cipsi',
+    description: 'Günlük dilimlenip kızartılan ev yapımı patates cipsi. Tuz ve baharatla tatlandırılmış.',
+    price: '45', imageUrl: U('1519984388953-d2406bc725e1'),
+    gallery: [],
+    etiketler: ['Hızlı', 'Vegan'], views: 189, createdAt: new Date(),
+  },
+
+  // ── İmzalı Ürünler ────────────────────────────────────────────────────────
+  {
+    id: 'u-41', categoryId: 'kat-6', menuId: MENU_ID,
+    name: 'Şefin Burger\'ı', slug: 'sefin-burgeri',
+    description: '200g angus dana, cheddar, yerli turşu ve özel sos. Brioche bun, kızarmış cipsi ile.',
+    price: '150', imageUrl: U('1561758033-d89a2a3f1183'),
+    gallery: [U('1568901346375-23c9190de21e')],
+    etiketler: ['İmza', 'Bestseller'], views: 312, createdAt: new Date(),
+  },
+  {
+    id: 'u-42', categoryId: 'kat-6', menuId: MENU_ID,
+    name: 'Izgara Somon', slug: 'izgara-somon',
+    description: 'Atlantik somonu, mevsim sebzeleri, limon tereyağı sos ile. Şefin özel tarifi.',
+    price: '180', imageUrl: U('1559314809-0d155014e29e'),
+    gallery: [],
+    etiketler: ['İmza', 'Deniz Ürünleri'], views: 198, createdAt: new Date(),
+  },
+  {
+    id: 'u-43', categoryId: 'kat-6', menuId: MENU_ID,
+    name: 'Ribeye Biftek', slug: 'ribeye-biftek',
+    description: '300g olgunlaştırılmış ribeye, tercih ettiğiniz pişirme derecesinde. Kümbet mantar ve patates ile.',
+    price: '250', imageUrl: U('1558618666-fcd25c85cd64'),
+    gallery: [],
+    etiketler: ['İmza', 'Premium', 'Et'], views: 267, createdAt: new Date(),
+  },
+  {
+    id: 'u-44', categoryId: 'kat-6', menuId: MENU_ID,
+    name: 'Truffle Risotto', slug: 'truffle-risotto',
+    description: 'Yabani mantar ve gerçek siyah truffle talaşı ile hazırlanmış kremsi Arborio pirinç risotto.',
+    price: '165', imageUrl: U('1546069901-ba9599a7f5f2'),
+    gallery: [],
+    etiketler: ['İmza', 'Vejetaryen', 'Truffle'], views: 145, createdAt: new Date(),
+  },
+  {
+    id: 'u-45', categoryId: 'kat-6', menuId: MENU_ID,
+    name: 'İmzalı Latte', slug: 'imzali-latte',
+    description: 'Ev yapımı lavanta şurubu, çift shot espresso ve buharlı yulaf sütü ile eşsiz latte.',
+    price: '75', imageUrl: U('1570968915860-54d5c301fa9f'),
+    gallery: [],
+    etiketler: ['İmza', 'Çiçeksi'], views: 198, createdAt: new Date(),
+  },
+  {
+    id: 'u-46', categoryId: 'kat-6', menuId: MENU_ID,
+    name: 'Molten Çikolata', slug: 'molten-cikolata',
+    description: 'Sıcak kek içinde sıvı çikolata kalbi, vanilyalı dondurma ile masada servis edilir.',
+    price: '95', imageUrl: U('1578985545062-69928b1d9587'),
+    gallery: [],
+    etiketler: ['İmza', 'Tatlı', 'Sıcak'], views: 234, createdAt: new Date(),
+  },
+];
+
+// Kategori referanslarını ekle
+export const DEMO_URUNLER: DemoUrun[] = urunListesi.map(u => ({
+  ...u,
+  category: DEMO_KATEGORILER.find(k => k.id === u.categoryId)!,
+}));
+
+export function buildDemoMenuTR(temaSlug: string, temaAdi: string): DemoMenu {
+  return {
+    id: MENU_ID,
+    slug: `onizleme-${temaSlug}`,
+    businessName: 'Lezzet Durağı',
+    aciklama: 'Şehrin kalbinde, damak tadınıza özel bir deneyim',
+    userId: 'demo-kullanici',
+    themeId: 'demo-tema',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+}
+
+// Tema görsel kaynak eşleştirmesi
+export const TEMA_PREVIEW_IMAGES: Record<string, string> = {
+  'tema_01': U('1414235077428-338989a2e8c0'),
+  'tema_02': U('1559339352-11d035aa65de'),
+  'tema_03': U('1493770348161-369560ae357d'),
+  'tema_04': U('1517248135467-4c7edcad34c4'),
+  'tema_05': U('1466978913421-dad2ebd01d17'),
+  'tema_06': U('1414235077428-338989a2e8c0'),
+  'tema_07': U('1559339352-11d035aa65de'),
+  'tema_08': U('1414235077428-338989a2e8c0'),
+  'tema_09': U('1493770348161-369560ae357d'),
+  'tema_10': U('1517248135467-4c7edcad34c4'),
+};

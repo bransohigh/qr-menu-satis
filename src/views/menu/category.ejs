@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head><%- include('../partials/menu-head') %></head>
+<body class="bg-slate-50 min-h-screen">
+
+  <% if (typeof isPreview !== 'undefined' && isPreview && typeof previewBannerTheme !== 'undefined' && previewBannerTheme) { %>
+  <div class="sticky top-0 z-[60] bg-amber-400 text-amber-900 text-xs font-semibold flex items-center justify-between px-4 py-2 shadow">
+    <span>👀 <strong>Önizleme Modu</strong> — Bu tema için demo içerik gösteriliyor.</span>
+    <div class="flex items-center gap-3">
+      <a href="/preview/<%= previewBannerTheme.slug %>" class="underline">Önizlemeyi Paylaş</a>
+      <a href="/themes/<%= previewBannerTheme.slug %>" class="bg-amber-900 text-amber-50 px-3 py-1 rounded-full hover:bg-amber-800 transition-colors no-underline">
+        Satın Al →
+      </a>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- ── Top Nav ─────────────────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center gap-3">
+      <a href="<%= baseUrl %>" class="flex items-center justify-center size-9 rounded-full bg-slate-100 hover:bg-slate-200 transition-smooth flex-shrink-0" aria-label="Back">
+        <svg class="size-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6"/></svg>
+      </a>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-1.5 text-xs text-slate-400 mb-0.5">
+          <a href="<%= baseUrl %>" class="hover:text-brand-600 transition-smooth truncate"><%= menu.businessName || 'Menu' %></a>
+          <span>/</span>
+          <span class="text-slate-600 font-medium truncate"><%= category.name %></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Category Header ────────────────────────────────────────────────── -->
+  <section class="bg-gradient-to-br from-slate-800 to-slate-900 text-white px-4 pt-10 pb-14">
+    <div class="max-w-5xl mx-auto">
+      <h1 class="text-2xl sm:text-3xl font-extrabold mb-1"><%= category.name %></h1>
+      <p class="text-white/60 text-sm"><%= products.length %> <%= products.length === 1 ? 'item' : 'items' %></p>
+    </div>
+  </section>
+
+  <!-- ── Category Switcher ──────────────────────────────────────────────── -->
+  <div class="sticky top-14 z-40 bg-white border-b border-slate-100">
+    <div class="max-w-5xl mx-auto px-4">
+      <div class="flex gap-2 overflow-x-auto py-2 scrollbar-hide no-scrollbar">
+        <% categories.forEach(function(cat) { %>
+          <a href="<%= baseUrl %>/c/<%= cat.slug %>"
+             class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-smooth whitespace-nowrap
+               <%= cat.id === category.id
+                 ? 'bg-brand-600 text-white shadow-sm'
+                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200' %>">
+            <%= cat.name %>
+          </a>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+  <style>.no-scrollbar::-webkit-scrollbar{display:none;}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}</style>
+
+  <!-- ── Products ───────────────────────────────────────────────────────── -->
+  <main class="max-w-5xl mx-auto px-4 py-6 pb-24">
+    <% if (products.length === 0) { %>
+      <div class="bg-white rounded-3xl p-10 text-center shadow-card mt-4">
+        <div class="text-5xl mb-4">🍽</div>
+        <h2 class="text-lg font-bold text-slate-700 mb-2">No items yet</h2>
+        <p class="text-slate-400 text-sm">This category doesn't have any products yet.</p>
+        <a href="<%= baseUrl %>" class="inline-block mt-4 text-brand-600 text-sm font-semibold hover:underline">← Back to menu</a>
+      </div>
+    <% } else { %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <% products.forEach(function(p) { %>
+          <a href="<%= baseUrl %>/p/<%= p.slug %>"
+             class="group bg-white rounded-2xl overflow-hidden shadow-card hover-lift flex flex-col">
+            <!-- Image -->
+            <div class="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200 flex-shrink-0">
+              <% if (p.imageUrl) { %>
+                <img src="<%= p.imageUrl %>" alt="<%= p.name %>"
+                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"/>
+              <% } else { %>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <span class="text-5xl opacity-30">🍽</span>
+                </div>
+              <% } %>
+              <!-- Price bubble -->
+              <div class="absolute bottom-3 right-3 bg-white shadow-md rounded-xl px-2.5 py-1">
+                <span class="text-brand-700 font-bold text-sm">$<%= Number(p.price).toFixed(2) %></span>
+              </div>
+            </div>
+            <!-- Body -->
+            <div class="p-4 flex-1 flex flex-col">
+              <h3 class="font-bold text-slate-800 text-base leading-snug mb-1 group-hover:text-brand-700 transition-smooth">
+                <%= p.name %>
+              </h3>
+              <% if (p.description) { %>
+                <p class="text-slate-500 text-xs leading-relaxed flex-1 line-clamp-2"><%= p.description %></p>
+              <% } %>
+              <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-50">
+                <span class="text-xs text-slate-400">View details</span>
+                <svg class="size-4 text-brand-500 group-hover:translate-x-1 transition-smooth" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        <% }); %>
+      </div>
+    <% } %>
+  </main>
+
+  <!-- ── Mobile bottom nav ──────────────────────────────────────────────── -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-100 px-4 py-2 z-50 flex items-center justify-between sm:hidden">
+    <a href="<%= baseUrl %>" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-brand-600 transition-smooth text-xs">
+      <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </a>
+    <div class="flex-1 text-center">
+      <span class="font-semibold text-slate-800 text-sm"><%= category.name %></span>
+    </div>
+    <div class="w-12"></div>
+  </nav>
+
+</body>
+</html>

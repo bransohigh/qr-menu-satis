@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Ödeme — <%= tema.name %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>body{font-family:'Inter',system-ui,sans-serif;}.gecis{transition:all .2s ease;}</style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+<!-- Üst bar -->
+<header class="bg-white border-b border-slate-200">
+  <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+    <a href="/temalar" class="text-slate-400 hover:text-slate-700 gecis text-sm">← Temalara Dön</a>
+    <div class="flex items-center gap-2">
+      <span class="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300">🧪 SİMÜLASYON</span>
+      <span class="text-slate-800 font-bold text-sm">QR Menü</span>
+    </div>
+    <span class="text-slate-200 text-sm">🔒 Güvenli</span>
+  </div>
+</header>
+
+<main class="flex-1 flex items-start justify-center py-10 px-4">
+  <div class="w-full max-w-lg space-y-5">
+
+    <!-- DEV uyarısı -->
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm">
+      <p class="font-bold text-amber-800 mb-1">🧪 Bu bir ödeme simülasyonudur</p>
+      <p class="text-amber-700">Gerçek para çekilmez. Formu doldurup "Ödemeyi Tamamla" butonuna tıklayın.</p>
+    </div>
+
+    <!-- Tema özeti -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+      <p class="text-xs text-slate-400 uppercase tracking-wider mb-3">Seçilen Tema</p>
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="font-bold text-slate-900 text-lg"><%= tema.name %></p>
+          <p class="text-slate-400 text-sm"><%= tema.description || 'QR Menü Teması' %></p>
+        </div>
+        <div class="text-right">
+          <p class="text-2xl font-black text-slate-900">₺<%= Number(tema.price).toFixed(0) %></p>
+          <p class="text-xs text-slate-400"><%= tema.currency || 'TRY' %></p>
+        </div>
+      </div>
+      <% if (tema.features && tema.features.length) { %>
+      <ul class="mt-4 space-y-1">
+        <% tema.features.slice(0,3).forEach(function(f){ %>
+        <li class="text-xs text-slate-500 flex items-center gap-2"><span class="text-green-500">✓</span><%= f %></li>
+        <% }); %>
+      </ul>
+      <% } %>
+    </div>
+
+    <!-- Ödeme Formu -->
+    <form action="/odeme/tamamla" method="POST" class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+      <input type="hidden" name="temaId" value="<%= tema.id %>"/>
+      <input type="hidden" name="temaSlug" value="<%= tema.slug %>"/>
+
+      <!-- İşletme adı -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1.5">İşletme Adınız *</label>
+        <input type="text" name="isletmeAdi" required placeholder="ör. Lezzet Durağı"
+               class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 gecis"/>
+        <p class="text-xs text-slate-400 mt-1">Menünüz bu isimle oluşturulacak.</p>
+      </div>
+
+      <hr class="border-slate-100"/>
+
+      <!-- Sahte kart bilgileri -->
+      <div class="opacity-70">
+        <p class="text-xs font-semibold text-slate-500 mb-3 flex items-center gap-1.5">
+          <span>💳</span> Kart Bilgileri <span class="text-amber-500">(Simülasyon — gerçek değil)</span>
+        </p>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Kart Numarası</label>
+            <input type="text" value="4242 4242 4242 4242" disabled
+                   class="w-full border border-slate-100 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-400 cursor-not-allowed"/>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Son Kullanma</label>
+              <input type="text" value="12/26" disabled class="w-full border border-slate-100 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-400 cursor-not-allowed"/>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">CVV</label>
+              <input type="text" value="***" disabled class="w-full border border-slate-100 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-400 cursor-not-allowed"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="border-slate-100"/>
+
+      <!-- Sipariş özeti -->
+      <div class="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
+        <div class="flex justify-between text-slate-600"><span><%= tema.name %></span><span>₺<%= Number(tema.price).toFixed(0) %></span></div>
+        <div class="flex justify-between text-slate-400 text-xs"><span>KDV (%18)</span><span>kdv dahil</span></div>
+        <hr class="border-slate-200"/>
+        <div class="flex justify-between font-black text-slate-900 text-base"><span>Toplam</span><span>₺<%= Number(tema.price).toFixed(0) %></span></div>
+      </div>
+
+      <!-- Butonlar -->
+      <button type="submit"
+              class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-sm hover:bg-slate-700 gecis active:scale-95">
+        🎉 Ödemeyi Tamamla (Simüle)
+      </button>
+      <a href="/temalar/<%= tema.slug %>"
+         class="block text-center text-slate-400 text-xs hover:text-slate-600 gecis py-1">İptal Et</a>
+    </form>
+
+    <p class="text-center text-slate-300 text-[11px]">Bu ortam üretim değildir. Veriler kayıt altına alınmaz.</p>
+  </div>
+</main>
+</body>
+</html>

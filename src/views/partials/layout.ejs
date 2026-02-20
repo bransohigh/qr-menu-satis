@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title || 'QR Menu' %></title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; }
+    .topbar { background: #1e293b; color: #fff; padding: .75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .topbar a { color: #94a3b8; text-decoration: none; font-size: .85rem; }
+    .topbar a:hover { color: #fff; }
+    .topbar .logo { font-weight: 700; font-size: 1.1rem; color: #fff; letter-spacing: .5px; }
+    .topbar-actions { display: flex; gap: 1rem; align-items: center; }
+    .btn { display: inline-block; padding: .45rem 1rem; border-radius: 6px; font-size: .85rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: opacity .15s; }
+    .btn:hover { opacity: .85; }
+    .btn-primary { background: #6366f1; color: #fff; }
+    .btn-sm { padding: .3rem .7rem; font-size: .8rem; }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .btn-outline { background: transparent; border: 1.5px solid #6366f1; color: #6366f1; }
+    .btn-success { background: #22c55e; color: #fff; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+    .sidebar-layout { display: flex; min-height: calc(100vh - 48px); }
+    .sidebar { width: 220px; background: #fff; border-right: 1px solid #e2e8f0; padding: 1.5rem 0; flex-shrink: 0; }
+    .sidebar a { display: block; padding: .6rem 1.25rem; color: #64748b; text-decoration: none; font-size: .88rem; font-weight: 500; border-left: 3px solid transparent; }
+    .sidebar a:hover, .sidebar a.active { color: #6366f1; border-left-color: #6366f1; background: #f0f0ff; }
+    .page-content { flex: 1; padding: 2rem; }
+    .page-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+    .card { background: #fff; border-radius: 10px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,.07); margin-bottom: 1.25rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .35rem; color: #374151; }
+    .form-control { width: 100%; padding: .5rem .75rem; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: .9rem; transition: border-color .15s; }
+    .form-control:focus { outline: none; border-color: #6366f1; }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th { text-align: left; padding: .6rem .75rem; font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: #94a3b8; border-bottom: 1.5px solid #e2e8f0; }
+    .table td { padding: .75rem; font-size: .88rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .table tr:hover td { background: #f8faff; }
+    .badge { display: inline-block; padding: .2rem .55rem; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+    .badge-blue { background: #e0e7ff; color: #4338ca; }
+    .alert { padding: .75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: .88rem; }
+    .alert-info { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+    .alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 1.75rem; width: 100%; max-width: 480px; box-shadow: 0 10px 40px rgba(0,0,0,.15); }
+    .modal h3 { font-size: 1.1rem; margin-bottom: 1.25rem; }
+    .modal-footer { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.25rem; }
+    img.preview { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+    .drag-handle { cursor: grab; color: #cbd5e1; margin-right: .5rem; font-size: 1.1rem; }
+    .drag-handle:active { cursor: grabbing; }
+    .dragging { opacity: .4; }
+    .drag-over { border-top: 2px dashed #6366f1; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <span class="logo">🍽 QR Menu</span>
+    <div class="topbar-actions">
+      <% if (typeof user !== 'undefined' && user) { %>
+        <span style="color:#94a3b8;font-size:.85rem;"><%= user.email %></span>
+        <a href="/admin" class="btn btn-primary btn-sm">Dashboard</a>
+        <a href="#" onclick="logout()" class="btn btn-sm" style="color:#fff">Logout</a>
+      <% } else { %>
+        <a href="/themes" style="color:#94a3b8">Browse Themes</a>
+      <% } %>
+    </div>
+  </div>
+  <%- body %>
+  <script>
+    async function logout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/themes';
+    }
+  </script>
+</body>
+</html>

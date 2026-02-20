@@ -1,0 +1,23 @@
+<div class="topbar">
+  <a href="/admin" class="logo">🍽 QR Menu Admin</a>
+  <div class="topbar-right">
+    <span style="color:#94a3b8"><%= user.email %></span>
+    <a href="<%= typeof menu !== 'undefined' && menu ? '/m/' + menu.slug : '#' %>" target="_blank">View Menu ↗</a>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-section">Menu</div>
+    <a href="/admin" class="<%= active === 'dashboard' ? 'active' : '' %>">📊 Dashboard</a>
+    <a href="/admin/categories" class="<%= active === 'categories' ? 'active' : '' %>">📂 Categories</a>
+    <a href="/admin/products" class="<%= active === 'products' ? 'active' : '' %>">🍔 Products</a>
+    <div class="sidebar-section">Links</div>
+    <a href="/themes">🎨 Change Theme</a>
+  </nav>
+<script>
+  async function logout() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/themes';
+  }
+</script>

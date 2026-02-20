@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Categories – QR Menu Admin</title>
+  <style><%- include('../partials/admin-styles') %></style>
+</head>
+<body>
+  <%- include('../partials/admin-nav', { active: 'categories' }) %>
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Categories</h1>
+      <button class="btn btn-primary" onclick="openCreate()">+ Add Category</button>
+    </div>
+
+    <div id="flash-msg"></div>
+
+    <div class="card">
+      <p style="font-size:.82rem;color:#94a3b8;margin-bottom:1rem">
+        Drag rows to reorder, then click <strong>Save Order</strong>.
+      </p>
+      <% if (categories.length === 0) { %>
+        <div class="empty-state">
+          <p>No categories yet. Create your first category!</p>
+          <button class="btn btn-primary" onclick="openCreate()">+ Add Category</button>
+        </div>
+      <% } else { %>
+        <table class="table" id="cat-table">
+          <thead>
+            <tr>
+              <th style="width:40px"></th>
+              <th>Name</th>
+              <th>Slug</th>
+              <th>Sort Order</th>
+              <th style="width:160px">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="cat-tbody">
+            <% categories.forEach((cat, i) => { %>
+              <tr draggable="true" data-id="<%= cat.id %>">
+                <td><span class="drag-handle" title="Drag to reorder">⠿</span></td>
+                <td><strong><%= cat.name %></strong></td>
+                <td><code style="font-size:.78rem;color:#6366f1;background:#ede9fe;padding:2px 6px;border-radius:4px"><%= cat.slug || '—' %></code></td>
+                <td><span class="badge badge-purple">#<%= i + 1 %></span></td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openEdit(<%= JSON.stringify(cat.id) %>, <%= JSON.stringify(cat.name) %>)">Rename</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteCategory(<%= JSON.stringify(cat.id) %>, <%= JSON.stringify(cat.name) %>)">Delete</button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <div style="margin-top:1rem;display:flex;gap:.75rem">
+          <button class="btn btn-success" onclick="saveOrder()">💾 Save Order</button>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Create Modal -->
+  <div class="modal-overlay" id="create-modal">
+    <div class="modal">
+      <h3>Add Category</h3>
+      <div id="create-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-group">
+        <label>Category Name</label>
+        <input type="text" id="create-name" class="form-control" placeholder="e.g. Starters"/>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeCreate()">Cancel</button>
+        <button class="btn btn-primary" onclick="createCategory()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <h3>Rename Category</h3>
+      <div id="edit-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-group">
+        <label>New Name</label>
+        <input type="text" id="edit-name" class="form-control"/>
+      </div>
+      <input type="hidden" id="edit-id"/>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeEdit()">Cancel</button>
+        <button class="btn btn-primary" onclick="updateCategory()">Save</button>
+      </div>
+    </div>
+  </div><!-- /.main-content -->
+</div><!-- /.layout -->
+
+  <script>
+    // ── Drag & Drop ─────────────────────────────────────────────────────
+    let dragSrc = null;
+    const tbody = document.getElementById('cat-tbody');
+    if (tbody) {
+      tbody.addEventListener('dragstart', (e) => {
+        dragSrc = e.target.closest('tr');
+        dragSrc.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      tbody.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const row = e.target.closest('tr');
+        if (row && row !== dragSrc) {
+          document.querySelectorAll('#cat-tbody tr').forEach(r => r.classList.remove('drag-over'));
+          row.classList.add('drag-over');
+        }
+      });
+      tbody.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const row = e.target.closest('tr');
+        if (row && row !== dragSrc) {
+          const rows = [...tbody.querySelectorAll('tr')];
+          const srcIdx = rows.indexOf(dragSrc);
+          const destIdx = rows.indexOf(row);
+          if (srcIdx < destIdx) row.after(dragSrc);
+          else row.before(dragSrc);
+          // Update badges
+          [...tbody.querySelectorAll('tr')].forEach((r, i) => {
+            const badge = r.querySelector('.badge');
+            if (badge) badge.textContent = '#' + (i + 1);
+          });
+        }
+        document.querySelectorAll('#cat-tbody tr').forEach(r => r.classList.remove('drag-over', 'dragging'));
+      });
+      tbody.addEventListener('dragend', () => {
+        document.querySelectorAll('#cat-tbody tr').forEach(r => r.classList.remove('dragging', 'drag-over'));
+      });
+    }
+
+    async function saveOrder() {
+      const orderedIds = [...document.querySelectorAll('#cat-tbody tr')].map(r => r.dataset.id);
+      const res = await fetch('/api/categories/reorder', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderedIds }),
+      });
+      if (res.ok) {
+        showFlash('Order saved!', 'success');
+      } else {
+        showFlash('Failed to save order.', 'error');
+      }
+    }
+
+    // ── Create ────────────────────────────────────────────────────────────
+    function openCreate() { document.getElementById('create-modal').classList.add('open'); document.getElementById('create-name').focus(); }
+    function closeCreate() { document.getElementById('create-modal').classList.remove('open'); }
+
+    async function createCategory() {
+      const name = document.getElementById('create-name').value.trim();
+      const err = document.getElementById('create-error');
+      err.style.display = 'none';
+      if (!name) { err.textContent = 'Name is required'; err.style.display = 'block'; return; }
+      const res = await fetch('/api/categories', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        const data = await res.json();
+        err.textContent = data.error?.message || 'Failed';
+        err.style.display = 'block';
+      }
+    }
+
+    // ── Edit ──────────────────────────────────────────────────────────────
+    function openEdit(id, name) {
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-name').value = name;
+      document.getElementById('edit-error').style.display = 'none';
+      document.getElementById('edit-modal').classList.add('open');
+    }
+    function closeEdit() { document.getElementById('edit-modal').classList.remove('open'); }
+
+    async function updateCategory() {
+      const id = document.getElementById('edit-id').value;
+      const name = document.getElementById('edit-name').value.trim();
+      const err = document.getElementById('edit-error');
+      err.style.display = 'none';
+      if (!name) { err.textContent = 'Name is required'; err.style.display = 'block'; return; }
+      const res = await fetch(`/api/categories/${id}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        const data = await res.json();
+        err.textContent = data.error?.message || 'Failed';
+        err.style.display = 'block';
+      }
+    }
+
+    // ── Delete ────────────────────────────────────────────────────────────
+    async function deleteCategory(id, name) {
+      if (!confirm(`Delete category "${name}" and all its products?`)) return;
+      const res = await fetch(`/api/categories/${id}`, { method: 'DELETE', credentials: 'include' });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        showFlash('Failed to delete category.', 'error');
+      }
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────
+    function showFlash(msg, type = 'success') {
+      const el = document.getElementById('flash-msg');
+      el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+      setTimeout(() => { el.innerHTML = ''; }, 3000);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // Close modals on backdrop click
+    ['create-modal','edit-modal'].forEach(id => {
+      document.getElementById(id).addEventListener('click', (e) => {
+        if (e.target.id === id) document.getElementById(id).classList.remove('open');
+      });
+    });
+
+    // Enter key to submit
+    document.getElementById('create-name')?.addEventListener('keydown', e => { if (e.key === 'Enter') createCategory(); });
+    document.getElementById('edit-name')?.addEventListener('keydown', e => { if (e.key === 'Enter') updateCategory(); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= theme.name %> — QR Menu Temaları</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="min-h-screen bg-gray-50">
+
+  <!-- Nav -->
+  <nav class="bg-white border-b border-gray-100 sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="/themes" class="flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors text-sm font-medium">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Tüm Temalar
+      </a>
+      <a href="/" class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+        QR Menu
+      </a>
+      <% if (user) { %>
+        <a href="/admin" class="text-sm font-medium text-indigo-600 hover:text-indigo-700">Panel →</a>
+      <% } else { %>
+        <a href="/admin" class="text-sm font-medium text-indigo-600 hover:text-indigo-700">Giriş Yap</a>
+      <% } %>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="bg-white border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16 flex flex-col md:flex-row gap-10 items-start">
+
+      <!-- Preview image -->
+      <div class="w-full md:w-1/2 flex-shrink-0">
+        <div class="aspect-[4/3] bg-gradient-to-br from-indigo-100 to-violet-100 rounded-2xl overflow-hidden shadow-xl flex items-center justify-center">
+          <% if (theme.previewImage) { %>
+            <img src="<%= theme.previewImage %>" alt="<%= theme.name %> önizleme"
+              class="w-full h-full object-cover" />
+          <% } else { %>
+            <div class="text-center p-8">
+              <div class="w-16 h-16 bg-white/60 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
+                <svg class="w-8 h-8 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1 1 .03 2.711-1.379 2.711H4.178c-1.408 0-2.38-1.71-1.379-2.711L4.2 15.3" />
+                </svg>
+              </div>
+              <p class="text-indigo-600 font-semibold text-lg"><%= theme.name %></p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="flex-1">
+        <div class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-4">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z" />
+          </svg>
+          Önizleme mevcut
+        </div>
+
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-3"><%= theme.name %></h1>
+        <p class="text-gray-500 text-lg mb-6"><%= theme.description || 'Modern ve şık bir QR menü teması.' %></p>
+
+        <!-- Price -->
+        <div class="flex items-baseline gap-3 mb-8">
+          <span class="text-5xl font-extrabold text-gray-900">
+            <%= theme.currency === 'USD' ? '$' : '₺' %><%= Number(theme.price).toFixed(0) %>
+          </span>
+          <span class="text-gray-400 line-through text-xl">
+            <%= theme.currency === 'USD' ? '$' : '₺' %><%= (Number(theme.price) * 2).toFixed(0) %>
+          </span>
+          <span class="bg-green-100 text-green-700 text-sm font-bold px-2.5 py-0.5 rounded-full">%50 İndirim</span>
+        </div>
+
+        <!-- Features -->
+        <% if (theme.features && theme.features.length > 0) { %>
+        <ul class="space-y-2 mb-8">
+          <% theme.features.forEach(function(f) { %>
+          <li class="flex items-center gap-2 text-gray-700 text-sm">
+            <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <%= f %>
+          </li>
+          <% }) %>
+        </ul>
+        <% } %>
+
+        <!-- CTAs -->
+        <% if (hasPurchased) { %>
+          <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 flex items-center gap-3">
+            <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <p class="text-green-700 text-sm font-medium">Bu temayı satın aldınız. Menünüz aktif.</p>
+          </div>
+          <a href="/admin"
+            class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-6 rounded-xl text-center transition-colors text-lg mb-3">
+            Menüyü Düzenle →
+          </a>
+        <% } else { %>
+          <div class="flex gap-3 mb-4">
+            <a href="/preview/<%= theme.slug %>"
+              class="flex-1 border-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-semibold py-3.5 px-4 rounded-xl text-center transition-colors">
+              Önizle →
+            </a>
+            <button onclick="handleBuy('<%= theme.id %>')"
+              class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors">
+              Satın Al —
+              <%= theme.currency === 'USD' ? '$' : '₺' %><%= Number(theme.price).toFixed(0) %>
+            </button>
+          </div>
+        <% } %>
+
+        <p class="text-xs text-gray-400 text-center">
+          🔒 Güvenli ödeme · Ömür boyu lisans · 30 gün iade garantisi
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features detail -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+    <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">Tema Özellikleri</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <% const defaultFeatures = [
+        { icon: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z', title: 'Mobil Öncelikli', desc: 'Tüm cihazlarda mükemmel görünüm' },
+        { icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z', title: 'Kolay Düzenleme', desc: 'Sürükle-bırak admin paneli' },
+        { icon: 'M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z', title: 'Fotoğraf Desteği', desc: 'Her ürün için görsel ekleyin' },
+        { icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', title: 'İstatistikler', desc: 'Ürün görüntüleme takibi' },
+        { icon: 'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z', title: 'QR Kod', desc: 'Özel QR kodu anında oluştur' },
+        { icon: 'M13 10V3L4 14h7v7l9-11h-7z', title: 'Hızlı Yükleme', desc: 'Optimize edilmiş yükleme hızı' },
+      ] %>
+      <% defaultFeatures.forEach(function(f) { %>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="<%= f.icon %>" />
+          </svg>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-1"><%= f.title %></h3>
+        <p class="text-gray-500 text-sm"><%= f.desc %></p>
+      </div>
+      <% }) %>
+    </div>
+  </section>
+
+  <!-- Bottom CTA -->
+  <% if (!hasPurchased) { %>
+  <section class="bg-gradient-to-r from-indigo-600 to-violet-600 py-16">
+    <div class="max-w-2xl mx-auto px-4 text-center">
+      <h2 class="text-3xl font-bold text-white mb-4">Bugün Başlayın</h2>
+      <p class="text-indigo-100 mb-8">Ömür boyu lisans. Güncelleme dahil. Tek seferlik ödeme.</p>
+      <div class="flex gap-4 justify-center">
+        <a href="/preview/<%= theme.slug %>"
+          class="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
+          Önizle →
+        </a>
+        <button onclick="handleBuy('<%= theme.id %>')"
+          class="bg-white text-indigo-600 hover:bg-gray-50 font-bold py-3 px-8 rounded-xl transition-colors shadow-lg">
+          Satın Al —
+          <%= theme.currency === 'USD' ? '$' : '₺' %><%= Number(theme.price).toFixed(0) %>
+        </button>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- Auth modal -->
+  <div id="auth-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 relative">
+      <button onclick="document.getElementById('auth-modal').classList.add('hidden')"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <h3 class="text-xl font-bold text-gray-900 mb-1">Hesap Gerekli</h3>
+      <p class="text-gray-500 text-sm mb-6">Satın almak için giriş yapın veya hesap oluşturun.</p>
+      <a href="/admin" onclick="sessionStorage.setItem('pendingThemeId','<%= theme.id %>')"
+        class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl text-center transition-colors mb-2">
+        Giriş Yap / Kayıt Ol
+      </a>
+    </div>
+  </div>
+
+  <script>
+    async function handleBuy(themeId) {
+      try {
+        const res = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ themeId }),
+          credentials: 'include',
+        });
+
+        if (res.status === 401) {
+          sessionStorage.setItem('pendingThemeId', themeId);
+          document.getElementById('auth-modal').classList.remove('hidden');
+          return;
+        }
+
+        const data = await res.json();
+        if (data.redirect) {
+          window.location.href = data.redirect;
+          return;
+        }
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+          return;
+        }
+        alert(data.error || 'Bir hata oluştu.');
+      } catch (err) {
+        alert('Bağlantı hatası. Lütfen tekrar deneyin.');
+      }
+    }
+
+    // Auto-trigger buy if user just logged in with a pending theme
+    document.addEventListener('DOMContentLoaded', () => {
+      const pending = sessionStorage.getItem('pendingThemeId');
+      if (pending && pending === '<%= theme.id %>') {
+        sessionStorage.removeItem('pendingThemeId');
+        <% if (user) { %>
+        handleBuy('<%= theme.id %>');
+        <% } %>
+      }
+    });
+  </script>
+
+</body>
+</html>

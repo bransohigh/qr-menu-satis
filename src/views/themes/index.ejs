@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tema Seçin – QR Menü SaaS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: {
+              50:'#f0f5ff',100:'#e5edff',200:'#cddbfe',300:'#a4bcfd',
+              400:'#7194f8',500:'#4b6ef0',600:'#3550e8',700:'#2a3dcc',
+              800:'#2534a6',900:'#243184',
+            }
+          },
+          animation: {
+            'fade-in': 'fadeIn .35s ease both',
+          },
+          keyframes: {
+            fadeIn: { from:{opacity:'0'}, to:{opacity:'1'} },
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .card-hover { transition: transform .25s ease, box-shadow .25s ease; }
+    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 48px -12px rgba(53,80,232,.22); }
+    .gradient-preview::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.32));
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+  <!-- Topbar -->
+  <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-2 font-bold text-xl text-slate-900 hover:text-brand-600 transition-colors">
+        <span class="text-2xl">&#127869;</span>
+        <span>QR Menu</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <% if (user) { %>
+          <span class="hidden sm:block text-sm text-slate-500 truncate max-w-[160px]"><%= user.email %></span>
+          <a href="/admin" class="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition-all">
+            Dashboard &rarr;
+          </a>
+          <button onclick="logout()" class="text-sm text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded-lg hover:bg-slate-100">&#199;&#305;k&#305;&#351;</button>
+        <% } else { %>
+          <button onclick="openModal(null,null,'login')" class="text-sm font-medium text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-all">
+            Giri&#351; Yap
+          </button>
+          <button onclick="openModal(null,null,'register')" class="text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white px-4 py-1.5 rounded-lg transition-all shadow-sm">
+            &#220;cretsiz Ba&#351;la
+          </button>
+        <% } %>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-brand-900 to-slate-900 text-white">
+    <div class="absolute inset-0 opacity-30"
+         style="background-image:radial-gradient(circle at 20% 50%,#4b6ef0 0%,transparent 50%),radial-gradient(circle at 80% 20%,#7c3aed 0%,transparent 50%)"></div>
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-20 sm:py-28 text-center">
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6 backdrop-blur-sm">
+        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+        10 Premium Tema &middot; Anında Yayın
+      </div>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight mb-5">
+        Restoranınız İçin<br/>
+        <span class="bg-gradient-to-r from-brand-300 to-purple-400 bg-clip-text text-transparent">Mükemmel Temayı</span><br/>
+        Seçin
+      </h1>
+      <p class="text-slate-300 text-lg sm:text-xl max-w-xl mx-auto mb-8">
+        QR kodlu dijital menünüzü dakikalar içinde hazırlayın. Kategorilerinizi ve ürünlerinizi ekleyin, QR kodunuzu paylaşın.
+      </p>
+      <% if (userMenu) { %>
+        <a href="/admin" class="inline-flex items-center gap-2 bg-white text-brand-700 font-bold px-7 py-3.5 rounded-2xl shadow-lg hover:shadow-xl transition-all">
+          Admin Paneline Git &rarr;
+        </a>
+      <% } else { %>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+          <a href="#themes" class="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg hover:shadow-xl transition-all">
+            Temayı Seç &#8595;
+          </a>
+          <button onclick="openModal(null,null,'register')" class="inline-flex items-center gap-2 bg-white/10 border border-white/30 hover:bg-white/20 text-white font-semibold px-7 py-3.5 rounded-2xl transition-all backdrop-blur-sm">
+            Ücretsiz Hesap Aç
+          </button>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- Flash -->
+  <% if (flash === 'login_required') { %>
+    <div class="max-w-5xl mx-auto px-4 pt-6">
+      <div class="flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-4 py-3 text-sm">
+        Bu temayı kullanmak için lütfen giriş yapın veya hesap oluşturun.
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Search + Sort -->
+  <section id="themes" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-4">
+    <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+      <div class="relative flex-1 max-w-md">
+        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input id="search-input" type="search" placeholder="Tema ara…" autocomplete="off"
+               class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm transition"/>
+      </div>
+      <select id="sort-select" class="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm cursor-pointer">
+        <option value="default">Sıralama: Varsayılan</option>
+        <option value="name-asc">İsim A→Z</option>
+        <option value="name-desc">İsim Z→A</option>
+      </select>
+      <span class="hidden sm:flex items-center text-sm text-slate-500 whitespace-nowrap">
+        <span id="count-num"><%= themes.length %></span>&nbsp;tema
+      </span>
+    </div>
+  </section>
+
+  <!-- Themes Grid -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div id="themes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <%
+        const tg = [
+          ['from-rose-400','to-orange-400'],['from-violet-500','to-purple-600'],
+          ['from-pink-400','to-rose-500'],  ['from-emerald-400','to-teal-500'],
+          ['from-amber-400','to-orange-500'],['from-sky-400','to-blue-500'],
+          ['from-red-400','to-pink-600'],   ['from-cyan-400','to-teal-500'],
+          ['from-slate-500','to-slate-700'],['from-yellow-400','to-amber-500'],
+        ];
+        const tf = [
+          ['Temiz liste','Mobil uyumlu','Hızlı yükleme'],
+          ['Kart görünümü','Görsel ağırlıklı','Akıcı grid'],
+          ['Tipografi odaklı','Minimal tasarım','Şık görünüm'],
+          ['Karanlık mod','Modern UI','Yüksek kontrast'],
+          ['Büyük başlıklar','Görselli bölümler','Etkileyici'],
+          ['Kenar çubuğu','Hızlı navigasyon','Kategori bazlı'],
+          ['Yüzen butonlar','Akıcı kaydırma','Dinamik liste'],
+          ['Görsel öncelikli','Yemek fotoğrafı','Görsel menü'],
+          ['Kompakt görünüm','Çok ürün','Yoğun içerik'],
+          ['Premium tasarım','Lüks his','Özel animasyon'],
+        ];
+      %>
+      <% themes.forEach(function(theme, i) { %>
+        <div class="theme-card card-hover bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-md flex flex-col"
+             data-name="<%= theme.name.toLowerCase() %>" data-idx="<%= i %>">
+
+          <!-- Preview gradient -->
+          <div class="gradient-preview h-44 bg-gradient-to-br <%= tg[i%tg.length][0] %> <%= tg[i%tg.length][1] %> flex items-end justify-between p-3 relative">
+            <span class="z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl">&#127869;</span>
+            <span class="z-10 relative text-white/70 text-[10px] font-bold tracking-widest uppercase">TPL <%= String(i+1).padStart(2,'0') %></span>
+            <span class="z-10 relative bg-white/20 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full border border-white/30">Premium</span>
+          </div>
+
+          <!-- Body -->
+          <div class="flex flex-col flex-1 p-4 gap-3">
+            <div>
+              <h3 class="font-bold text-slate-900 text-[0.95rem] leading-snug"><%= theme.name %></h3>
+              <p class="text-slate-500 text-[0.78rem] mt-1 line-clamp-2 leading-relaxed"><%= theme.description %></p>
+            </div>
+
+            <ul class="flex flex-col gap-1.5">
+              <% tf[i % tf.length].forEach(function(f){ %>
+                <li class="flex items-center gap-2 text-[0.78rem] text-slate-500">
+                  <svg class="w-3.5 h-3.5 text-brand-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <%= f %>
+                </li>
+              <% }); %>
+            </ul>
+
+            <div class="mt-auto pt-2">
+              <% if (userMenu) { %>
+                <a href="/admin" class="w-full flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm py-2.5 px-4 rounded-xl transition-all">
+                  Menünüz hazır &rarr;
+                </a>
+              <% } else { %>
+                <div class="flex gap-2">
+                  <a href="/preview/<%= theme.slug %>"
+                    class="flex-1 flex items-center justify-center border border-brand-200 text-brand-700 hover:bg-brand-50 font-semibold text-sm py-2.5 px-3 rounded-xl transition-all">
+                    Önizle
+                  </a>
+                  <button class="theme-cta-btn flex-1 flex items-center justify-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm py-2.5 px-3 rounded-xl transition-all shadow-sm hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                          data-theme-id="<%= theme.id %>"
+                          data-theme-name="<%= theme.name %>"
+                          onclick="handleBuyBtn(this)">
+                    <span class="btn-text">Satın Al</span>
+                    <svg class="btn-spinner hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    </svg>
+                  </button>
+                </div>
+                <a href="/themes/<%= theme.slug %>" class="block text-center text-xs text-slate-400 hover:text-brand-600 mt-1.5 transition-colors">
+                  Detayları gör →
+                </a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+
+    <div id="empty-state" class="hidden text-center py-20">
+      <p class="text-5xl mb-4">&#128269;</p>
+      <p class="text-slate-500 text-lg font-medium">Tema bulunamadı</p>
+      <p class="text-slate-400 text-sm mt-1">Farklı bir arama deneyin</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-100 mt-12 py-8 text-center text-sm text-slate-400">
+    QR Menü SaaS — Restoranınız için dijital menü çözümü
+  </footer>
+
+  <!-- Auth Modal -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+       onclick="if(event.target===this)closeModal()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="px-6 pt-6 pb-0">
+        <div class="flex items-start justify-between mb-1">
+          <h2 class="text-xl font-bold text-slate-900">
+            <% if (!user) { %>Hesap Gerekli<% } else { %>Menü Oluştur<% } %>
+          </h2>
+          <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 -mr-1 rounded-lg p-1 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <p class="text-sm text-slate-500 mb-4">Seçilen tema: <strong id="modal-theme-name" class="text-brand-600">—</strong></p>
+      </div>
+
+      <% if (!user) { %>
+        <div class="px-6 pb-0">
+          <div class="flex border-b border-slate-100 mb-5">
+            <button id="tab-register-btn" onclick="switchTab('register')"
+                    class="flex-1 text-sm font-semibold py-2.5 border-b-2 border-brand-600 text-brand-600 transition-colors">
+              Hesap Oluştur
+            </button>
+            <button id="tab-login-btn" onclick="switchTab('login')"
+                    class="flex-1 text-sm font-semibold py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-700 transition-colors">
+              Giriş Yap
+            </button>
+          </div>
+        </div>
+        <div class="px-6 pb-6">
+          <div id="tab-register" class="space-y-3">
+            <div id="reg-error" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl px-3.5 py-2.5 text-sm"></div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">E-posta</label>
+              <input type="email" id="reg-email" placeholder="siz@example.com"
+                     class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Şifre <span class="font-normal text-slate-400">(en az 8 karakter)</span></label>
+              <input type="password" id="reg-password" placeholder="••••••••"
+                     class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">İşletme adı <span class="font-normal text-slate-400">(isteğe bağlı)</span></label>
+              <input type="text" id="reg-business" placeholder="Restoranım"
+                     class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"/>
+            </div>
+          </div>
+          <div id="tab-login" class="space-y-3 hidden">
+            <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl px-3.5 py-2.5 text-sm"></div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">E-posta</label>
+              <input type="email" id="login-email" placeholder="siz@example.com"
+                     class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Şifre</label>
+              <input type="password" id="login-password" placeholder="••••••••"
+                     class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"/>
+            </div>
+          </div>
+          <button id="auth-submit-btn" onclick="handleAuthSubmit()"
+                  class="w-full mt-5 flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-xl transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
+            <span id="auth-btn-text">Hesap Oluştur &amp; Menü Aç</span>
+            <svg id="auth-btn-spin" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+          </button>
+        </div>
+      <% } else { %>
+        <div class="px-6 pb-6 space-y-4">
+          <div id="create-error" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl px-3.5 py-2.5 text-sm"></div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">İşletme adı <span class="font-normal text-slate-400">(isteğe bağlı)</span></label>
+            <input type="text" id="loggedin-business" placeholder="Restoranım"
+                   class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"/>
+          </div>
+          <button id="create-menu-btn" onclick="createMenuLoggedIn()"
+                  class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-xl transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
+            <span>Menüyü Oluştur</span>
+            <svg id="create-menu-spin" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+          </button>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    var selectedThemeId = '';
+    var selectedThemeName = '';
+    var activeTab = 'register';
+    var isLoggedIn = <%- user ? 'true' : 'false' %>;
+
+    function handleThemeCta(btn) {
+      selectedThemeId   = btn.dataset.themeId;
+      selectedThemeName = btn.dataset.themeName;
+      if (isLoggedIn) {
+        btn.disabled = true;
+        btn.querySelector('.btn-text').textContent = 'Oluşturuluyor…';
+        btn.querySelector('.btn-spinner').classList.remove('hidden');
+        createMenu('', btn);
+      } else {
+        openModal(selectedThemeId, selectedThemeName, 'register');
+      }
+    }
+
+    async function handleBuyBtn(btn) {
+      selectedThemeId   = btn.dataset.themeId;
+      selectedThemeName = btn.dataset.themeName;
+      if (!isLoggedIn) {
+        openModal(selectedThemeId, selectedThemeName, 'register');
+        return;
+      }
+      btn.disabled = true;
+      btn.querySelector('.btn-text').textContent = 'Yönlendiriliyor…';
+      btn.querySelector('.btn-spinner').classList.remove('hidden');
+      try {
+        var res = await fetch('/api/checkout', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ themeId: selectedThemeId }),
+        });
+        var data = await res.json();
+        if (data.redirect) { window.location.href = data.redirect; return; }
+        if (data.redirectUrl) { window.location.href = data.redirectUrl; return; }
+        alert(data.error || 'Bir hata oluştu.');
+      } catch(e) {
+        alert('Bağlantı hatası. Lütfen tekrar deneyin.');
+      } finally {
+        btn.disabled = false;
+        btn.querySelector('.btn-text').textContent = 'Satın Al';
+        btn.querySelector('.btn-spinner').classList.add('hidden');
+      }
+    }
+
+    function openModal(themeId, themeName, tab) {
+      if (themeId) { selectedThemeId = themeId; selectedThemeName = themeName; }
+      var nm = document.getElementById('modal-theme-name');
+      if (nm) nm.textContent = selectedThemeName || '—';
+      document.getElementById('modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      if (tab && !isLoggedIn) switchTab(tab);
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function switchTab(tab) {
+      activeTab = tab;
+      var isReg = tab === 'register';
+      document.getElementById('tab-register').classList.toggle('hidden', !isReg);
+      document.getElementById('tab-login').classList.toggle('hidden', isReg);
+      var active   = 'flex-1 text-sm font-semibold py-2.5 border-b-2 border-brand-600 text-brand-600 transition-colors';
+      var inactive = 'flex-1 text-sm font-semibold py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-700 transition-colors';
+      document.getElementById('tab-register-btn').className = isReg  ? active : inactive;
+      document.getElementById('tab-login-btn').className    = !isReg ? active : inactive;
+      var t = document.getElementById('auth-btn-text');
+      if (t) t.textContent = isReg ? 'Hesap Oluştur & Menü Aç' : 'Giriş Yap & Menü Aç';
+    }
+
+    async function handleAuthSubmit() {
+      var btn  = document.getElementById('auth-submit-btn');
+      var spin = document.getElementById('auth-btn-spin');
+      btn.disabled = true; spin.classList.remove('hidden');
+      try {
+        if (activeTab === 'register') {
+          var email    = document.getElementById('reg-email').value.trim();
+          var password = document.getElementById('reg-password').value;
+          var biz      = document.getElementById('reg-business').value.trim();
+          var r = await fetch('/api/auth/register',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+          var d = await r.json();
+          if (!r.ok) { showErr('reg-error', d.error ? d.error.message : 'Kayıt başarısız'); return; }
+          await createMenu(biz);
+        } else {
+          var email    = document.getElementById('login-email').value.trim();
+          var password = document.getElementById('login-password').value;
+          var r = await fetch('/api/auth/login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+          var d = await r.json();
+          if (!r.ok) { showErr('login-error', d.error ? d.error.message : 'Giriş başarısız'); return; }
+          await createMenu('');
+        }
+      } finally {
+        btn.disabled = false; spin.classList.add('hidden');
+      }
+    }
+
+    async function createMenu(businessName, originBtn) {
+      var r = await fetch('/api/menus/create-from-theme',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({themeId:selectedThemeId,businessName:businessName})});
+      var d = await r.json();
+      if (r.ok && d.redirect) { window.location.href = d.redirect; return; }
+      var msg = d.error ? d.error.message : 'Menü oluşturulamadı';
+      if (originBtn) {
+        originBtn.disabled = false;
+        originBtn.querySelector('.btn-text').textContent = 'Bu Temayı Seç';
+        originBtn.querySelector('.btn-spinner').classList.add('hidden');
+        alert(msg);
+      } else {
+        showErr('reg-error', msg);
+      }
+    }
+
+    async function createMenuLoggedIn() {
+      var btn  = document.getElementById('create-menu-btn');
+      var spin = document.getElementById('create-menu-spin');
+      btn.disabled = true; spin.classList.remove('hidden');
+      var biz = (document.getElementById('loggedin-business') || {value:''}).value.trim();
+      var r = await fetch('/api/menus/create-from-theme',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({themeId:selectedThemeId,businessName:biz})});
+      var d = await r.json();
+      if (r.ok && d.redirect) { window.location.href = d.redirect; return; }
+      btn.disabled = false; spin.classList.add('hidden');
+      showErr('create-error', d.error ? d.error.message : 'Menü oluşturulamadı');
+    }
+
+    function showErr(id, msg) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    async function logout() {
+      await fetch('/api/auth/logout',{method:'POST',credentials:'include'});
+      window.location.href = '/themes';
+    }
+
+    // Search and sort
+    var cards       = Array.from(document.querySelectorAll('.theme-card'));
+    var emptyState  = document.getElementById('empty-state');
+    var countNum    = document.getElementById('count-num');
+    var searchInput = document.getElementById('search-input');
+    var sortSelect  = document.getElementById('sort-select');
+
+    function filterAndSort() {
+      var q    = searchInput.value.toLowerCase().trim();
+      var sort = sortSelect.value;
+      var visible = cards.filter(function(c){ return !q || c.dataset.name.includes(q); });
+      if (sort === 'name-asc')  visible.sort(function(a,b){ return a.dataset.name.localeCompare(b.dataset.name); });
+      if (sort === 'name-desc') visible.sort(function(a,b){ return b.dataset.name.localeCompare(a.dataset.name); });
+      cards.forEach(function(c){ c.classList.add('hidden'); });
+      visible.forEach(function(c){ c.classList.remove('hidden'); });
+      if (countNum) countNum.textContent = visible.length;
+      if (emptyState) emptyState.classList.toggle('hidden', visible.length > 0);
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterAndSort);
+    if (sortSelect)  sortSelect.addEventListener('change', filterAndSort);
+
+    ['reg-password','login-password'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('keydown', function(e){ if(e.key==='Enter') handleAuthSubmit(); });
+    });
+  </script>
+</body>
+</html>
