@@ -91,8 +91,24 @@ app.use('/checkout', checkout_1.checkoutRouter);
 // ─── Global error handler ────────────────────────────────────────────────────
 app.use(errorHandler_1.errorHandler);
 // ─── Start server ────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-    console.log(`🚀 QR Menü çalışıyor → ${env_1.env.APP_URL} (port ${PORT}) [${env_1.env.NODE_ENV}]`);
+process.on('uncaughtException', (err) => {
+    console.error('[HATA] Yakalanmamış istisna:', err);
+    process.exit(1);
 });
+process.on('unhandledRejection', (reason) => {
+    console.error('[HATA] Yakalanmamış promise reddi:', reason);
+    process.exit(1);
+});
+try {
+    app.listen(PORT, () => {
+        console.log(`🚀 QR Menü çalışıyor → ${env_1.env.APP_URL} (port ${PORT}) [${env_1.env.NODE_ENV}]`);
+        console.log(`📁 Views: ${process.cwd()}/src/views`);
+        console.log(`📁 CWD: ${process.cwd()}`);
+    });
+}
+catch (err) {
+    console.error('[HATA] Sunucu başlatılamadı:', err);
+    process.exit(1);
+}
 exports.default = app;
 //# sourceMappingURL=app.js.map
