@@ -53,7 +53,7 @@ app.use(
 
 // ─── View engine ─────────────────────────────────────────────────────────────
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '../views'));
+app.set('views', path.join(process.cwd(), 'src/views'));
 
 // ─── Body parsing, cookies, logging ─────────────────────────────────────────
 app.use(express.json());
@@ -63,7 +63,7 @@ app.use(cookieParser());
 app.use(morgan(isProd ? 'combined' : 'dev'));
 
 // ─── Static files ────────────────────────────────────────────────────────────
-app.use('/public', express.static(path.join(__dirname, '../../public')));
+app.use('/public', express.static(path.join(process.cwd(), 'public')));
 // UPLOAD_DIR env ile konfigüre edilir; mutlak ya da proje köküne göre göreli olabilir
 const uploadDir = path.isAbsolute(env.UPLOAD_DIR)
   ? env.UPLOAD_DIR

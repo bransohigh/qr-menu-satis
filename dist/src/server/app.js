@@ -51,7 +51,7 @@ app.use((0, helmet_1.default)({
 }));
 // ─── View engine ─────────────────────────────────────────────────────────────
 app.set('view engine', 'ejs');
-app.set('views', path_1.default.join(__dirname, '../views'));
+app.set('views', path_1.default.join(process.cwd(), 'src/views'));
 // ─── Body parsing, cookies, logging ─────────────────────────────────────────
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
@@ -59,7 +59,7 @@ app.use((0, cookie_parser_1.default)());
 // Production'da 'combined' (Apache formatı, log toplayıcılarla uyumlu)
 app.use((0, morgan_1.default)(env_1.isProd ? 'combined' : 'dev'));
 // ─── Static files ────────────────────────────────────────────────────────────
-app.use('/public', express_1.default.static(path_1.default.join(__dirname, '../../public')));
+app.use('/public', express_1.default.static(path_1.default.join(process.cwd(), 'public')));
 // UPLOAD_DIR env ile konfigüre edilir; mutlak ya da proje köküne göre göreli olabilir
 const uploadDir = path_1.default.isAbsolute(env_1.env.UPLOAD_DIR)
     ? env_1.env.UPLOAD_DIR
