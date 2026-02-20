@@ -1,5 +1,5 @@
 node_modules/
-dist/
+# dist/ — lokalde build edilip GitHub'a push edilir
 .env
 uploads/*
 !uploads/.gitkeep
