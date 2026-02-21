@@ -14,9 +14,11 @@ console.log('[server.js] NODE_VERSION:', process.version);
 console.log('[server.js] CWD:', process.cwd());
 console.log('[server.js] PORT env:', process.env.PORT);
 
-require('dotenv').config({ path: __dirname + '/.env' });
+// override:true → mevcut ortam değişkenlerini .env ile geçersiz kıl
+require('dotenv').config({ path: __dirname + '/.env', override: true });
 
 console.log('[server.js] APP_URL:', process.env.APP_URL);
+console.log('[server.js] DATABASE_URL host:', (process.env.DATABASE_URL || '').replace(/:[^@]*@/, ':***@').split('@')[1]?.split('/')[0] || 'NOT SET');
 console.log('[server.js] DATABASE_URL set:', !!process.env.DATABASE_URL);
 console.log('[server.js] JWT_SECRET set:', !!process.env.JWT_SECRET);
 
