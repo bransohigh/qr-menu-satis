@@ -1,0 +1,26 @@
+<!-- Yönetim Navbar -->
+<div style="background:#0f172a;color:#fff;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;">
+  <a href="/yonetim" style="font-weight:700;font-size:1.05rem;color:#fff;text-decoration:none;">⚙️ QR Menü Yönetimi</a>
+  <div style="display:flex;gap:1rem;align-items:center;font-size:.85rem;">
+    <span style="color:#94a3b8"><%= kullanici.email %></span>
+    <span style="background:#7c3aed;color:#fff;padding:2px 8px;border-radius:9999px;font-size:.72rem;font-weight:700;">ADMIN</span>
+    <button onclick="cikisYap()" style="color:#94a3b8;background:none;border:none;cursor:pointer;font-size:.85rem;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Çıkış</button>
+  </div>
+</div>
+<div style="display:flex;flex:1;">
+  <nav style="width:230px;background:#fff;border-right:1px solid #e2e8f0;padding:1.25rem 0;flex-shrink:0;min-height:calc(100vh - 48px);">
+    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;padding:.4rem 1.25rem;margin-top:.75rem;">Yönetim</div>
+    <a href="/yonetim" style="display:flex;align-items:center;gap:.5rem;padding:.55rem 1.25rem;color:<%= active==='dashboard'?'#7c3aed':'#64748b' %>;text-decoration:none;font-size:.88rem;font-weight:500;border-left:3px solid <%= active==='dashboard'?'#7c3aed':'transparent' %>;background:<%= active==='dashboard'?'#f5f3ff':'transparent' %>">📊 Genel Bakış</a>
+    <a href="/yonetim/satin-alimlar" style="display:flex;align-items:center;gap:.5rem;padding:.55rem 1.25rem;color:<%= active==='satinalimlar'?'#7c3aed':'#64748b' %>;text-decoration:none;font-size:.88rem;font-weight:500;border-left:3px solid <%= active==='satinalimlar'?'#7c3aed':'transparent' %>;background:<%= active==='satinalimlar'?'#f5f3ff':'transparent' %>">💳 Satın Alımlar</a>
+    <a href="/yonetim/menuler" style="display:flex;align-items:center;gap:.5rem;padding:.55rem 1.25rem;color:<%= active==='menuler'?'#7c3aed':'#64748b' %>;text-decoration:none;font-size:.88rem;font-weight:500;border-left:3px solid <%= active==='menuler'?'#7c3aed':'transparent' %>;background:<%= active==='menuler'?'#f5f3ff':'transparent' %>">🍽 Menüler</a>
+    <a href="/yonetim/kullanicilar" style="display:flex;align-items:center;gap:.5rem;padding:.55rem 1.25rem;color:<%= active==='kullanicilar'?'#7c3aed':'#64748b' %>;text-decoration:none;font-size:.88rem;font-weight:500;border-left:3px solid <%= active==='kullanicilar'?'#7c3aed':'transparent' %>;background:<%= active==='kullanicilar'?'#f5f3ff':'transparent' %>">👥 Kullanıcılar</a>
+    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;padding:.4rem 1.25rem;margin-top:.75rem;">Sistem</div>
+    <a href="/temalar" style="display:flex;align-items:center;gap:.5rem;padding:.55rem 1.25rem;color:#64748b;text-decoration:none;font-size:.88rem;font-weight:500;">🎨 Temalar</a>
+    <a href="/saglik" style="display:flex;align-items:center;gap:.5rem;padding:.55rem 1.25rem;color:#64748b;text-decoration:none;font-size:.88rem;font-weight:500;">❤️ Sistem Sağlığı</a>
+  </nav>
+<script>
+  async function cikisYap() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/temalar';
+  }
+</script>

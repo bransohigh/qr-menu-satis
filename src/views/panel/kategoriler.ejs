@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kategoriler — Panel</title>
+  <style><%- include('../partials/admin-styles') %></style>
+</head>
+<body>
+  <%- include('../partials/panel-nav', { active: 'kategoriler' }) %>
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Kategoriler</h1>
+      <button class="btn btn-primary" onclick="openCreate()">+ Kategori Ekle</button>
+    </div>
+
+    <div id="flash-msg"></div>
+
+    <div class="card">
+      <p style="font-size:.82rem;color:#94a3b8;margin-bottom:1rem">
+        Satırları sürükleyerek sıralayın, ardından <strong>Sırayı Kaydet</strong>'e tıklayın.
+      </p>
+      <% if (kategoriler.length === 0) { %>
+        <div class="empty-state" style="text-align:center;padding:2rem">
+          <p style="color:#94a3b8;margin-bottom:1rem">Henüz kategori yok. İlk kategorinizi oluşturun!</p>
+          <button class="btn btn-primary" onclick="openCreate()">+ Kategori Ekle</button>
+        </div>
+      <% } else { %>
+        <table class="table" id="cat-table">
+          <thead>
+            <tr>
+              <th style="width:40px"></th>
+              <th>Ad</th>
+              <th>Slug</th>
+              <th>Sıra</th>
+              <th style="width:160px">İşlemler</th>
+            </tr>
+          </thead>
+          <tbody id="cat-tbody">
+            <% kategoriler.forEach((kat, i) => { %>
+              <tr draggable="true" data-id="<%= kat.id %>">
+                <td><span class="drag-handle" title="Sürükleyerek sırala">⠿</span></td>
+                <td><strong><%= kat.name %></strong></td>
+                <td><code style="font-size:.78rem;color:#6366f1;background:#ede9fe;padding:2px 6px;border-radius:4px"><%= kat.slug || '—' %></code></td>
+                <td><span class="badge badge-purple" style="background:#ede9fe;color:#6366f1;padding:2px 8px;border-radius:9999px;font-size:.78rem">#<%= i + 1 %></span></td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openEdit(<%= JSON.stringify(kat.id) %>, <%= JSON.stringify(kat.name) %>)">Yeniden Adlandır</button>
+                  <button class="btn btn-danger btn-sm" onclick="kategoriSil(<%= JSON.stringify(kat.id) %>, <%= JSON.stringify(kat.name) %>)">Sil</button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <div style="margin-top:1rem;display:flex;gap:.75rem">
+          <button class="btn btn-success" onclick="siralamaKaydet()">💾 Sırayı Kaydet</button>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Oluşturma Modalı -->
+  <div class="modal-overlay" id="create-modal">
+    <div class="modal">
+      <h3>Kategori Ekle</h3>
+      <div id="create-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-group">
+        <label>Kategori Adı</label>
+        <input type="text" id="create-name" class="form-control" placeholder="örn. Başlangıçlar"/>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeCreate()">İptal</button>
+        <button class="btn btn-primary" onclick="kategoriOlustur()">Oluştur</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Düzenleme Modalı -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <h3>Kategoriyi Yeniden Adlandır</h3>
+      <div id="edit-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-group">
+        <label>Yeni Ad</label>
+        <input type="text" id="edit-name" class="form-control"/>
+      </div>
+      <input type="hidden" id="edit-id"/>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeEdit()">İptal</button>
+        <button class="btn btn-primary" onclick="kategoriGuncelle()">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Drag & Drop
+    let dragSrc = null;
+    const tbody = document.getElementById('cat-tbody');
+    if (tbody) {
+      tbody.addEventListener('dragstart', (e) => { dragSrc = e.target.closest('tr'); dragSrc.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+      tbody.addEventListener('dragover', (e) => { e.preventDefault(); const row = e.target.closest('tr'); if (row && row !== dragSrc) { document.querySelectorAll('#cat-tbody tr').forEach(r => r.classList.remove('drag-over')); row.classList.add('drag-over'); } });
+      tbody.addEventListener('drop', (e) => { e.preventDefault(); const row = e.target.closest('tr'); if (row && row !== dragSrc) { const rows = [...tbody.querySelectorAll('tr')]; const si = rows.indexOf(dragSrc); const di = rows.indexOf(row); if (si < di) row.after(dragSrc); else row.before(dragSrc); [...tbody.querySelectorAll('tr')].forEach((r, i) => { const b = r.querySelector('[class*="badge"]'); if (b) b.textContent = '#' + (i+1); }); } document.querySelectorAll('#cat-tbody tr').forEach(r => r.classList.remove('drag-over','dragging')); });
+      tbody.addEventListener('dragend', () => { document.querySelectorAll('#cat-tbody tr').forEach(r => r.classList.remove('dragging','drag-over')); });
+    }
+
+    async function siralamaKaydet() {
+      const orderedIds = [...document.querySelectorAll('#cat-tbody tr')].map(r => r.dataset.id);
+      const res = await fetch('/api/categories/reorder', { method:'PATCH', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ orderedIds }) });
+      if (res.ok) flash('Sıralama kaydedildi!', 'success'); else flash('Kaydetme başarısız.', 'error');
+    }
+
+    function openCreate() { document.getElementById('create-modal').classList.add('open'); document.getElementById('create-name').focus(); }
+    function closeCreate() { document.getElementById('create-modal').classList.remove('open'); }
+
+    async function kategoriOlustur() {
+      const name = document.getElementById('create-name').value.trim();
+      const err = document.getElementById('create-error');
+      err.style.display = 'none';
+      if (!name) { err.textContent = 'Kategori adı zorunludur'; err.style.display = 'block'; return; }
+      const res = await fetch('/api/categories', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name }) });
+      if (res.ok) { window.location.reload(); } else { const d = await res.json(); err.textContent = d.error?.message || 'Hata oluştu'; err.style.display = 'block'; }
+    }
+
+    function openEdit(id, name) { document.getElementById('edit-id').value = id; document.getElementById('edit-name').value = name; document.getElementById('edit-error').style.display = 'none'; document.getElementById('edit-modal').classList.add('open'); }
+    function closeEdit() { document.getElementById('edit-modal').classList.remove('open'); }
+
+    async function kategoriGuncelle() {
+      const id = document.getElementById('edit-id').value;
+      const name = document.getElementById('edit-name').value.trim();
+      const err = document.getElementById('edit-error');
+      err.style.display = 'none';
+      if (!name) { err.textContent = 'Ad zorunludur'; err.style.display = 'block'; return; }
+      const res = await fetch(`/api/categories/${id}`, { method:'PATCH', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name }) });
+      if (res.ok) { window.location.reload(); } else { const d = await res.json(); err.textContent = d.error?.message || 'Hata'; err.style.display = 'block'; }
+    }
+
+    async function kategoriSil(id, name) {
+      if (!confirm(`"${name}" kategorisi ve tüm ürünleri silinecek. Emin misiniz?`)) return;
+      const res = await fetch(`/api/categories/${id}`, { method:'DELETE', credentials:'include' });
+      if (res.ok) { window.location.reload(); } else { flash('Silme başarısız.', 'error'); }
+    }
+
+    function flash(msg, type = 'success') {
+      const el = document.getElementById('flash-msg');
+      el.innerHTML = `<div class="alert alert-${type}" style="background:${type==='success'?'#f0fdf4':'#fef2f2'};color:${type==='success'?'#166534':'#991b1b'};border:1px solid ${type==='success'?'#bbf7d0':'#fecaca'};padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.85rem;">${msg}</div>`;
+      setTimeout(() => { el.innerHTML = ''; }, 3000);
+    }
+
+    ['create-modal','edit-modal'].forEach(id => {
+      document.getElementById(id).addEventListener('click', (e) => { if (e.target.id === id) document.getElementById(id).classList.remove('open'); });
+    });
+    document.getElementById('create-name')?.addEventListener('keydown', e => { if (e.key === 'Enter') kategoriOlustur(); });
+    document.getElementById('edit-name')?.addEventListener('keydown', e => { if (e.key === 'Enter') kategoriGuncelle(); });
+  </script>
+</body>
+</html>

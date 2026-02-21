@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menü Yönetimi — Yönetim</title>
+  <style><%- include('../partials/admin-styles') %></style>
+</head>
+<body>
+  <%- include('../partials/yonetim-nav', { active: 'menuler' }) %>
+  <div class="main-content" style="max-width:1200px">
+    <div class="page-header">
+      <h1 class="page-title">Menüler</h1>
+      <span style="font-size:.85rem;color:#94a3b8">Toplam: <%= toplamSayi %></span>
+    </div>
+
+    <!-- Arama -->
+    <div class="card" style="padding:1rem 1.5rem;margin-bottom:1rem">
+      <form method="GET" style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <input type="search" name="arama" value="<%= arama %>" placeholder="İşletme adı veya e-posta ile ara..." class="form-control" style="max-width:320px"/>
+        <button type="submit" class="btn btn-primary">Ara</button>
+        <% if (arama) { %><a href="/yonetim/menuler" class="btn btn-ghost btn-sm">Temizle</a><% } %>
+      </form>
+    </div>
+
+    <div class="card">
+      <% if (menuler.length === 0) { %>
+        <p style="color:#94a3b8;font-size:.9rem;text-align:center;padding:2rem">Sonuç bulunamadı.</p>
+      <% } else { %>
+        <div style="overflow-x:auto">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>İşletme Adı</th>
+                <th>Menü Linki</th>
+                <th>Sahibi</th>
+                <th>Tema</th>
+                <th>Kategori / Ürün</th>
+                <th>Oluşturma</th>
+                <th style="width:90px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% menuler.forEach(m => { %>
+                <tr>
+                  <td><strong><%= m.businessName || '—' %></strong></td>
+                  <td>
+                    <a href="/m/<%= m.slug %>" target="_blank" style="color:#7c3aed;font-size:.85rem">/m/<%= m.slug %> ↗</a>
+                  </td>
+                  <td style="font-size:.85rem;color:#64748b"><%= m.user?.email || '—' %></td>
+                  <td style="font-size:.85rem"><%= m.theme?.name || '—' %></td>
+                  <td style="font-size:.85rem;text-align:center">
+                    <span style="color:#7c3aed;font-weight:600"><%= m._count.categories %></span>
+                    <span style="color:#94a3b8"> / </span>
+                    <span style="color:#0891b2;font-weight:600"><%= m._count.products %></span>
+                  </td>
+                  <td style="font-size:.82rem;color:#64748b;white-space:nowrap">
+                    <%= new Date(m.createdAt).toLocaleDateString('tr-TR') %>
+                  </td>
+                  <td>
+                    <a href="/yonetim/menuler/<%= m.id %>" class="btn btn-ghost btn-sm">Düzenle</a>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+        <% if (toplamSayfa > 1) { %>
+          <div style="display:flex;justify-content:center;gap:.5rem;margin-top:1.25rem;flex-wrap:wrap">
+            <% for (let i = 1; i <= toplamSayfa; i++) { %>
+              <a href="?sayfa=<%= i %>&arama=<%= encodeURIComponent(arama) %>" class="btn btn-sm <%= sayfa === i ? 'btn-primary' : 'btn-ghost' %>"><%= i %></a>
+            <% } %>
+          </div>
+        <% } %>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

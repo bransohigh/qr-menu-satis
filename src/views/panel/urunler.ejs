@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ürünler — Panel</title>
+  <style>
+    <%- include('../partials/admin-styles') %>
+    .img-thumb { width:50px;height:50px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0; }
+    .no-img-thumb { width:50px;height:50px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem; }
+    .img-preview-wrap img { max-width:120px;max-height:80px;object-fit:cover;border-radius:8px;margin-top:.5rem;border:1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <%- include('../partials/panel-nav', { active: 'urunler' }) %>
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Ürünler</h1>
+      <% if (kategoriler.length > 0) { %>
+        <button class="btn btn-primary" onclick="openCreate()">+ Ürün Ekle</button>
+      <% } %>
+    </div>
+
+    <div id="flash-msg"></div>
+
+    <% if (kategoriler.length === 0) { %>
+      <div class="card">
+        <div style="text-align:center;padding:2rem">
+          <p style="color:#94a3b8;margin-bottom:1rem">Ürün eklemeden önce en az bir kategori oluşturmanız gerekiyor.</p>
+          <a href="/panel/kategoriler" class="btn btn-primary">Kategori Oluştur</a>
+        </div>
+      </div>
+    <% } else { %>
+      <!-- Kategori filtresi -->
+      <div class="card" style="padding:1rem 1.5rem">
+        <form method="GET" action="/panel/urunler" style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+          <label style="font-size:.85rem;font-weight:600;color:#374151">Kategoriye Göre Filtrele:</label>
+          <select name="kategoriId" class="form-control" style="width:auto" onchange="this.form.submit()">
+            <option value="">Tüm Kategoriler</option>
+            <% kategoriler.forEach(kat => { %>
+              <option value="<%= kat.id %>" <%= seciliKategoriId === kat.id ? 'selected' : '' %>><%= kat.name %></option>
+            <% }) %>
+          </select>
+          <% if (seciliKategoriId) { %>
+            <a href="/panel/urunler" class="btn btn-ghost btn-sm">Temizle</a>
+          <% } %>
+        </form>
+      </div>
+
+      <div class="card">
+        <% if (urunler.length === 0) { %>
+          <div style="text-align:center;padding:2rem">
+            <p style="color:#94a3b8;margin-bottom:1rem">Henüz ürün yok<%= seciliKategoriId ? ' bu kategoride' : '' %>.</p>
+            <button class="btn btn-primary" onclick="openCreate()">+ Ürün Ekle</button>
+          </div>
+        <% } else { %>
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width:60px">Fotoğraf</th>
+                <th>Ad</th>
+                <th>Kategori</th>
+                <th>Fiyat</th>
+                <th style="width:80px">Görüntüleme</th>
+                <th style="width:160px">İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% urunler.forEach(p => { %>
+                <tr>
+                  <td>
+                    <% if (p.imageUrl) { %>
+                      <img src="<%= p.imageUrl %>" alt="<%= p.name %>" class="img-thumb"/>
+                    <% } else { %>
+                      <div class="no-img-thumb">🍽</div>
+                    <% } %>
+                  </td>
+                  <td>
+                    <strong><%= p.name %></strong>
+                    <% if (p.description) { %>
+                      <br/><small style="color:#94a3b8;font-size:.78rem"><%= p.description.slice(0,60) %><%= p.description.length>60?'…':'' %></small>
+                    <% } %>
+                  </td>
+                  <td><span style="background:#ede9fe;color:#6366f1;padding:2px 8px;border-radius:9999px;font-size:.78rem"><%= p.category ? p.category.name : '—' %></span></td>
+                  <td><strong>₺<%= Number(p.price).toFixed(2) %></strong></td>
+                  <td style="text-align:center;font-size:.85rem;color:#64748b"><%= p.views ?? 0 %></td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" onclick='openEdit(<%- JSON.stringify(p) %>)'>Düzenle</button>
+                    <button class="btn btn-danger btn-sm" onclick='urunSil("<%= p.id %>", "<%= p.name.replace(/"/g,"&quot;") %>")'>Sil</button>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Ürün Oluşturma Modalı -->
+  <div class="modal-overlay" id="create-modal">
+    <div class="modal">
+      <h3>Ürün Ekle</h3>
+      <div id="create-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ad *</label>
+          <input type="text" id="c-name" class="form-control" placeholder="Ürün adı"/>
+        </div>
+        <div class="form-group">
+          <label>Fiyat (₺) *</label>
+          <input type="number" id="c-price" class="form-control" placeholder="0.00" min="0" step="0.01"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Kategori *</label>
+        <select id="c-category" class="form-control">
+          <% kategoriler.forEach(kat => { %>
+            <option value="<%= kat.id %>" <%= (seciliKategoriId === kat.id) ? 'selected' : '' %>><%= kat.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Açıklama</label>
+        <textarea id="c-desc" class="form-control" rows="2" placeholder="Kısa açıklama (isteğe bağlı)"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Fotoğraf</label>
+        <input type="file" id="c-image" class="form-control" accept="image/*" onchange="onizleFoto(this,'c-preview')"/>
+        <div id="c-preview"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeCreate()">İptal</button>
+        <button class="btn btn-primary" onclick="urunOlustur()">Oluştur</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ürün Düzenleme Modalı -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <h3>Ürünü Düzenle</h3>
+      <div id="edit-error" class="alert alert-error" style="display:none"></div>
+      <input type="hidden" id="e-id"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ad *</label>
+          <input type="text" id="e-name" class="form-control"/>
+        </div>
+        <div class="form-group">
+          <label>Fiyat (₺) *</label>
+          <input type="number" id="e-price" class="form-control" min="0" step="0.01"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Kategori</label>
+        <select id="e-category" class="form-control">
+          <% kategoriler.forEach(kat => { %>
+            <option value="<%= kat.id %>"><%= kat.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Açıklama</label>
+        <textarea id="e-desc" class="form-control" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Fotoğraf (boş bırakırsanız mevcut korunur)</label>
+        <input type="file" id="e-image" class="form-control" accept="image/*" onchange="onizleFoto(this,'e-preview')"/>
+        <div id="e-current-preview"></div>
+        <div id="e-preview" style="display:none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeEdit()">İptal</button>
+        <button class="btn btn-primary" onclick="urunGuncelle()">Değişiklikleri Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function onizleFoto(input, previewId) {
+      const wrap = document.getElementById(previewId);
+      const file = input.files[0];
+      if (file) { const reader = new FileReader(); reader.onload = e => { wrap.innerHTML = `<img src="${e.target.result}" alt="Önizleme" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:8px;margin-top:.5rem;border:1px solid #e2e8f0"/>`; wrap.style.display = 'block'; }; reader.readAsDataURL(file); }
+    }
+
+    function openCreate() { document.getElementById('create-modal').classList.add('open'); }
+    function closeCreate() { document.getElementById('create-modal').classList.remove('open'); document.getElementById('create-error').style.display = 'none'; }
+
+    async function urunOlustur() {
+      const name = document.getElementById('c-name').value.trim();
+      const price = document.getElementById('c-price').value;
+      const categoryId = document.getElementById('c-category').value;
+      const description = document.getElementById('c-desc').value.trim();
+      const imageFile = document.getElementById('c-image').files[0];
+      const err = document.getElementById('create-error');
+      err.style.display = 'none';
+      if (!name || !price || !categoryId) { err.textContent = 'Ad, fiyat ve kategori zorunludur.'; err.style.display = 'block'; return; }
+      const fd = new FormData();
+      fd.append('name', name); fd.append('price', parseFloat(price).toFixed(2)); fd.append('categoryId', categoryId); fd.append('description', description);
+      if (imageFile) fd.append('image', imageFile);
+      const res = await fetch('/api/products', { method:'POST', credentials:'include', body:fd });
+      if (res.ok) { window.location.reload(); } else { const d = await res.json(); err.textContent = d.error?.message || 'Ürün oluşturulamadı'; err.style.display = 'block'; }
+    }
+
+    function openEdit(p) {
+      document.getElementById('e-id').value = p.id; document.getElementById('e-name').value = p.name; document.getElementById('e-price').value = Number(p.price).toFixed(2);
+      document.getElementById('e-category').value = p.categoryId; document.getElementById('e-desc').value = p.description || '';
+      document.getElementById('e-preview').style.display = 'none'; document.getElementById('e-preview').innerHTML = ''; document.getElementById('e-image').value = '';
+      const cp = document.getElementById('e-current-preview'); cp.innerHTML = p.imageUrl ? `<img src="${p.imageUrl}" alt="Mevcut fotoğraf" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:8px;margin-top:.5rem;border:1px solid #e2e8f0"/>` : '';
+      document.getElementById('edit-error').style.display = 'none'; document.getElementById('edit-modal').classList.add('open');
+    }
+    function closeEdit() { document.getElementById('edit-modal').classList.remove('open'); }
+
+    async function urunGuncelle() {
+      const id = document.getElementById('e-id').value; const name = document.getElementById('e-name').value.trim(); const price = document.getElementById('e-price').value;
+      const categoryId = document.getElementById('e-category').value; const description = document.getElementById('e-desc').value.trim();
+      const imageFile = document.getElementById('e-image').files[0]; const err = document.getElementById('edit-error'); err.style.display = 'none';
+      if (!name || !price) { err.textContent = 'Ad ve fiyat zorunludur.'; err.style.display = 'block'; return; }
+      const fd = new FormData(); fd.append('name', name); fd.append('price', parseFloat(price).toFixed(2)); fd.append('categoryId', categoryId); fd.append('description', description);
+      if (imageFile) fd.append('image', imageFile);
+      const res = await fetch(`/api/products/${id}`, { method:'PATCH', credentials:'include', body:fd });
+      if (res.ok) { window.location.reload(); } else { const d = await res.json(); err.textContent = d.error?.message || 'Güncelleme başarısız'; err.style.display = 'block'; }
+    }
+
+    async function urunSil(id, name) {
+      if (!confirm(`"${name}" adlı ürünü silmek istediğinizden emin misiniz?`)) return;
+      const res = await fetch(`/api/products/${id}`, { method:'DELETE', credentials:'include' });
+      if (res.ok) { window.location.reload(); } else { flash('Silme başarısız.', 'error'); }
+    }
+
+    function flash(msg, type = 'success') {
+      const el = document.getElementById('flash-msg');
+      el.innerHTML = `<div style="background:${type==='success'?'#f0fdf4':'#fef2f2'};color:${type==='success'?'#166534':'#991b1b'};border:1px solid ${type==='success'?'#bbf7d0':'#fecaca'};padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.85rem;">${msg}</div>`;
+      setTimeout(() => { el.innerHTML = ''; }, 3000);
+    }
+
+    ['create-modal','edit-modal'].forEach(id => {
+      document.getElementById(id).addEventListener('click', e => { if (e.target.id === id) document.getElementById(id).classList.remove('open'); });
+    });
+  </script>
+</body>
+</html>

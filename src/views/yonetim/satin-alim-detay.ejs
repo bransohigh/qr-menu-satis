@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Satın Alım Detayı — Yönetim</title>
+  <style><%- include('../partials/admin-styles') %>
+    .badge-durum { padding:3px 10px;border-radius:9999px;font-size:.8rem;font-weight:600; }
+    .durum-paid { background:#dcfce7;color:#166534; }
+    .durum-pending { background:#fef9c3;color:#854d0e; }
+    .durum-failed,.durum-refunded { background:#fee2e2;color:#991b1b; }
+    .bilgi-satir { display:flex;border-bottom:1px solid #f1f5f9;padding:.6rem 0; }
+    .bilgi-etiket { width:160px;font-size:.83rem;font-weight:600;color:#64748b;flex-shrink:0; }
+    .bilgi-deger { font-size:.88rem;color:#1e293b; }
+  </style>
+</head>
+<body>
+  <%- include('../partials/yonetim-nav', { active: 'satinalimlar' }) %>
+  <div class="main-content">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <a href="/yonetim/satin-alimlar" class="btn btn-ghost btn-sm">← Geri</a>
+        <h1 class="page-title">Satın Alım Detayı</h1>
+      </div>
+      <span class="badge-durum durum-<%= satinAlim.status %>">
+        <%= satinAlim.status === 'paid' ? 'Ödendi' : satinAlim.status === 'pending' ? 'Beklemede' : satinAlim.status === 'failed' ? 'Başarısız' : 'İptal' %>
+      </span>
+    </div>
+
+    <% if (typeof flash !== 'undefined' && flash === 'guncellendi') { %>
+      <div style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.85rem;">
+        ✅ Durum başarıyla güncellendi.
+      </div>
+    <% } %>
+
+    <div class="card">
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem">Satın Alım Bilgileri</h2>
+      <div class="bilgi-satir"><div class="bilgi-etiket">Satın Alım ID</div><div class="bilgi-deger"><code style="font-size:.8rem"><%= satinAlim.id %></code></div></div>
+      <div class="bilgi-satir"><div class="bilgi-etiket">Tarih</div><div class="bilgi-deger"><%= new Date(satinAlim.createdAt).toLocaleString('tr-TR') %></div></div>
+      <div class="bilgi-satir"><div class="bilgi-etiket">Kullanıcı</div><div class="bilgi-deger"><a href="/yonetim/kullanicilar/<%= satinAlim.user.id %>" style="color:#7c3aed"><%= satinAlim.user.email %></a></div></div>
+      <div class="bilgi-satir"><div class="bilgi-etiket">İşletme Adı</div><div class="bilgi-deger"><%= satinAlim.menu?.businessName || '—' %></div></div>
+      <div class="bilgi-satir"><div class="bilgi-etiket">Tema</div><div class="bilgi-deger"><%= satinAlim.theme?.name || '—' %></div></div>
+      <div class="bilgi-satir"><div class="bilgi-etiket">Tutar</div><div class="bilgi-deger"><strong><%= Number(satinAlim.amount).toFixed(2) %> <%= satinAlim.currency %></strong></div></div>
+      <div class="bilgi-satir"><div class="bilgi-etiket">Sağlayıcı</div><div class="bilgi-deger"><%= satinAlim.provider || '—' %></div></div>
+      <div class="bilgi-satir"><div class="bilgi-etiket">Sağlayıcı Ref.</div><div class="bilgi-deger"><code style="font-size:.8rem"><%= satinAlim.providerRef || '—' %></code></div></div>
+      <% if (satinAlim.menu) { %>
+        <div class="bilgi-satir">
+          <div class="bilgi-etiket">Menü</div>
+          <div class="bilgi-deger">
+            <a href="/m/<%= satinAlim.menu.slug %>" target="_blank" style="color:#7c3aed">/m/<%= satinAlim.menu.slug %> ↗</a>
+            &nbsp; <a href="/yonetim/menuler/<%= satinAlim.menu.id %>" style="color:#64748b;font-size:.83rem">Menüyü Düzenle</a>
+          </div>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- FakePay ise durum güncellenebilir -->
+    <% if (satinAlim.provider === 'fakepay') { %>
+    <div class="card">
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem">🔧 Durum Güncelle (Fake Ödeme)</h2>
+      <form action="/yonetim/satin-alimlar/<%= satinAlim.id %>/durum" method="POST" style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+        <select name="durum" class="form-control" style="width:auto">
+          <option value="pending" <%= satinAlim.status==='pending'?'selected':'' %>>Beklemede</option>
+          <option value="paid" <%= satinAlim.status==='paid'?'selected':'' %>>Ödendi</option>
+          <option value="failed" <%= satinAlim.status==='failed'?'selected':'' %>>Başarısız</option>
+          <option value="refunded" <%= satinAlim.status==='refunded'?'selected':'' %>>İptal</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Durumu Güncelle</button>
+      </form>
+    </div>
+    <% } %>
+  </div>
+</body>
+</html>

@@ -11,10 +11,16 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Role {
+  MUSTERI
+  ADMIN
+}
+
 model User {
   id           String     @id @default(cuid())
   email        String     @unique
   passwordHash String     @map("password_hash")
+  role         Role       @default(MUSTERI)
   createdAt    DateTime   @default(now()) @map("created_at")
   menu         Menu?
   purchases    Purchase[]

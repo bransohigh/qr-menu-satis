@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menü Düzenle — Yönetim</title>
+  <style>
+    <%- include('../partials/admin-styles') %>
+    .img-thumb { width:50px;height:50px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0; }
+    .no-img-thumb { width:50px;height:50px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem; }
+    .sekme-bar { display:flex;border-bottom:1px solid #e2e8f0;margin-bottom:1.5rem; }
+    .sekme { padding:.6rem 1.25rem;cursor:pointer;font-size:.9rem;font-weight:600;color:#64748b;border-bottom:3px solid transparent; }
+    .sekme.aktif { color:#7c3aed;border-bottom-color:#7c3aed; }
+  </style>
+</head>
+<body>
+  <%- include('../partials/yonetim-nav', { active: 'menuler' }) %>
+  <div class="main-content" style="max-width:1100px">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <a href="/yonetim/menuler" class="btn btn-ghost btn-sm">← Geri</a>
+        <h1 class="page-title">Menü Düzenle</h1>
+        <span style="font-size:.85rem;color:#94a3b8">Sahip: <%= menu.user.email %></span>
+      </div>
+      <div style="display:flex;gap:.75rem">
+        <a href="/m/<%= menu.slug %>" target="_blank" class="btn btn-outline btn-sm">Menüyü Gör ↗</a>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;font-size:.88rem;color:#64748b">
+        <span>🏷 <strong><%= menu.businessName || '—' %></strong></span>
+        <span>🎨 <%= menu.theme?.name %></span>
+        <span>📂 <%= kategoriler.length %> kategori</span>
+        <span>🍔 <%= urunler.length %> ürün</span>
+        <span>🔗 /m/<%= menu.slug %></span>
+      </div>
+    </div>
+
+    <div id="flash-msg"></div>
+
+    <!-- Sekmeler -->
+    <div class="sekme-bar">
+      <div class="sekme aktif" id="sekme-kategoriler" onclick="goster('kategoriler')">📂 Kategoriler</div>
+      <div class="sekme" id="sekme-urunler" onclick="goster('urunler')">🍔 Ürünler</div>
+    </div>
+
+    <!-- KATEGORİLER PANELİ -->
+    <div id="panel-kategoriler">
+      <div class="page-header" style="margin-bottom:1rem">
+        <span style="font-weight:600;color:#374151">Kategoriler (<%= kategoriler.length %>)</span>
+        <button class="btn btn-primary btn-sm" onclick="openCreate()">+ Kategori Ekle</button>
+      </div>
+      <div class="card">
+        <% if (kategoriler.length === 0) { %>
+          <p style="text-align:center;padding:2rem;color:#94a3b8">Henüz kategori yok.</p>
+        <% } else { %>
+          <table class="table" id="cat-table">
+            <thead><tr><th style="width:40px"></th><th>Ad</th><th>Slug</th><th>Sıra</th><th style="width:160px">İşlemler</th></tr></thead>
+            <tbody id="cat-tbody">
+              <% kategoriler.forEach((kat, i) => { %>
+                <tr draggable="true" data-id="<%= kat.id %>">
+                  <td><span class="drag-handle" title="Sürükle">⠿</span></td>
+                  <td><strong><%= kat.name %></strong></td>
+                  <td><code style="font-size:.78rem;color:#7c3aed;background:#f5f3ff;padding:2px 6px;border-radius:4px"><%= kat.slug || '—' %></code></td>
+                  <td><span style="background:#f5f3ff;color:#7c3aed;padding:2px 8px;border-radius:9999px;font-size:.78rem">#<%= i+1 %></span></td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" onclick="openEdit(<%= JSON.stringify(kat.id) %>, <%= JSON.stringify(kat.name) %>)">Yeniden Adlandır</button>
+                    <button class="btn btn-danger btn-sm" onclick="kategoriSil(<%= JSON.stringify(kat.id) %>, <%= JSON.stringify(kat.name) %>)">Sil</button>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <div style="margin-top:1rem"><button class="btn btn-success" onclick="siralamaKaydet()">💾 Sırayı Kaydet</button></div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- ÜRÜNLER PANELİ -->
+    <div id="panel-urunler" style="display:none">
+      <div class="page-header" style="margin-bottom:1rem">
+        <span style="font-weight:600;color:#374151">Ürünler (<%= urunler.length %>)</span>
+        <% if (kategoriler.length > 0) { %>
+          <button class="btn btn-primary btn-sm" onclick="openCreateUrun()">+ Ürün Ekle</button>
+        <% } %>
+      </div>
+      <div class="card">
+        <!-- Filtre -->
+        <div style="margin-bottom:1rem">
+          <form method="GET" style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+            <select name="kategoriId" class="form-control" style="width:auto" onchange="this.form.submit()">
+              <option value="">Tüm Kategoriler</option>
+              <% kategoriler.forEach(kat => { %><option value="<%= kat.id %>" <%= seciliKategoriId===kat.id?'selected':'' %>><%= kat.name %></option><% }) %>
+            </select>
+            <% if (seciliKategoriId) { %><a href="/yonetim/menuler/<%= menu.id %>" class="btn btn-ghost btn-sm">Temizle</a><% } %>
+          </form>
+        </div>
+        <% if (urunler.length === 0) { %>
+          <p style="text-align:center;padding:2rem;color:#94a3b8">Ürün bulunamadı.</p>
+        <% } else { %>
+          <table class="table">
+            <thead><tr><th style="width:60px">Foto</th><th>Ad</th><th>Kategori</th><th>Fiyat</th><th style="width:160px">İşlemler</th></tr></thead>
+            <tbody>
+              <% urunler.forEach(p => { %>
+                <tr>
+                  <td>
+                    <% if (p.imageUrl) { %><img src="<%= p.imageUrl %>" alt="" class="img-thumb"/><% } else { %><div class="no-img-thumb">🍽</div><% } %>
+                  </td>
+                  <td>
+                    <strong><%= p.name %></strong>
+                    <% if (p.description) { %><br/><small style="color:#94a3b8;font-size:.78rem"><%= p.description.slice(0,50) %><%= p.description.length>50?'…':'' %></small><% } %>
+                  </td>
+                  <td><span style="background:#f5f3ff;color:#7c3aed;padding:2px 8px;border-radius:9999px;font-size:.78rem"><%= p.category?.name || '—' %></span></td>
+                  <td><strong>₺<%= Number(p.price).toFixed(2) %></strong></td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" onclick='openEditUrun(<%- JSON.stringify(p) %>)'>Düzenle</button>
+                    <button class="btn btn-danger btn-sm" onclick='urunSil("<%= p.id %>", "<%= p.name.replace(/"/g,"&quot;") %>")'>Sil</button>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kategori Oluşturma Modalı -->
+  <div class="modal-overlay" id="create-modal">
+    <div class="modal">
+      <h3>Kategori Ekle</h3>
+      <div id="create-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-group"><label>Kategori Adı</label><input type="text" id="create-name" class="form-control" placeholder="örn. Başlangıçlar"/></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeCreate()">İptal</button>
+        <button class="btn btn-primary" onclick="kategoriOlustur()">Oluştur</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kategori Düzenleme Modalı -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <h3>Kategoriyi Yeniden Adlandır</h3>
+      <div id="edit-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-group"><label>Yeni Ad</label><input type="text" id="edit-name" class="form-control"/></div>
+      <input type="hidden" id="edit-id"/>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeEdit()">İptal</button>
+        <button class="btn btn-primary" onclick="kategoriGuncelle()">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ürün Oluşturma Modalı -->
+  <div class="modal-overlay" id="create-urun-modal">
+    <div class="modal">
+      <h3>Ürün Ekle</h3>
+      <div id="cu-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Ad *</label><input type="text" id="cu-name" class="form-control"/></div>
+        <div class="form-group"><label>Fiyat (₺) *</label><input type="number" id="cu-price" class="form-control" min="0" step="0.01"/></div>
+      </div>
+      <div class="form-group"><label>Kategori *</label><select id="cu-category" class="form-control"><% kategoriler.forEach(kat => { %><option value="<%= kat.id %>"><%= kat.name %></option><% }) %></select></div>
+      <div class="form-group"><label>Açıklama</label><textarea id="cu-desc" class="form-control" rows="2"></textarea></div>
+      <div class="form-group"><label>Fotoğraf</label><input type="file" id="cu-image" class="form-control" accept="image/*"/></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeCreateUrun()">İptal</button>
+        <button class="btn btn-primary" onclick="urunOlustur()">Oluştur</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ürün Düzenleme Modalı -->
+  <div class="modal-overlay" id="edit-urun-modal">
+    <div class="modal">
+      <h3>Ürünü Düzenle</h3>
+      <div id="eu-error" class="alert alert-error" style="display:none"></div>
+      <input type="hidden" id="eu-id"/>
+      <div class="form-row">
+        <div class="form-group"><label>Ad *</label><input type="text" id="eu-name" class="form-control"/></div>
+        <div class="form-group"><label>Fiyat (₺) *</label><input type="number" id="eu-price" class="form-control" min="0" step="0.01"/></div>
+      </div>
+      <div class="form-group"><label>Kategori</label><select id="eu-category" class="form-control"><% kategoriler.forEach(kat => { %><option value="<%= kat.id %>"><%= kat.name %></option><% }) %></select></div>
+      <div class="form-group"><label>Açıklama</label><textarea id="eu-desc" class="form-control" rows="2"></textarea></div>
+      <div class="form-group"><label>Fotoğraf (boş bırakırsanız mevcut korunur)</label><input type="file" id="eu-image" class="form-control" accept="image/*"/><div id="eu-current-preview"></div></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeEditUrun()">İptal</button>
+        <button class="btn btn-primary" onclick="urunGuncelle()">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function goster(sekme) {
+      document.getElementById('panel-kategoriler').style.display = sekme==='kategoriler' ? 'block' : 'none';
+      document.getElementById('panel-urunler').style.display = sekme==='urunler' ? 'block' : 'none';
+      document.getElementById('sekme-kategoriler').className = 'sekme' + (sekme==='kategoriler' ? ' aktif' : '');
+      document.getElementById('sekme-urunler').className = 'sekme' + (sekme==='urunler' ? ' aktif' : '');
+    }
+
+    // ── Kategori Drag & Drop
+    let dragSrc = null;
+    const tbody = document.getElementById('cat-tbody');
+    if (tbody) {
+      tbody.addEventListener('dragstart', e => { dragSrc = e.target.closest('tr'); dragSrc.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+      tbody.addEventListener('dragover', e => { e.preventDefault(); const row = e.target.closest('tr'); if (row && row !== dragSrc) { document.querySelectorAll('#cat-tbody tr').forEach(r => r.classList.remove('drag-over')); row.classList.add('drag-over'); } });
+      tbody.addEventListener('drop', e => { e.preventDefault(); const row = e.target.closest('tr'); if (row && row !== dragSrc) { const rows = [...tbody.querySelectorAll('tr')]; const si = rows.indexOf(dragSrc); const di = rows.indexOf(row); if (si < di) row.after(dragSrc); else row.before(dragSrc); } document.querySelectorAll('#cat-tbody tr').forEach(r => r.classList.remove('drag-over','dragging')); });
+      tbody.addEventListener('dragend', () => { document.querySelectorAll('#cat-tbody tr').forEach(r => r.classList.remove('dragging','drag-over')); });
+    }
+    async function siralamaKaydet() {
+      const orderedIds = [...document.querySelectorAll('#cat-tbody tr')].map(r => r.dataset.id);
+      const res = await fetch('/api/categories/reorder', { method:'PATCH', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ orderedIds }) });
+      flash(res.ok ? 'Sıralama kaydedildi!' : 'Kaydetme başarısız.', res.ok ? 'success' : 'error');
+    }
+
+    function openCreate() { document.getElementById('create-modal').classList.add('open'); document.getElementById('create-name').focus(); }
+    function closeCreate() { document.getElementById('create-modal').classList.remove('open'); }
+    async function kategoriOlustur() {
+      const name = document.getElementById('create-name').value.trim();
+      const err = document.getElementById('create-error'); err.style.display = 'none';
+      if (!name) { err.textContent = 'Ad zorunludur'; err.style.display = 'block'; return; }
+      const res = await fetch('/api/categories', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name }) });
+      if (res.ok) { window.location.reload(); } else { const d = await res.json(); err.textContent = d.error?.message || 'Hata'; err.style.display = 'block'; }
+    }
+    function openEdit(id, name) { document.getElementById('edit-id').value = id; document.getElementById('edit-name').value = name; document.getElementById('edit-modal').classList.add('open'); }
+    function closeEdit() { document.getElementById('edit-modal').classList.remove('open'); }
+    async function kategoriGuncelle() {
+      const id = document.getElementById('edit-id').value; const name = document.getElementById('edit-name').value.trim();
+      const err = document.getElementById('edit-error'); err.style.display = 'none';
+      if (!name) { err.textContent = 'Ad zorunludur'; err.style.display = 'block'; return; }
+      const res = await fetch(`/api/categories/${id}`, { method:'PATCH', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name }) });
+      if (res.ok) { window.location.reload(); } else { const d = await res.json(); err.textContent = d.error?.message || 'Hata'; err.style.display = 'block'; }
+    }
+    async function kategoriSil(id, name) {
+      if (!confirm(`"${name}" kategorisi ve tüm ürünleri silinecek?`)) return;
+      const res = await fetch(`/api/categories/${id}`, { method:'DELETE', credentials:'include' });
+      if (res.ok) { window.location.reload(); } else { flash('Silme başarısız.', 'error'); }
+    }
+
+    // ── Ürün
+    function openCreateUrun() { document.getElementById('create-urun-modal').classList.add('open'); }
+    function closeCreateUrun() { document.getElementById('create-urun-modal').classList.remove('open'); }
+    async function urunOlustur() {
+      const name=document.getElementById('cu-name').value.trim(); const price=document.getElementById('cu-price').value; const categoryId=document.getElementById('cu-category').value; const description=document.getElementById('cu-desc').value.trim(); const img=document.getElementById('cu-image').files[0];
+      const err=document.getElementById('cu-error'); err.style.display='none';
+      if (!name||!price||!categoryId) { err.textContent='Ad, fiyat ve kategori zorunlu.'; err.style.display='block'; return; }
+      const fd=new FormData(); fd.append('name',name); fd.append('price',parseFloat(price).toFixed(2)); fd.append('categoryId',categoryId); fd.append('description',description); if(img) fd.append('image',img);
+      const res=await fetch('/api/products',{method:'POST',credentials:'include',body:fd}); if(res.ok){window.location.reload();}else{const d=await res.json();err.textContent=d.error?.message||'Hata';err.style.display='block';}
+    }
+    function openEditUrun(p) {
+      document.getElementById('eu-id').value=p.id; document.getElementById('eu-name').value=p.name; document.getElementById('eu-price').value=Number(p.price).toFixed(2); document.getElementById('eu-category').value=p.categoryId; document.getElementById('eu-desc').value=p.description||'';
+      const cp=document.getElementById('eu-current-preview'); cp.innerHTML=p.imageUrl?`<img src="${p.imageUrl}" style="max-width:100px;max-height:70px;object-fit:cover;border-radius:8px;margin-top:.5rem;border:1px solid #e2e8f0"/>`:'';
+      document.getElementById('edit-urun-modal').classList.add('open');
+    }
+    function closeEditUrun() { document.getElementById('edit-urun-modal').classList.remove('open'); }
+    async function urunGuncelle() {
+      const id=document.getElementById('eu-id').value; const name=document.getElementById('eu-name').value.trim(); const price=document.getElementById('eu-price').value; const categoryId=document.getElementById('eu-category').value; const description=document.getElementById('eu-desc').value.trim(); const img=document.getElementById('eu-image').files[0];
+      const err=document.getElementById('eu-error'); err.style.display='none';
+      if (!name||!price){err.textContent='Ad ve fiyat zorunlu.';err.style.display='block';return;}
+      const fd=new FormData(); fd.append('name',name); fd.append('price',parseFloat(price).toFixed(2)); fd.append('categoryId',categoryId); fd.append('description',description); if(img) fd.append('image',img);
+      const res=await fetch(`/api/products/${id}`,{method:'PATCH',credentials:'include',body:fd}); if(res.ok){window.location.reload();}else{const d=await res.json();err.textContent=d.error?.message||'Hata';err.style.display='block';}
+    }
+    async function urunSil(id, name) {
+      if(!confirm(`"${name}" silinecek, emin misiniz?`)) return;
+      const res=await fetch(`/api/products/${id}`,{method:'DELETE',credentials:'include'}); if(res.ok){window.location.reload();}else{flash('Silme başarısız.','error');}
+    }
+
+    function flash(msg, type='success') {
+      const el=document.getElementById('flash-msg'); el.innerHTML=`<div style="background:${type==='success'?'#f0fdf4':'#fef2f2'};color:${type==='success'?'#166534':'#991b1b'};border:1px solid ${type==='success'?'#bbf7d0':'#fecaca'};padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.85rem;">${msg}</div>`;
+      setTimeout(()=>{el.innerHTML='';},3000);
+    }
+
+    ['create-modal','edit-modal','create-urun-modal','edit-urun-modal'].forEach(id => {
+      document.getElementById(id).addEventListener('click', e => { if (e.target.id===id) document.getElementById(id).classList.remove('open'); });
+    });
+  </script>
+</body>
+</html>

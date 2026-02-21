@@ -35,14 +35,21 @@
         QR Menü
       </a>
       <div class="flex items-center gap-3">
+        <a href="/temalar" class="text-sm font-medium text-slate-600 hover:text-slate-900 gecis hidden sm:block">Temalar</a>
         <% if (kullanici) { %>
           <span class="text-sm text-slate-500 hidden sm:block"><%= kullanici.email %></span>
-          <a href="/admin" class="bg-marka-600 hover:bg-marka-700 text-white text-sm font-semibold px-4 py-2 rounded-xl gecis">
-            Panel →
-          </a>
+          <% if (kullanici.role === 'ADMIN') { %>
+            <a href="/yonetim" class="bg-marka-600 hover:bg-marka-700 text-white text-sm font-semibold px-4 py-2 rounded-xl gecis">
+              Yönetim →
+            </a>
+          <% } else { %>
+            <a href="/panel" class="bg-marka-600 hover:bg-marka-700 text-white text-sm font-semibold px-4 py-2 rounded-xl gecis">
+              Panel →
+            </a>
+          <% } %>
         <% } else { %>
-          <a href="/admin" class="text-sm font-medium text-marka-600 hover:text-marka-700 gecis">Giriş Yap</a>
-          <a href="/admin" class="bg-marka-600 hover:bg-marka-700 text-white text-sm font-semibold px-4 py-2 rounded-xl gecis">
+          <a href="/giris" class="text-sm font-medium text-marka-600 hover:text-marka-700 gecis">Giriş Yap</a>
+          <a href="/giris" class="bg-marka-600 hover:bg-marka-700 text-white text-sm font-semibold px-4 py-2 rounded-xl gecis">
             Ücretsiz Dene
           </a>
         <% } %>
@@ -277,7 +284,7 @@
 
           <!-- Butonlar -->
           <% if (kullaniciMenusu) { %>
-            <a href="/admin" class="block w-full text-center bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm py-2.5 rounded-xl gecis">
+            <a href="/panel" class="block w-full text-center bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm py-2.5 rounded-xl gecis">
               Menünüze Git →
             </a>
           <% } else { %>
@@ -329,7 +336,7 @@
       </button>
       <h3 class="text-xl font-bold text-slate-900 mb-1">Hesap Gerekli</h3>
       <p class="text-slate-500 text-sm mb-6">Satın alma için giriş yapın veya ücretsiz hesap oluşturun.</p>
-      <a id="auth-modal-link" href="/admin"
+      <a id="auth-modal-link" href="/giris"
         class="block w-full bg-marka-600 hover:bg-marka-700 text-white font-semibold py-3 rounded-xl text-center gecis mb-2">
         Giriş Yap / Kayıt Ol
       </a>

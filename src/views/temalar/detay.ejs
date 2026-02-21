@@ -18,9 +18,13 @@
       </a>
       <a href="/temalar" class="text-xl font-black bg-gradient-to-r from-violet-600 to-purple-500 bg-clip-text text-transparent">QR Menü</a>
       <% if (kullanici) { %>
-        <a href="/admin" class="text-sm font-semibold text-violet-600 hover:text-violet-700 gecis">Panel →</a>
+        <% if (kullanici.role === 'ADMIN') { %>
+          <a href="/yonetim" class="text-sm font-semibold text-violet-600 hover:text-violet-700 gecis">Yönetim →</a>
+        <% } else { %>
+          <a href="/panel" class="text-sm font-semibold text-violet-600 hover:text-violet-700 gecis">Panel →</a>
+        <% } %>
       <% } else { %>
-        <a href="/admin" class="text-sm font-medium text-violet-600 gecis">Giriş Yap</a>
+        <a href="/giris" class="text-sm font-medium text-violet-600 gecis">Giriş Yap</a>
       <% } %>
     </div>
   </nav>
@@ -129,7 +133,7 @@
             <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             <p class="text-green-700 text-sm font-medium">Bu temayı satın aldınız — Menünüz aktif!</p>
           </div>
-          <a href="/admin" class="block w-full text-center bg-violet-600 hover:bg-violet-700 text-white font-bold py-4 rounded-xl gecis text-lg mb-3">
+          <a href="/panel" class="block w-full text-center bg-violet-600 hover:bg-violet-700 text-white font-bold py-4 rounded-xl gecis text-lg mb-3">
             Menüyü Düzenle →
           </a>
         <% } else { %>

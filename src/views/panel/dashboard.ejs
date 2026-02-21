@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel — QR Menü</title>
+  <style>
+    <%- include('../partials/admin-styles') %>
+  </style>
+</head>
+<body>
+  <%- include('../partials/panel-nav', { active: 'panel' }) %>
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Genel Bakış</h1>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Kategoriler</div>
+        <div class="stat-value"><%= kategoriSayisi %></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Ürünler</div>
+        <div class="stat-value"><%= urunSayisi %></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Tema</div>
+        <div class="stat-value" style="font-size:1rem"><%= menu.theme.name %></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem">Menü Bağlantınız</h2>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+        <a href="<%= publicUrl %>" target="_blank" class="menu-url"><%= publicUrl %></a>
+        <button class="btn btn-sm btn-outline" onclick="kopyala()">🔗 Kopyala</button>
+        <a href="/api/qr" class="btn btn-sm btn-success" download="qr-kod.png">📥 QR İndir</a>
+      </div>
+      <div style="margin-top:1.5rem">
+        <p style="font-size:.82rem;color:#64748b;margin-bottom:.75rem">QR Kod önizleme:</p>
+        <img id="qr-img" src="/api/qr" alt="QR Kod" style="width:180px;height:180px;border:1px solid #e2e8f0;border-radius:8px;display:block;"/>
+      </div>
+    </div>
+
+    <% if (menu.businessName) { %>
+    <div class="card">
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:.5rem">İşletme Adı</h2>
+      <p style="color:#64748b;font-size:.9rem"><%= menu.businessName %></p>
+    </div>
+    <% } %>
+
+    <div class="card">
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem">Hızlı İşlemler</h2>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+        <a href="/panel/kategoriler" class="btn btn-primary">📂 Kategorileri Yönet</a>
+        <a href="/panel/urunler" class="btn btn-primary">🍔 Ürünleri Yönet</a>
+        <a href="<%= publicUrl %>" target="_blank" class="btn btn-outline">👁 Menüyü Önizle</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function kopyala() {
+      navigator.clipboard.writeText('<%= publicUrl %>').then(() => {
+        alert('Bağlantı kopyalandı!');
+      });
+    }
+  </script>
+</body>
+</html>

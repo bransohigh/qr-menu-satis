@@ -1,0 +1,26 @@
+<!-- Panel Navbar -->
+<div style="background:#1e293b;color:#fff;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;">
+  <a href="/panel" style="font-weight:700;font-size:1.05rem;color:#fff;text-decoration:none;">🍽 QR Menü Paneli</a>
+  <div style="display:flex;gap:1rem;align-items:center;font-size:.85rem;">
+    <span style="color:#94a3b8"><%= kullanici.email %></span>
+    <% if (typeof menu !== 'undefined' && menu) { %>
+      <a href="/m/<%= menu.slug %>" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Menüyü Gör ↗</a>
+    <% } %>
+    <button onclick="cikisYap()" style="color:#94a3b8;background:none;border:none;cursor:pointer;font-size:.85rem;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Çıkış</button>
+  </div>
+</div>
+<div style="display:flex;flex:1;">
+  <nav style="width:220px;background:#fff;border-right:1px solid #e2e8f0;padding:1.25rem 0;flex-shrink:0;min-height:calc(100vh - 48px);">
+    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;padding:.4rem 1.25rem;margin-top:.75rem;">Menüm</div>
+    <a href="/panel" style="display:flex;align-items:center;gap:.5rem;padding:.55rem 1.25rem;color:<%= active==='panel'?'#6366f1':'#64748b' %>;text-decoration:none;font-size:.88rem;font-weight:500;border-left:3px solid <%= active==='panel'?'#6366f1':'transparent' %>;background:<%= active==='panel'?'#f0f0ff':'transparent' %>">📊 Genel Bakış</a>
+    <a href="/panel/kategoriler" style="display:flex;align-items:center;gap:.5rem;padding:.55rem 1.25rem;color:<%= active==='kategoriler'?'#6366f1':'#64748b' %>;text-decoration:none;font-size:.88rem;font-weight:500;border-left:3px solid <%= active==='kategoriler'?'#6366f1':'transparent' %>;background:<%= active==='kategoriler'?'#f0f0ff':'transparent' %>">📂 Kategoriler</a>
+    <a href="/panel/urunler" style="display:flex;align-items:center;gap:.5rem;padding:.55rem 1.25rem;color:<%= active==='urunler'?'#6366f1':'#64748b' %>;text-decoration:none;font-size:.88rem;font-weight:500;border-left:3px solid <%= active==='urunler'?'#6366f1':'transparent' %>;background:<%= active==='urunler'?'#f0f0ff':'transparent' %>">🍔 Ürünler</a>
+    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;padding:.4rem 1.25rem;margin-top:.75rem;">Bağlantılar</div>
+    <a href="/temalar" style="display:flex;align-items:center;gap:.5rem;padding:.55rem 1.25rem;color:#64748b;text-decoration:none;font-size:.88rem;font-weight:500;">🎨 Temaları Keşfet</a>
+  </nav>
+<script>
+  async function cikisYap() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/temalar';
+  }
+</script>

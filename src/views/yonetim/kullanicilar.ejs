@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kullanıcı Yönetimi — Yönetim</title>
+  <style><%- include('../partials/admin-styles') %></style>
+</head>
+<body>
+  <%- include('../partials/yonetim-nav', { active: 'kullanicilar' }) %>
+  <div class="main-content" style="max-width:1200px">
+    <div class="page-header">
+      <h1 class="page-title">Kullanıcılar</h1>
+      <span style="font-size:.85rem;color:#94a3b8">Toplam: <%= toplamSayi %></span>
+    </div>
+
+    <!-- Arama -->
+    <div class="card" style="padding:1rem 1.5rem;margin-bottom:1rem">
+      <form method="GET" style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <input type="search" name="arama" value="<%= arama %>" placeholder="E-posta ile ara..." class="form-control" style="max-width:320px"/>
+        <button type="submit" class="btn btn-primary">Ara</button>
+        <% if (arama) { %><a href="/yonetim/kullanicilar" class="btn btn-ghost btn-sm">Temizle</a><% } %>
+      </form>
+    </div>
+
+    <div class="card">
+      <% if (kullanicilar.length === 0) { %>
+        <p style="color:#94a3b8;font-size:.9rem;text-align:center;padding:2rem">Sonuç bulunamadı.</p>
+      <% } else { %>
+        <div style="overflow-x:auto">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>E-posta</th>
+                <th>Rol</th>
+                <th>Menü</th>
+                <th>Son Satın Alım</th>
+                <th>Kayıt Tarihi</th>
+                <th style="width:80px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% kullanicilar.forEach(k => { %>
+                <tr>
+                  <td style="font-size:.88rem"><%= k.email %></td>
+                  <td>
+                    <% if (k.role === 'ADMIN') { %>
+                      <span style="background:#f5f3ff;color:#7c3aed;padding:2px 8px;border-radius:9999px;font-size:.75rem;font-weight:700;">ADMIN</span>
+                    <% } else { %>
+                      <span style="background:#f0fdf4;color:#166534;padding:2px 8px;border-radius:9999px;font-size:.75rem;font-weight:600;">MÜŞTERİ</span>
+                    <% } %>
+                  </td>
+                  <td style="font-size:.85rem">
+                    <% if (k.menu) { %>
+                      <a href="/m/<%= k.menu.slug %>" target="_blank" style="color:#7c3aed"><%= k.menu.businessName || k.menu.slug %> ↗</a>
+                    <% } else { %>
+                      <span style="color:#94a3b8">—</span>
+                    <% } %>
+                  </td>
+                  <td style="font-size:.82rem;color:#64748b">
+                    <% if (k.purchases && k.purchases.length > 0) { %>
+                      <%= new Date(k.purchases[0].createdAt).toLocaleDateString('tr-TR') %>
+                      <span style="background:<%= k.purchases[0].status==='paid'?'#dcfce7':'#fef9c3' %>;color:<%= k.purchases[0].status==='paid'?'#166534':'#854d0e' %>;padding:1px 6px;border-radius:9999px;font-size:.72rem;margin-left:.25rem"><%= k.purchases[0].status==='paid'?'Ödendi':'Beklemede' %></span>
+                    <% } else { %>
+                      <span style="color:#94a3b8">—</span>
+                    <% } %>
+                  </td>
+                  <td style="font-size:.82rem;color:#64748b;white-space:nowrap">
+                    <%= new Date(k.createdAt).toLocaleDateString('tr-TR') %>
+                  </td>
+                  <td>
+                    <a href="/yonetim/kullanicilar/<%= k.id %>" class="btn btn-ghost btn-sm">Detay</a>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+        <% if (toplamSayfa > 1) { %>
+          <div style="display:flex;justify-content:center;gap:.5rem;margin-top:1.25rem;flex-wrap:wrap">
+            <% for (let i = 1; i <= toplamSayfa; i++) { %>
+              <a href="?sayfa=<%= i %>&arama=<%= encodeURIComponent(arama) %>" class="btn btn-sm <%= sayfa === i ? 'btn-primary' : 'btn-ghost' %>"><%= i %></a>
+            <% } %>
+          </div>
+        <% } %>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

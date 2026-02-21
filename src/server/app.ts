@@ -13,6 +13,9 @@ import { menuRouter } from './routes/menus';
 import { categoryRouter } from './routes/categories';
 import { productRouter } from './routes/products';
 import { adminRouter } from './routes/admin';
+import { panelRouter } from './routes/panel';
+import { yonetimRouter } from './routes/yonetim';
+import { girisRouter } from './routes/giris';
 import { publicMenuRouter } from './routes/publicMenu';
 import { qrRouter } from './routes/qr';
 import { previewRouter } from './routes/preview';
@@ -87,9 +90,12 @@ app.use('/api/qr', qrRouter);
 
 app.use('/themes', themeRouter);
 app.use('/temalar', temalarRouter);
+app.use('/giris', girisRouter);
 app.use('/onizleme', onizlemeRouter);
 app.use('/odeme', odemeRouter);
-app.use('/admin', adminRouter);
+app.use('/panel', panelRouter);
+app.use('/yonetim', yonetimRouter);
+app.use('/admin', adminRouter);          // geriye dönük uyumluluk → role bazlı yönlendir
 app.use('/m', publicMenuRouter);
 app.use('/preview', previewRouter);
 app.use('/pay', fakepayRouter);
@@ -101,14 +107,14 @@ app.use('/checkout', checkoutRouter);
 app.use(errorHandler);
 
 // ─── Start server ────────────────────────────────────────────────────────────
-process.on('uncaughtException', (err) => {
+process.on('uncaughtException', (err: Error) => {
   console.error('[HATA] Yakalanmamış istisna:', err);
-  process.exit(1);
+  // Do NOT exit — let lsnode keep the process alive
 });
 
-process.on('unhandledRejection', (reason) => {
+process.on('unhandledRejection', (reason: unknown) => {
   console.error('[HATA] Yakalanmamış promise reddi:', reason);
-  process.exit(1);
+  // Do NOT exit — let lsnode keep the process alive
 });
 
 try {
@@ -119,7 +125,7 @@ try {
   });
 } catch (err) {
   console.error('[HATA] Sunucu başlatılamadı:', err);
-  process.exit(1);
+  // Do NOT exit — log only
 }
 
 export default app;

@@ -69,7 +69,12 @@ npm run dev
 
 → [http://localhost:3000](http://localhost:3000) — `/temalar` sayfasına yönlendirilirsiniz.
 
-**Demo hesabı:** `demo@qrmenu.app` / `demo1234`
+### 🔑 Demo Hesaplar
+
+| Rol | E-posta | Şifre | Panel |
+|-----|---------|-------|-------|
+| Süper Admin | `admin@demo.local` | `Demo12345!` | `/yonetim` |
+| Demo Müşteri | `musteri@demo.local` | `Demo12345!` | `/panel` |
 
 ---
 
@@ -156,6 +161,7 @@ curl https://alanadi.com/saglik
 | GET | `/` | → `/temalar` yönlendir |
 | GET | `/temalar` | Tema galerisi |
 | GET | `/temalar/:slug` | Tema detayı + satın al |
+| GET | `/giris` | Giriş / Kayıt sayfası |
 | GET | `/onizleme/:slug` | Canlı tema önizleme |
 | GET | `/onizleme/:slug/k/:kat` | Kategori önizleme |
 | GET | `/onizleme/:slug/u/:urun` | Ürün detay önizleme |
@@ -163,7 +169,14 @@ curl https://alanadi.com/saglik
 | POST | `/api/auth/register` | Kayıt |
 | POST | `/api/auth/login` | Giriş |
 | POST | `/api/auth/logout` | Çıkış |
-| GET | `/admin` | Yönetim paneli |
+| GET | `/panel` | Müşteri paneli (giriş gerekli) |
+| GET | `/panel/kategoriler` | Kategori yönetimi |
+| GET | `/panel/urunler` | Ürün yönetimi |
+| GET | `/yonetim` | Süper Admin paneli (ADMIN gerekli) |
+| GET | `/yonetim/satin-alimlar` | Satın alımlar listesi |
+| GET | `/yonetim/menuler` | Tüm menüler |
+| GET | `/yonetim/kullanicilar` | Tüm kullanıcılar |
+| GET | `/admin` | → Role göre `/yonetim` veya `/panel` yönlendir |
 | GET | `/m/:slug` | Herkese açık menü |
 | GET | `/saglik` | Healthcheck |
 
@@ -229,4 +242,5 @@ curl https://alanadi.com/saglik
 - **Görseller:** Ürün görselleri `uploads/` klasörüne kaydedilir. Üretimde Hostinger'ın persistent storage'ı kullanılır. Ölçekleme için S3 / Cloudflare R2'ye geçin.
 - **Tek menü:** Kullanıcı başına bir menü (MVP kısıtı, kolayca genişletilebilir).
 - **Ödeme:** `fakepay` simülasyon modunda çalışır; gerçek ödeme için Stripe/İyzico entegrasyonu ekleyin.
+- **Roller:** Kullanıcılar `MUSTERI` (varsayılan) veya `ADMIN` rolüne sahip olabilir. ADMIN kullanıcılar `/yonetim` paneline erişebilir; MUSTERI kullanıcılar sadece `/panel`'e erişir. `/admin` rotası geriye dönük uyumluluk için role göre yönlendirir.
 
