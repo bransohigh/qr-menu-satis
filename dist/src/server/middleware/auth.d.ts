@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 export interface AuthUser {
     id: string;
     email: string;
+    role: 'MUSTERI' | 'ADMIN';
 }
 declare global {
     namespace Express {
@@ -16,9 +17,18 @@ declare global {
  */
 export declare function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void>;
 /**
- * Same as requireAuth but redirects to /temalar (login form) for HTML routes.
+ * Same as requireAuth but redirects to /giris for HTML routes.
  */
 export declare function requireAuthHtml(req: Request, res: Response, next: NextFunction): Promise<void>;
+/**
+ * Requires ADMIN role for HTML routes.
+ * Redirects to /panel if MUSTERI, /giris if not logged in.
+ */
+export declare function requireAdminHtml(req: Request, res: Response, next: NextFunction): Promise<void>;
+/**
+ * Requires ADMIN role for API routes. Returns 403 JSON if not admin.
+ */
+export declare function requireAdmin(req: Request, res: Response, next: NextFunction): Promise<void>;
 /**
  * Optional auth: attaches user if logged in, doesn't fail if not.
  */

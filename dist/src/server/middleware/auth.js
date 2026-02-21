@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.requireAuth = requireAuth;
 exports.requireAuthHtml = requireAuthHtml;
+exports.requireAdminHtml = requireAdminHtml;
+exports.requireAdmin = requireAdmin;
 exports.optionalAuth = optionalAuth;
 exports.signToken = signToken;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -19,43 +21,98 @@ async function requireAuth(req, res, next) {
     try {
         const token = req.cookies?.[env_1.env.COOKIE_NAME];
         if (!token) {
-            res.status(401).json({ error: { message: 'Authentication required' } });
+            res.status(401).json({ error: { message: 'Kimlik doğrulama gerekli' } });
             return;
         }
         const payload = jsonwebtoken_1.default.verify(token, JWT_SECRET);
         const user = await prisma_1.prisma.user.findUnique({ where: { id: payload.userId } });
         if (!user) {
-            res.status(401).json({ error: { message: 'User not found' } });
+            res.status(401).json({ error: { message: 'Kullanıcı bulunamadı' } });
             return;
         }
-        req.user = { id: user.id, email: user.email };
+        req.user = { id: user.id, email: user.email, role: user.role };
         next();
     }
     catch {
-        res.status(401).json({ error: { message: 'Invalid or expired token' } });
+        res.status(401).json({ error: { message: 'Geçersiz veya süresi dolmuş token' } });
     }
 }
 /**
- * Same as requireAuth but redirects to /temalar (login form) for HTML routes.
+ * Same as requireAuth but redirects to /giris for HTML routes.
  */
 async function requireAuthHtml(req, res, next) {
     try {
         const token = req.cookies?.[env_1.env.COOKIE_NAME];
         if (!token) {
-            res.redirect(`/temalar?giris=${encodeURIComponent(req.originalUrl)}`);
+            res.redirect(`/giris?sonra=${encodeURIComponent(req.originalUrl)}`);
             return;
         }
         const payload = jsonwebtoken_1.default.verify(token, JWT_SECRET);
         const user = await prisma_1.prisma.user.findUnique({ where: { id: payload.userId } });
         if (!user) {
-            res.redirect('/temalar');
+            res.redirect('/giris');
             return;
         }
-        req.user = { id: user.id, email: user.email };
+        req.user = { id: user.id, email: user.email, role: user.role };
         next();
     }
     catch {
-        res.redirect('/temalar');
+        res.redirect('/giris');
+    }
+}
+/**
+ * Requires ADMIN role for HTML routes.
+ * Redirects to /panel if MUSTERI, /giris if not logged in.
+ */
+async function requireAdminHtml(req, res, next) {
+    try {
+        const token = req.cookies?.[env_1.env.COOKIE_NAME];
+        if (!token) {
+            res.redirect(`/giris?sonra=${encodeURIComponent(req.originalUrl)}`);
+            return;
+        }
+        const payload = jsonwebtoken_1.default.verify(token, JWT_SECRET);
+        const user = await prisma_1.prisma.user.findUnique({ where: { id: payload.userId } });
+        if (!user) {
+            res.redirect('/giris');
+            return;
+        }
+        req.user = { id: user.id, email: user.email, role: user.role };
+        if (user.role !== 'ADMIN') {
+            res.redirect('/panel');
+            return;
+        }
+        next();
+    }
+    catch {
+        res.redirect('/giris');
+    }
+}
+/**
+ * Requires ADMIN role for API routes. Returns 403 JSON if not admin.
+ */
+async function requireAdmin(req, res, next) {
+    try {
+        const token = req.cookies?.[env_1.env.COOKIE_NAME];
+        if (!token) {
+            res.status(401).json({ error: { message: 'Kimlik doğrulama gerekli' } });
+            return;
+        }
+        const payload = jsonwebtoken_1.default.verify(token, JWT_SECRET);
+        const user = await prisma_1.prisma.user.findUnique({ where: { id: payload.userId } });
+        if (!user) {
+            res.status(401).json({ error: { message: 'Kullanıcı bulunamadı' } });
+            return;
+        }
+        req.user = { id: user.id, email: user.email, role: user.role };
+        if (user.role !== 'ADMIN') {
+            res.status(403).json({ error: { message: 'Bu işlem için yetkiniz yok' } });
+            return;
+        }
+        next();
+    }
+    catch {
+        res.status(401).json({ error: { message: 'Geçersiz veya süresi dolmuş token' } });
     }
 }
 /**
@@ -68,7 +125,7 @@ async function optionalAuth(req, _res, next) {
             const payload = jsonwebtoken_1.default.verify(token, JWT_SECRET);
             const user = await prisma_1.prisma.user.findUnique({ where: { id: payload.userId } });
             if (user) {
-                req.user = { id: user.id, email: user.email };
+                req.user = { id: user.id, email: user.email, role: user.role };
             }
         }
     }
