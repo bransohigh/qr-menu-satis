@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- Modern Galeri — Sky/Slate, tam genişlik hero, galeri ızgarası -->
+  <defs>
+    <linearGradient id="sg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#075985"/>
+    </linearGradient>
+  </defs>
+  <!-- Arka plan -->
+  <rect width="400" height="300" fill="#f8fafc"/>
+  <!-- Header -->
+  <rect width="400" height="44" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="14" y="12" width="90" height="20" rx="6" fill="#e0f2fe"/>
+  <text x="59" y="26" font-size="12" fill="#0284c7" font-family="Arial,sans-serif" text-anchor="middle" opacity=".9">🍽 Restoran</text>
+  <!-- Category pill nav -->
+  <rect x="170" y="12" width="50" height="20" rx="10" fill="#e0f2fe"/>
+  <rect x="228" y="12" width="50" height="20" rx="10" fill="#e0f2fe"/>
+  <rect x="286" y="12" width="50" height="20" rx="10" fill="#e0f2fe"/>
+  <!-- Hero banner tam genişlik -->
+  <rect y="44" width="400" height="76" fill="url(#sg)"/>
+  <rect x="80" y="55" width="240" height="16" rx="5" fill="rgba(255,255,255,.3)"/>
+  <rect x="130" y="77" width="140" height="10" rx="4" fill="rgba(255,255,255,.18)"/>
+  <rect x="160" y="95" width="80" height="16" rx="8" fill="rgba(255,255,255,.2)"/>
+  <!-- Galeri ızgara başlığı -->
+  <rect x="16" y="130" width="120" height="10" rx="3" fill="#1e293b" opacity=".5"/>
+  <!-- İlk kart geniş (2 sütun) -->
+  <rect x="16" y="148" width="184" height="140" rx="14" fill="#e0f2fe" stroke="#bae6fd" stroke-width="1"/>
+  <rect x="16" y="148" width="184" height="78" rx="14" fill="#7dd3fc" opacity=".5"/>
+  <rect x="26" y="236" width="90" height="10" rx="3" fill="#0c4a6e" opacity=".7"/>
+  <rect x="26" y="252" width="60" height="8" rx="3" fill="#94a3b8" opacity=".6"/>
+  <rect x="170" y="254" width="22" height="22" rx="8" fill="#0284c7" opacity=".6"/>
+
+  <!-- İkinci kart normal -->
+  <rect x="210" y="148" width="86" height="64" rx="12" fill="#e0f2fe" stroke="#bae6fd" stroke-width="1"/>
+  <rect x="210" y="148" width="86" height="36" rx="12" fill="#7dd3fc" opacity=".4"/>
+  <rect x="216" y="194" width="50" height="8" rx="3" fill="#0c4a6e" opacity=".6"/>
+
+  <rect x="306" y="148" width="78" height="64" rx="12" fill="#e0f2fe" stroke="#bae6fd" stroke-width="1"/>
+  <rect x="306" y="148" width="78" height="36" rx="12" fill="#7dd3fc" opacity=".4"/>
+  <rect x="312" y="194" width="45" height="8" rx="3" fill="#0c4a6e" opacity=".6"/>
+
+  <rect x="210" y="222" width="86" height="66" rx="12" fill="#e0f2fe" stroke="#bae6fd" stroke-width="1"/>
+  <rect x="210" y="222" width="86" height="36" rx="12" fill="#7dd3fc" opacity=".4"/>
+  <rect x="216" y="268" width="55" height="8" rx="3" fill="#0c4a6e" opacity=".6"/>
+
+  <rect x="306" y="222" width="78" height="66" rx="12" fill="#e0f2fe" stroke="#bae6fd" stroke-width="1"/>
+  <rect x="306" y="222" width="78" height="36" rx="12" fill="#7dd3fc" opacity=".4"/>
+  <rect x="312" y="268" width="40" height="8" rx="3" fill="#0c4a6e" opacity=".6"/>
+
+  <text x="200" y="297" font-family="Arial,sans-serif" font-size="10" fill="#0284c7" text-anchor="middle" opacity=".8">Modern Galeri</text>
+</svg>

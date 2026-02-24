@@ -1,134 +1,199 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head><%- include('../partials/menu-head') %></head>
-<body class="bg-slate-50 min-h-screen">
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title><%= title || menu.businessName %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    body{font-family:'Inter',system-ui,sans-serif;}.gecis{transition:all .2s ease;}
+    .no-scrollbar::-webkit-scrollbar{display:none;}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
+  </style>
+</head>
+<%
+var d = (konfig && konfig.duzen) ? konfig.duzen : 'koy-kahvaltisi';
+var isDark = (d==='sushi-kartlar'||d==='premium-koyu');
+%>
+<body class="min-h-screen
+  <% if(d==='premium-koyu'){%>bg-[#070714] text-white<%}else if(d==='sushi-kartlar'){%>bg-slate-900 text-white<%}else if(d==='vegan-minimal'){%>bg-white text-zinc-800<%}else if(d==='bistro-editoryal'){%>bg-white text-zinc-900<%}else if(d==='modern-galeri'){%>bg-slate-50 text-slate-800<%}else{%>bg-amber-50 text-stone-800<%}%>">
 
-  <% if (typeof isPreview !== 'undefined' && isPreview && typeof previewBannerTheme !== 'undefined' && previewBannerTheme) { %>
-  <div class="sticky top-0 z-[60] bg-amber-400 text-amber-900 text-xs font-semibold flex items-center justify-between px-4 py-2 shadow">
-    <span>👀 <strong>Önizleme Modu</strong> — Bu tema için demo içerik gösteriliyor.</span>
-    <div class="flex items-center gap-3">
-      <a href="/preview/<%= previewBannerTheme.slug %>" class="underline">Önizlemeyi Paylaş</a>
-      <a href="/themes/<%= previewBannerTheme.slug %>" class="bg-amber-900 text-amber-50 px-3 py-1 rounded-full hover:bg-amber-800 transition-colors no-underline">
-        Satın Al →
+<%# ─── PREMIUM KOYU tema özel stilleri ─%>
+<% if(d==='premium-koyu'){ %>
+<style>
+  .glass{background:rgba(255,255,255,.04);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.07);}
+  .grad-text{background:linear-gradient(135deg,#c084fc,#f472b6,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+</style>
+<% } %>
+
+<!-- ── HEADER ─────────────────────────────────────────────────────────── -->
+<% if(d==='premium-koyu'){ %>
+<header class="sticky top-0 z-50 border-b border-purple-900/20" style="background:rgba(7,7,20,.85);backdrop-filter:blur(20px)">
+<% }else{ %>
+<header class="sticky top-0 z-50 border-b
+  <% if(d==='sushi-kartlar'){%>bg-slate-950 border-slate-800<%}
+  else if(d==='vegan-minimal'){%>bg-white border-green-100<%}
+  else if(d==='bistro-editoryal'){%>bg-white border-b-2 border-zinc-900<%}
+  else if(d==='koy-kahvaltisi'){%>bg-white/90 border-amber-100<%}
+  else{%>bg-white border-slate-200 shadow-sm<%}%>">
+<% } %>
+  <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <span class="font-bold truncate
+      <% if(d==='premium-koyu'){%>grad-text text-lg<%}
+      else if(d==='sushi-kartlar'){%>text-white<%}
+      else if(d==='vegan-minimal'){%>text-green-700<%}
+      else if(d==='koy-kahvaltisi'){%>font-['Playfair_Display',serif] text-amber-800<%}
+      else if(d==='bistro-editoryal'){%>font-['Playfair_Display',serif] text-zinc-900 text-lg<%}
+      else{%>text-sky-600<%}%>">
+      🍽 <%= menu.businessName %>
+    </span>
+    <div class="flex gap-2 overflow-x-auto no-scrollbar">
+      <% categories.forEach(function(cat){ %>
+      <a href="#kat-<%= cat.id %>"
+         class="shrink-0 px-3 py-1 rounded-full text-xs font-medium gecis
+           <% if(isDark){%>text-slate-400 hover:text-white hover:bg-white/10<%}
+           else if(d==='vegan-minimal'){%>text-green-700 bg-green-50 hover:bg-green-100<%}
+           else if(d==='koy-kahvaltisi'){%>text-amber-700 hover:bg-amber-50<%}
+           else{%>text-slate-600 hover:bg-slate-100<%}%>">
+        <%= cat.name %>
       </a>
+      <% }); %>
     </div>
   </div>
-  <% } %>
+</header>
 
-  <!-- ── Top Nav ─────────────────────────────────────────────────────────── -->
-  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-100 shadow-sm">
-    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-2 min-w-0">
-        <span class="text-xl">🍽</span>
-        <span class="font-bold text-slate-800 truncate text-sm sm:text-base">
-          <%= menu.businessName || 'Our Menu' %>
-        </span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="text-xs text-slate-400 hidden sm:block"><%= categories.length %> categories</span>
-        <% if (categories.length > 0) { %>
-          <a href="#categories" class="text-xs font-semibold text-brand-600 bg-brand-50 px-3 py-1.5 rounded-full hover:bg-brand-100 transition-smooth">
-            Browse
-          </a>
+<!-- ── HERO ─────────────────────────────────────────────────────────── -->
+<% if(d==='modern-galeri'){ %>
+<div class="relative overflow-hidden" style="height:240px;background:linear-gradient(135deg,#0284c7,#075985)">
+  <div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
+    <h1 class="text-4xl font-black mb-2"><%= menu.businessName %></h1>
+    <p class="text-sky-100/80 text-sm"><%= menu.businessEmail || 'Lezzetli yemekler sizi bekliyor' %></p>
+  </div>
+</div>
+<% } else if(d==='vegan-minimal'){ %>
+<div class="max-w-2xl mx-auto px-6 pt-16 pb-8">
+  <p class="text-green-400 text-[10px] tracking-[0.4em] uppercase mb-3">organik · doğal · taze</p>
+  <h1 class="text-5xl font-bold text-zinc-800 mb-2"><%= menu.businessName %></h1>
+  <div class="w-12 h-1 bg-green-500 rounded-full mb-3"></div>
+</div>
+<% } else if(d==='bistro-editoryal'){ %>
+<div class="border-b-4 border-double border-zinc-200 py-8 text-center">
+  <p class="text-[10px] tracking-[0.4em] text-zinc-300 uppercase mb-2">dijital menü · lezzetler</p>
+  <h1 class="font-['Playfair_Display',serif] text-6xl font-bold text-zinc-900 leading-none mb-2"><%= menu.businessName %></h1>
+  <div class="flex items-center justify-center gap-3 text-zinc-200 text-xs">
+    <span class="h-px w-12 bg-zinc-200 block"></span>
+    <span class="text-zinc-400 italic">kategori seçkisi</span>
+    <span class="h-px w-12 bg-zinc-200 block"></span>
+  </div>
+</div>
+<% } else if(d==='koy-kahvaltisi'){ %>
+<div class="bg-gradient-to-br from-amber-600 to-amber-700 text-white py-12 text-center">
+  <p class="text-amber-200 text-[11px] tracking-[0.3em] uppercase mb-3">🌾 geleneksel lezzetler</p>
+  <h1 class="font-['Playfair_Display',serif] text-5xl font-bold mb-2"><%= menu.businessName %></h1>
+  <div class="w-16 h-0.5 bg-amber-300 mx-auto"></div>
+</div>
+<% } else if(d==='sushi-kartlar'){ %>
+<div class="relative bg-slate-900 border-b border-slate-800 py-14 overflow-hidden">
+  <div class="absolute inset-0" style="background:repeating-linear-gradient(0deg,rgba(99,102,241,.03) 0px,rgba(99,102,241,.03) 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,rgba(99,102,241,.03) 0px,rgba(99,102,241,.03) 1px,transparent 1px,transparent 40px)"></div>
+  <div class="relative max-w-5xl mx-auto px-4">
+    <p class="text-indigo-400 text-[10px] tracking-[0.4em] uppercase mb-3">◉ dijital menü</p>
+    <h1 class="text-4xl font-black text-white mb-2"><%= menu.businessName %></h1>
+    <div class="w-20 h-0.5 bg-indigo-500"></div>
+  </div>
+</div>
+<% } else if(d==='premium-koyu'){ %>
+<div class="relative py-20 text-white text-center overflow-hidden" style="background:linear-gradient(135deg,#070714,#150a2e,#070714)">
+  <div class="absolute inset-0" style="background:radial-gradient(ellipse 120% 80% at 50% 50%,rgba(139,92,246,.12),transparent 70%)"></div>
+  <div class="relative">
+    <div class="w-12 h-12 mx-auto mb-5 rounded-full flex items-center justify-center" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3)">✦</div>
+    <h1 class="text-5xl font-black mb-3 grad-text"><%= menu.businessName %></h1>
+  </div>
+</div>
+<% } %>
+
+<!-- ── KATEGORİLER ──────────────────────────────────────────────────────── -->
+<main class="max-w-5xl mx-auto px-4 py-8 pb-20" id="kategoriler">
+  <% if(categories.length === 0){ %>
+    <div class="text-center py-16">
+      <div class="text-5xl mb-4">🍽</div>
+      <h2 class="text-xl font-bold mb-2 <% if(isDark){%>text-white<%}%>">Menü hazırlanıyor</h2>
+      <p class="<% if(isDark){%>text-slate-400<%}else{%>text-slate-400<%}%> text-sm">Bu restoran menüsünü henüz yüklemedi. Yakında tekrar ziyaret edin!</p>
+    </div>
+  <% } else { %>
+    <!-- Kategori kart grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-12">
+      <% categories.forEach(function(cat, i) {
+        var catProducts = productsByCategory[cat.id] || [];
+        var heroProduct = catProducts.find(function(p){ return p.imageUrl; }) || catProducts[0];
+        var grads = ['from-amber-500 to-orange-600','from-green-500 to-emerald-600','from-indigo-500 to-purple-600','from-sky-500 to-blue-600','from-rose-500 to-pink-600','from-teal-500 to-cyan-600','from-violet-500 to-purple-600','from-lime-500 to-green-600'];
+        var grad = grads[i % grads.length];
+      %>
+      <a href="/m/<%= menu.slug %>/c/<%= cat.slug %>"
+         class="group relative block rounded-2xl overflow-hidden shadow-sm hover:shadow-lg gecis
+           <% if(isDark){%>border border-slate-800 hover:border-indigo-500/50<%}%>"
+         style="height:160px">
+        <% if(heroProduct && heroProduct.imageUrl){ %>
+          <img src="<%= heroProduct.imageUrl %>" alt="<%= cat.name %>"
+               class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 gecis opacity-80 group-hover:opacity-100"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+        <% } else { %>
+          <div class="absolute inset-0 bg-gradient-to-br <%= grad %>"></div>
         <% } %>
-      </div>
-    </div>
-  </header>
-
-  <!-- ── Hero ───────────────────────────────────────────────────────────── -->
-  <section class="bg-gradient-to-br from-brand-600 via-brand-700 to-violet-900 text-white pt-16 pb-20 px-4 text-center relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 20% 50%,white 1px,transparent 1px),radial-gradient(circle at 80% 20%,white 1px,transparent 1px);background-size:32px 32px;"></div>
-    <div class="relative max-w-2xl mx-auto">
-      <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white/90 text-xs font-semibold px-3 py-1 rounded-full mb-4 border border-white/20">
-        <span class="size-1.5 rounded-full bg-emerald-400 inline-block"></span>
-        Open Now
-      </div>
-      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">
-        <%= menu.businessName || 'Our Menu' %>
-      </h1>
-      <p class="text-white/70 text-sm">Tap a category to explore our dishes</p>
-    </div>
-  </section>
-
-  <!-- ── Categories ─────────────────────────────────────────────────────── -->
-  <main class="max-w-5xl mx-auto px-4 -mt-6 pb-20" id="categories">
-    <% if (categories.length === 0) { %>
-      <div class="bg-white rounded-3xl shadow-card p-10 text-center mt-8">
-        <div class="text-5xl mb-4">🍽</div>
-        <h2 class="text-xl font-bold text-slate-700 mb-2">Menu coming soon</h2>
-        <p class="text-slate-400 text-sm">This restaurant is still setting up their menu. Check back soon!</p>
-      </div>
-    <% } else { %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <% categories.forEach(function(cat, i) {
-          const catProducts = productsByCategory[cat.id] || [];
-          const heroProduct = catProducts.find(p => p.imageUrl) || catProducts[0];
-          const bgGradients = [
-            'from-violet-500 to-purple-700','from-rose-500 to-pink-700',
-            'from-emerald-500 to-teal-700','from-amber-500 to-orange-700',
-            'from-sky-500 to-blue-700','from-fuchsia-500 to-pink-700',
-            'from-lime-500 to-green-700','from-cyan-500 to-blue-700',
-            'from-red-500 to-rose-700','from-indigo-500 to-violet-700',
-          ];
-          const grad = bgGradients[i % bgGradients.length];
-        %>
-        <a href="<%= baseUrl %>/c/<%= cat.slug %>"
-           class="group relative block rounded-2xl overflow-hidden shadow-card hover-lift bg-white h-44">
-          <% if (heroProduct && heroProduct.imageUrl) { %>
-            <img src="<%= heroProduct.imageUrl %>" alt="<%= cat.name %>"
-                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"/>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-          <% } else { %>
-            <div class="absolute inset-0 bg-gradient-to-br <%= grad %>"></div>
-            <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:20px 20px;"></div>
-          <% } %>
-          <div class="absolute bottom-0 left-0 right-0 p-4">
-            <h3 class="text-white font-bold text-lg leading-tight drop-shadow-sm"><%= cat.name %></h3>
-            <p class="text-white/70 text-xs mt-0.5">
-              <%= catProducts.length %> <%= catProducts.length === 1 ? 'item' : 'items' %>
-            </p>
-          </div>
-          <div class="absolute top-3 right-3 bg-white/20 backdrop-blur-sm rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-smooth">
-            <svg class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/></svg>
-          </div>
-        </a>
-        <% }); %>
-      </div>
-
-      <!-- All products section (optional mini preview) -->
-      <% const allProducts = menu.products || [];
-         const featuredProducts = allProducts.slice(0, 6); %>
-      <% if (featuredProducts.length > 0) { %>
-        <div class="mt-10">
-          <h2 class="text-lg font-bold text-slate-800 mb-4">Featured Items</h2>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <% featuredProducts.forEach(function(p) { %>
-              <a href="<%= baseUrl %>/p/<%= p.slug %>"
-                 class="group bg-white rounded-2xl overflow-hidden shadow-card hover-lift">
-                <div class="relative h-32 bg-gradient-to-br from-slate-100 to-slate-200">
-                  <% if (p.imageUrl) { %>
-                    <img src="<%= p.imageUrl %>" alt="<%= p.name %>"
-                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"/>
-                  <% } else { %>
-                    <div class="w-full h-full flex items-center justify-center text-3xl text-slate-300">🍽</div>
-                  <% } %>
-                </div>
-                <div class="p-3">
-                  <p class="text-sm font-semibold text-slate-800 truncate"><%= p.name %></p>
-                  <p class="text-brand-600 font-bold text-sm mt-1">$<%= Number(p.price).toFixed(2) %></p>
-                </div>
-              </a>
-            <% }); %>
-          </div>
+        <div class="absolute bottom-0 left-0 right-0 p-3">
+          <span class="text-xl block mb-1"><%= cat.emoji || '🍽' %></span>
+          <h3 class="text-white font-bold text-sm leading-tight"><%= cat.name %></h3>
+          <p class="text-white/70 text-xs mt-0.5"><%= catProducts.length %> ürün</p>
         </div>
-      <% } %>
-    <% } %>
-  </main>
+      </a>
+      <% }); %>
+    </div>
 
-  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
-  <footer class="border-t border-slate-100 py-6 text-center text-xs text-slate-400">
-    Powered by <span class="font-semibold text-brand-600">QR Menu</span>
-  </footer>
+    <!-- Öne çıkan ürünler -->
+    <% var allProducts = [];
+       categories.forEach(function(c){ (productsByCategory[c.id]||[]).forEach(function(p){ allProducts.push(p); }); });
+       var featured = allProducts.slice(0, 6); %>
+    <% if(featured.length > 0){ %>
+    <h2 class="text-lg font-bold mb-4
+      <% if(isDark){%>text-white<%}else if(d==='koy-kahvaltisi'){%>font-['Playfair_Display',serif] text-amber-900<%}else if(d==='bistro-editoryal'){%>font-['Playfair_Display',serif] text-zinc-900<%}else{%>text-slate-800<%}%>">
+      Öne Çıkan Lezzetler
+    </h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <% featured.forEach(function(p){ %>
+      <a href="/m/<%= menu.slug %>/p/<%= p.slug %>"
+         class="group rounded-2xl overflow-hidden gecis
+           <% if(isDark){%>bg-slate-800/60 border border-slate-700/50 hover:border-indigo-500/50<%}
+           else if(d==='koy-kahvaltisi'){%>bg-white border border-amber-100 hover:border-amber-300 hover:shadow-md<%}
+           else{%>bg-white border border-slate-100 shadow-sm hover:shadow-md<%}%>">
+        <div class="h-32 overflow-hidden bg-slate-100">
+          <% if(p.imageUrl){ %>
+          <img src="<%= p.imageUrl %>" alt="<%= p.name %>" class="w-full h-full object-cover group-hover:scale-105 gecis"/>
+          <% }else{ %>
+          <div class="w-full h-full flex items-center justify-center text-3xl
+            <% if(isDark){%>bg-slate-700<%}else if(d==='koy-kahvaltisi'){%>bg-amber-50<%}else{%>bg-slate-50<%}%>">🍽</div>
+          <% } %>
+        </div>
+        <div class="p-3">
+          <p class="font-semibold text-sm truncate
+            <% if(isDark){%>text-white<%}else if(d==='koy-kahvaltisi'){%>text-stone-800<%}else{%>text-slate-800<%}%>"><%= p.name %></p>
+          <p class="font-bold text-sm mt-0.5
+            <% if(d==='premium-koyu'){%>text-transparent bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text<%}
+            else if(d==='sushi-kartlar'){%>text-indigo-400<%}
+            else if(d==='vegan-minimal'){%>text-green-600<%}
+            else if(d==='koy-kahvaltisi'){%>text-amber-700<%}
+            else{%>text-sky-600<%}%>">₺<%= p.price %></p>
+        </div>
+      </a>
+      <% }); %>
+    </div>
+    <% } %>
+  <% } %>
+</main>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────────── -->
+<footer class="border-t py-5 text-center text-xs
+  <% if(isDark){%>border-slate-800 text-slate-600<%}else if(d==='koy-kahvaltisi'){%>border-amber-100 text-stone-400<%}else{%>border-slate-100 text-slate-400<%}%>">
+  <span><%= menu.businessName %></span> · <span>QR Menü ile güçlendirilmiştir</span>
+</footer>
 
 </body>
 </html>

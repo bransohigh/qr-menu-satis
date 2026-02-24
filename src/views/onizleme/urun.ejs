@@ -3,6 +3,7 @@ var d = konfig.duzen;
 var koyu = konfig.koyuMod;
 var onizlemeBase = '/onizleme/' + tema.slug;
 var kat = kategori;
+var isDark = (d==='sushi-kartlar'||d==='premium-koyu'||d==='gece-modu'||d==='premium');
 %><!DOCTYPE html>
 <html lang="tr" class="scroll-smooth">
 <head>
@@ -17,7 +18,7 @@ var kat = kategori;
     .glass{background:rgba(255,255,255,.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);}
   </style>
 </head>
-<body class="min-h-screen <% if(koyu){%>bg-slate-950 text-white<%}else{%>bg-slate-50 text-slate-900<%}%>">
+<body class="min-h-screen <% if(d==='premium-koyu'){%>bg-[#070714] text-white<%}else if(d==='sushi-kartlar'){%>bg-slate-900 text-white<%}else if(isDark){%>bg-slate-950 text-white<%}else if(d==='vegan-minimal'){%>bg-white text-zinc-800<%}else if(d==='bistro-editoryal'){%>bg-white text-zinc-900<%}else if(d==='koy-kahvaltisi'){%>bg-amber-50 text-stone-800<%}else{%>bg-slate-50 text-slate-800<%}%>">
 
 <!-- Önizleme bandı -->
 <div class="sticky top-0 z-[60] bg-amber-400 text-amber-950 text-xs font-bold flex items-center justify-between px-4 py-2.5">
@@ -27,13 +28,13 @@ var kat = kategori;
 
 <!-- Header -->
 <header class="sticky top-8 z-50 border-b shadow-sm
-  <% if(koyu){%>bg-slate-950 border-slate-800<%}else{%>bg-white border-slate-200<%}%>">
+  <% if(isDark){%>bg-slate-950 border-slate-800<%}else if(d==='koy-kahvaltisi'){%>bg-white border-amber-100<%}else if(d==='vegan-minimal'){%>bg-white border-green-100<%}else if(d==='bistro-editoryal'){%>bg-white border-zinc-200<%}else{%>bg-white border-slate-200<%}%>">
   <div class="max-w-4xl mx-auto px-4 h-12 flex items-center gap-2 text-sm">
-    <a href="<%= onizlemeBase %>" class="<% if(koyu){%>text-slate-400 hover:text-white<%}else{%>text-slate-400 hover:text-slate-800<%}%> gecis">Ana Sayfa</a>
-    <span class="<% if(koyu){%>text-slate-700<%}else{%>text-slate-200<%}%>">/</span>
-    <a href="<%= onizlemeBase %>/k/<%= kat.slug||kat.id %>" class="<% if(koyu){%>text-slate-400 hover:text-white<%}else{%>text-slate-400 hover:text-slate-800<%}%> gecis"><%= kat.name %></a>
-    <span class="<% if(koyu){%>text-slate-700<%}else{%>text-slate-200<%}%>">/</span>
-    <span class="font-semibold truncate max-w-[160px] <% if(koyu){%>text-white<%}%>"><%= urun.name %></span>
+    <a href="<%= onizlemeBase %>" class="<% if(isDark){%>text-slate-400 hover:text-white<%}else{%>text-slate-400 hover:text-slate-800<%}%> gecis">Ana Sayfa</a>
+    <span class="<% if(isDark){%>text-slate-700<%}else{%>text-slate-200<%}%>">/</span>
+    <a href="<%= onizlemeBase %>/k/<%= kat.slug||kat.id %>" class="<% if(isDark){%>text-slate-400 hover:text-white<%}else{%>text-slate-400 hover:text-slate-800<%}%> gecis"><%= kat.name %></a>
+    <span class="<% if(isDark){%>text-slate-700<%}else{%>text-slate-200<%}%>">/</span>
+    <span class="font-semibold truncate max-w-[160px] <% if(isDark){%>text-white<%}%>"><%= urun.name %></span>
   </div>
 </header>
 
@@ -71,26 +72,31 @@ var kat = kategori;
     <div class="lg:sticky lg:top-24 space-y-5">
       <!-- Kategori badge -->
       <span class="text-xs font-semibold px-3 py-1 rounded-full
-        <% if(d==='gece-modu'){%>bg-cyan-900/50 text-cyan-400<%}
+        <% if(d==='premium-koyu'){%>bg-purple-900/50 text-purple-300<%}
+        else if(d==='sushi-kartlar'){%>bg-indigo-900/50 text-indigo-400<%}
+        else if(d==='gece-modu'){%>bg-cyan-900/50 text-cyan-400<%}
         else if(d==='premium'){%>bg-purple-900/50 text-purple-300<%}
+        else if(d==='vegan-minimal'){%>bg-green-50 text-green-700<%}
+        else if(d==='koy-kahvaltisi'){%>bg-amber-100 text-amber-800<%}
         else{%>bg-slate-100 text-slate-500<%}%>">
         <%= kat.emoji %> <%= kat.name %>
       </span>
 
       <!-- Ürün adı -->
       <h1 class="text-3xl font-black leading-tight
-        <% if(koyu){%>text-white<%}else{%>text-slate-900<%}%>"><%= urun.name %></h1>
+        <% if(isDark){%>text-white<%}else if(d==='koy-kahvaltisi'){%>text-stone-800<%}else if(d==='bistro-editoryal'){%>text-zinc-900<%}else{%>text-slate-900<%}%>"><%= urun.name %></h1>
 
       <!-- Fiyat -->
       <div class="flex items-center gap-3">
         <span class="text-4xl font-black
-          <% if(d==='gece-modu'){%>text-cyan-400<%}
+          <% if(d==='premium-koyu'){%>text-transparent bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text<%}
+          else if(d==='sushi-kartlar'){%>text-indigo-400<%}
+          else if(d==='gece-modu'){%>text-cyan-400<%}
           else if(d==='premium'){%>text-transparent bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text<%}
-          else if(d==='sol-menu'){%>text-emerald-600<%}
-          else if(d==='kompakt'){%>text-teal-600<%}
-          else if(d==='kapakli'){%>text-amber-600<%}
-          else if(d==='kategori-seridi'){%>text-rose-600<%}
-          else{%>text-slate-900<%}%>">₺<%= urun.price %></span>
+          else if(d==='vegan-minimal'){%>text-green-600<%}
+          else if(d==='koy-kahvaltisi'){%>text-amber-700<%}
+          else if(d==='bistro-editoryal'){%>text-zinc-900<%}
+          else{%>text-sky-600<%}%>">₺<%= urun.price %></span>
       </div>
 
       <!-- Etiketler -->
@@ -98,38 +104,40 @@ var kat = kategori;
       <div class="flex flex-wrap gap-2">
         <% urun.etiketler.forEach(function(e){ %>
         <span class="text-xs px-2.5 py-1 rounded-full
-          <% if(koyu){%>bg-slate-800 text-slate-300<%}else{%>bg-slate-100 text-slate-600<%}%>"><%= e %></span>
+          <% if(isDark){%>bg-slate-800 text-slate-300<%}else{%>bg-slate-100 text-slate-600<%}%>"><%= e %></span>
         <% }); %>
       </div>
       <% } %>
 
       <!-- Açıklama -->
-      <p class="leading-relaxed <% if(koyu){%>text-slate-300<%}else{%>text-slate-600<%}%>"><%= urun.description %></p>
+      <p class="leading-relaxed <% if(isDark){%>text-slate-300<%}else if(d==='koy-kahvaltisi'){%>text-stone-500<%}else{%>text-slate-600<%}%>"><%= urun.description %></p>
 
       <!-- Butonlar -->
       <div class="flex flex-col sm:flex-row gap-3 pt-2">
         <a href="<%= onizlemeBase %>/k/<%= kat.slug||kat.id %>"
            class="flex-1 text-center py-3 rounded-xl font-semibold gecis text-sm
-             <% if(d==='gece-modu'){%>bg-slate-800 text-slate-200 hover:bg-slate-700<%}
-             else if(d==='premium'){%>glass text-purple-200 hover:border-purple-400/30<%}
+             <% if(isDark){%>bg-slate-800 text-slate-200 hover:bg-slate-700<%}
+             else if(d==='koy-kahvaltisi'){%>bg-amber-100 text-amber-800 hover:bg-amber-200<%}
+             else if(d==='vegan-minimal'){%>bg-green-50 text-green-700 hover:bg-green-100<%}
              else{%>bg-slate-100 text-slate-700 hover:bg-slate-200<%}%>">
           ← Kategoriye Dön
         </a>
         <a href="/temalar/<%= tema.slug %>"
            class="flex-1 text-center py-3 rounded-xl font-bold gecis text-sm text-white
-             <% if(d==='gece-modu'){%>bg-cyan-600 hover:bg-cyan-500<%}
+             <% if(d==='premium-koyu'){%>bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500<%}
+             else if(d==='sushi-kartlar'){%>bg-indigo-600 hover:bg-indigo-500<%}
+             else if(d==='gece-modu'){%>bg-cyan-600 hover:bg-cyan-500<%}
              else if(d==='premium'){%>bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500<%}
-             else if(d==='sol-menu'){%>bg-emerald-600 hover:bg-emerald-500<%}
-             else if(d==='kapakli'){%>bg-amber-500 hover:bg-amber-400<%}
-             else if(d==='kategori-seridi'){%>bg-rose-500 hover:bg-rose-400<%}
-             else if(d==='kompakt'){%>bg-teal-600 hover:bg-teal-500<%}
-             else{%>bg-slate-900 hover:bg-slate-700<%}%>">
+             else if(d==='vegan-minimal'){%>bg-green-600 hover:bg-green-500<%}
+             else if(d==='koy-kahvaltisi'){%>bg-amber-600 hover:bg-amber-500<%}
+             else if(d==='bistro-editoryal'){%>bg-zinc-900 hover:bg-zinc-700<%}
+             else{%>bg-sky-600 hover:bg-sky-500<%}%>">
           Bu Temayı Satın Al
         </a>
       </div>
 
       <!-- Menü bilgisi -->
-      <div class="pt-3 border-t <% if(koyu){%>border-slate-800<%}else{%>border-slate-100<%}%>">
+      <div class="pt-3 border-t <% if(isDark){%>border-slate-800<%}else{%>border-slate-100<%}%>">
         <p class="text-xs <% if(koyu){%>text-slate-500<%}else{%>text-slate-400<%}%>">🍽 <%= menu.businessName %> · Demo Önizleme</p>
       </div>
     </div>
@@ -138,14 +146,14 @@ var kat = kategori;
   <!-- İlgili Ürünler -->
   <% if(kategoriUrunleri && kategoriUrunleri.length){ %>
   <section class="mt-14">
-    <h2 class="text-lg font-bold mb-5 <% if(koyu){%>text-white<%}else{%>text-slate-800<%}%>">
+    <h2 class="text-lg font-bold mb-5 <% if(isDark){%>text-white<%}else{%>text-slate-800<%}%>">
       <%= kat.emoji %> <%= kat.name %> kategorisinden diğerleri
     </h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
       <% kategoriUrunleri.forEach(function(r){ %>
       <a href="<%= onizlemeBase %>/u/<%= r.slug %>"
          class="group rounded-xl overflow-hidden gecis
-           <% if(koyu){%>bg-slate-900 border border-slate-800 hover:border-slate-600<%}else{%>bg-white border border-slate-100 hover:shadow-md<%}%>">
+           <% if(isDark){%>bg-slate-900 border border-slate-800 hover:border-slate-600<%}else{%>bg-white border border-slate-100 hover:shadow-md<%}%>">
         <div class="h-28 bg-slate-100 overflow-hidden">
           <% if(r.imageUrl){ %>
           <img src="<%= r.imageUrl %>" alt="<%= r.name %>" class="w-full h-full object-cover group-hover:scale-105 gecis"/>
@@ -154,8 +162,8 @@ var kat = kategori;
           <% } %>
         </div>
         <div class="p-3">
-          <p class="font-semibold text-sm truncate <% if(koyu){%>text-white<%}else{%>text-slate-800<%}%>"><%= r.name %></p>
-          <p class="font-bold text-sm <% if(koyu){%>text-slate-300<%}else{%>text-slate-600<%}%>">₺<%= r.price %></p>
+          <p class="font-semibold text-sm truncate <% if(isDark){%>text-white<%}else{%>text-slate-800<%}%>"><%= r.name %></p>
+          <p class="font-bold text-sm <% if(isDark){%>text-slate-300<%}else{%>text-slate-600<%}%>">₺<%= r.price %></p>
         </div>
       </a>
       <% }); %>

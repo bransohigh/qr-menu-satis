@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../services/prisma';
 import { asyncHandler } from '../middleware/errorHandler';
+import { getTemaKonfig } from './temalar';
 
 export const publicMenuRouter = Router();
 
@@ -38,8 +39,9 @@ publicMenuRouter.get(
       menu,
       categories: menu.categories,
       productsByCategory,
+      konfig: getTemaKonfig(menu.theme?.templateKey || 'tema_01'),
       baseUrl: `/m/${menu.slug}`,
-      title: menu.businessName || 'Menu',
+      title: menu.businessName || 'Menü',
     });
   })
 );
@@ -67,8 +69,9 @@ publicMenuRouter.get(
       category,
       categories: menu.categories,
       products,
+      konfig: getTemaKonfig(menu.theme?.templateKey || 'tema_01'),
       baseUrl: `/m/${menu.slug}`,
-      title: `${category.name} — ${menu.businessName || 'Menu'}`,
+      title: `${category.name} — ${menu.businessName || 'Menü'}`,
     });
   })
 );
@@ -102,8 +105,9 @@ publicMenuRouter.get(
       product,
       category,
       categories: menu.categories,
+      konfig: getTemaKonfig(menu.theme?.templateKey || 'tema_01'),
       baseUrl: `/m/${menu.slug}`,
-      title: `${product.name} — ${menu.businessName || 'Menu'}`,
+      title: `${product.name} — ${menu.businessName || 'Menü'}`,
     });
   })
 );

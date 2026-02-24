@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sipariş Geçmişi — QR Menü Paneli</title>
+  <style>
+    <%- include('../partials/admin-styles') %>
+    .siparis-tablo-wrap { overflow-x: auto; }
+    .siparis-tablo { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    .siparis-tablo th { text-align: left; padding: .75rem 1rem; color: #64748b; font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid #e2e8f0; }
+    .siparis-tablo td { padding: .85rem 1rem; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    .siparis-tablo tr:last-child td { border-bottom: none; }
+    .siparis-tablo tr:hover td { background: #f8fafc; }
+    .durum-badge { display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .65rem; border-radius: 999px; font-size: .73rem; font-weight: 700; }
+    .durum-odendi { background: #dcfce7; color: #166534; }
+    .durum-beklemede { background: #fef9c3; color: #854d0e; }
+    .durum-iptal { background: #fee2e2; color: #991b1b; }
+    .bos-durum { text-align: center; padding: 3rem 1rem; color: #94a3b8; }
+    .tutar { font-weight: 700; color: #1e293b; font-variant-numeric: tabular-nums; }
+    .ref-no { font-family: monospace; font-size: .78rem; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <%- include('../partials/panel-nav', { active: 'siparisler', menu: null, kullanici }) %>
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Sipariş Geçmişi</h1>
+      <p style="color:#64748b;font-size:.88rem;margin-top:.25rem">Tüm tema satın alımlarınızın listesi.</p>
+    </div>
+
+    <% if (!satinAlimlar || satinAlimlar.length === 0) { %>
+      <div class="card bos-durum">
+        <div style="font-size:2.5rem;margin-bottom:.75rem">🧾</div>
+        <h3 style="font-size:1rem;font-weight:700;color:#334155;margin-bottom:.4rem">Henüz sipariş bulunmuyor</h3>
+        <p style="font-size:.875rem">Bir tema satın aldığınızda burada görünecektir.</p>
+        <a href="/temalar" class="btn btn-primary" style="margin-top:1rem;display:inline-block">🎨 Temaları İncele</a>
+      </div>
+    <% } else { %>
+      <div class="card" style="padding:0">
+        <div class="siparis-tablo-wrap">
+          <table class="siparis-tablo">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Tema</th>
+                <th>Durum</th>
+                <th>Tutar</th>
+                <th>Ödeme Yöntemi</th>
+                <th>Referans No</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% satinAlimlar.forEach(function(s) {
+                const tarih = new Date(s.createdAt).toLocaleDateString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+                const durumMap = { paid: { label: 'Ödendi', cls: 'durum-odendi' }, pending: { label: 'Beklemede', cls: 'durum-beklemede' }, failed: { label: 'Başarısız', cls: 'durum-iptal' }, refunded: { label: 'İade Edildi', cls: 'durum-beklemede' } };
+                const durum = durumMap[s.status] || { label: s.status, cls: 'durum-beklemede' };
+                const providerMap = { fakepay: 'Simülasyon', stripe: 'Stripe', iyzico: 'İyzico Ödeme' };
+                const provider = providerMap[s.provider] || s.provider;
+                const tutar = parseFloat(s.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' ' + (s.currency === 'USD' ? '$' : s.currency === 'TRY' ? '₺' : s.currency);
+              %>
+              <tr>
+                <td style="white-space:nowrap"><%= tarih %></td>
+                <td>
+                  <strong><%= s.theme.name %></strong>
+                </td>
+                <td>
+                  <span class="durum-badge <%= durum.cls %>"><%= durum.label %></span>
+                </td>
+                <td><span class="tutar"><%= tutar %></span></td>
+                <td><%= provider %></td>
+                <td>
+                  <% if (s.providerRef) { %>
+                    <span class="ref-no"><%= s.providerRef %></span>
+                  <% } else { %>
+                    <span style="color:#cbd5e1">—</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1rem">
+        <p style="font-size:.82rem;color:#64748b">
+          ✉ Satın alımlarınızla ilgili sorularınız için 
+          <a href="mailto:<%= typeof SIRKET_EPOSTA !== 'undefined' ? SIRKET_EPOSTA : 'destek@qrmenu.com.tr' %>" style="color:#6366f1">destek ekibimizle</a> 
+          iletişime geçebilirsiniz.
+        </p>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

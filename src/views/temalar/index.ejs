@@ -24,6 +24,29 @@
     .kart-yukselt { transition: transform .2s ease, box-shadow .2s ease; }
     .kart-yukselt:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,.12); }
     .gecis { transition: all .2s ease; }
+
+    /* ── Infinite Grid Hero ───────────────────────────────────────────────── */
+    .hero-section { background: #2e1065; }
+    .hero-grid {
+      background-image:
+        linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 48px 48px;
+      animation: gridDrift 20s linear infinite;
+      will-change: background-position;
+    }
+    @keyframes gridDrift {
+      0%   { background-position: 0 0; }
+      100% { background-position: 48px 48px; }
+    }
+    /* Izgara vignette — kenarları yumuşat */
+    .hero-section::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(15,5,40,.6) 100%);
+      pointer-events: none;
+    }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -36,6 +59,8 @@
       </a>
       <div class="flex items-center gap-3">
         <a href="/temalar" class="text-sm font-medium text-slate-600 hover:text-slate-900 gecis hidden sm:block">Temalar</a>
+        <a href="/hakkimizda" class="text-sm font-medium text-slate-600 hover:text-slate-900 gecis hidden md:block">Hakkımızda</a>
+        <a href="/iletisim" class="text-sm font-medium text-slate-600 hover:text-slate-900 gecis hidden md:block">İletişim</a>
         <% if (kullanici) { %>
           <span class="text-sm text-slate-500 hidden sm:block"><%= kullanici.email %></span>
           <% if (kullanici.role === 'ADMIN') { %>
@@ -65,21 +90,45 @@
   <% } %>
 
   <!-- ── HERO ─────────────────────────────────────────────────────────────── -->
-  <section class="bg-gradient-to-br from-marka-700 via-purple-700 to-indigo-800 text-white py-16 sm:py-20 px-4 text-center relative overflow-hidden">
-    <div class="absolute inset-0 opacity-20" style="background-image:url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 60 60\"><circle cx=\"30\" cy=\"30\" r=\"1\" fill=\"white\"/></svg>');background-size:30px 30px;"></div>
+  <section class="text-white py-20 sm:py-28 px-4 text-center relative overflow-hidden hero-section">
+    <!-- Infinite Grid arka plan -->
+    <div class="absolute inset-0 hero-grid" aria-hidden="true"></div>
+    <!-- Gradient overlay (grid üstüne oturur, grid'i yumuşatır) -->
+    <div class="absolute inset-0 bg-gradient-to-br from-violet-900/90 via-purple-800/85 to-indigo-900/90" aria-hidden="true"></div>
+
     <div class="relative max-w-3xl mx-auto">
-      <div class="inline-flex items-center gap-2 bg-white/15 text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full mb-5 border border-white/20 backdrop-blur-sm">
+      <div class="inline-flex items-center gap-2 bg-white/15 text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-white/20 backdrop-blur-sm">
         <span class="w-1.5 h-1.5 rounded-full bg-green-400 inline-block animate-pulse"></span>
         10 profesyonel tema • Ömür boyu lisans
       </div>
-      <h1 class="text-4xl sm:text-5xl font-black tracking-tight mb-4">
-        Restoranınıza Özel<br/>
-        <span class="text-purple-200">Dijital Menü Temaları</span>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-5 leading-tight">
+        QR Menü Temalarıyla<br/>
+        <span class="text-purple-200">Dijital Menünüz Hazır</span>
       </h1>
-      <p class="text-white/70 text-lg mb-8 max-w-xl mx-auto">
-        Saniyeler içinde QR menünüzü oluşturun. 10 farklı tema arasından seçin,
-        önizleyin ve anında yayına geçin.
+      <p class="text-white/75 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+        Temayı seçin, ürün ve kategorileri girin, QR ile anında yayınlayın.
       </p>
+      <!-- Butonlar -->
+      <div class="flex flex-col sm:flex-row gap-3 justify-center mb-10">
+        <a href="#tema-grid" class="bg-white text-violet-800 font-bold px-7 py-3 rounded-xl hover:bg-violet-50 transition-colors shadow-lg">
+          Temaları İncele
+        </a>
+        <% if (kullanici) { %>
+          <% if (kullanici.role === 'ADMIN') { %>
+            <a href="/yonetim" class="border border-white/30 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition-colors backdrop-blur-sm">
+              Yönetim Paneli →
+            </a>
+          <% } else { %>
+            <a href="/panel" class="border border-white/30 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition-colors backdrop-blur-sm">
+              Panelim →
+            </a>
+          <% } %>
+        <% } else { %>
+          <a href="/giris" class="border border-white/30 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition-colors backdrop-blur-sm">
+            Ücretsiz Başla →
+          </a>
+        <% } %>
+      </div>
       <!-- Arama -->
       <div class="max-w-md mx-auto">
         <div class="relative">
@@ -105,29 +154,41 @@
       <% temalar.forEach(function(tema) {
         const k = getTemaKonfig(tema.templateKey);
         const duzenRenk = {
-          'klasik-liste':    'bg-slate-100 text-slate-700',
-          'kart-duzen':      'bg-violet-100 text-violet-700',
-          'minimal':         'bg-stone-100 text-stone-700',
-          'gece-modu':       'bg-slate-800 text-cyan-300',
-          'kapakli':         'bg-amber-100 text-amber-700',
-          'sol-menu':        'bg-emerald-100 text-emerald-700',
-          'kategori-seridi': 'bg-rose-100 text-rose-700',
-          'gorsel-odakli':   'bg-orange-100 text-orange-700',
-          'kompakt':         'bg-teal-100 text-teal-700',
-          'premium':         'bg-purple-900 text-purple-200',
+          'klasik-liste':     'bg-slate-100 text-slate-700',
+          'kart-duzen':       'bg-violet-100 text-violet-700',
+          'minimal':          'bg-stone-100 text-stone-700',
+          'gece-modu':        'bg-slate-800 text-cyan-300',
+          'kapakli':          'bg-amber-100 text-amber-700',
+          'sol-menu':         'bg-emerald-100 text-emerald-700',
+          'kategori-seridi':  'bg-rose-100 text-rose-700',
+          'gorsel-odakli':    'bg-orange-100 text-orange-700',
+          'kompakt':          'bg-teal-100 text-teal-700',
+          'premium':          'bg-purple-900 text-purple-200',
+          'koy-kahvaltisi':   'bg-amber-100 text-amber-700',
+          'vegan-minimal':    'bg-green-100 text-green-700',
+          'sushi-kartlar':    'bg-indigo-900 text-indigo-300',
+          'premium-koyu':     'bg-purple-950 text-purple-300',
+          'bistro-editoryal': 'bg-zinc-100 text-zinc-700',
+          'modern-galeri':    'bg-sky-100 text-sky-700',
         }[k.duzen] || 'bg-slate-100 text-slate-700';
 
         const duzenAdi = {
-          'klasik-liste':    'Klasik Liste',
-          'kart-duzen':      'Kart Düzeni',
-          'minimal':         'Minimal',
-          'gece-modu':       'Gece Modu',
-          'kapakli':         'Kapaklı',
-          'sol-menu':        'Sol Menü',
-          'kategori-seridi': 'Kategori Şeridi',
-          'gorsel-odakli':   'Görsel Odaklı',
-          'kompakt':         'Kompakt',
-          'premium':         'Premium',
+          'klasik-liste':     'Klasik Liste',
+          'kart-duzen':       'Kart Düzeni',
+          'minimal':          'Minimal',
+          'gece-modu':        'Gece Modu',
+          'kapakli':          'Kapaklı',
+          'sol-menu':         'Sol Menü',
+          'kategori-seridi':  'Kategori Şeridi',
+          'gorsel-odakli':    'Görsel Odaklı',
+          'kompakt':          'Kompakt',
+          'premium':          'Premium',
+          'koy-kahvaltisi':   'Köy Kahvaltısı',
+          'vegan-minimal':    'Vegan Minimal',
+          'sushi-kartlar':    'Sushi Kartlar',
+          'premium-koyu':     'Premium Koyu',
+          'bistro-editoryal': 'Bistro Editoryal',
+          'modern-galeri':    'Modern Galeri',
         }[k.duzen] || k.duzen;
       %>
       <div class="tema-kart kart-yukselt bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col"
@@ -241,6 +302,111 @@
                   <div class="h-8 bg-purple-900/50 rounded-lg border border-purple-500/20"></div>
                 </div>
               </div>
+            <% } else if (k.duzen === 'koy-kahvaltisi') { %>
+              <div class="p-0 space-y-0">
+                <div class="h-6 bg-gradient-to-r from-amber-500 to-amber-600"></div>
+                <div class="p-1.5 space-y-1">
+                  <div class="flex gap-1 h-5 bg-white rounded border border-amber-100">
+                    <div class="w-6 bg-amber-50 rounded-l"></div>
+                    <div class="flex-1 p-1 space-y-0.5">
+                      <div class="h-1.5 bg-amber-200 rounded w-3/4"></div>
+                      <div class="h-1 bg-slate-100 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                  <div class="flex gap-1 h-5 bg-white rounded border border-amber-100">
+                    <div class="w-6 bg-amber-50 rounded-l"></div>
+                    <div class="flex-1 p-1 space-y-0.5">
+                      <div class="h-1.5 bg-amber-200 rounded w-4/5"></div>
+                      <div class="h-1 bg-slate-100 rounded w-2/5"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% } else if (k.duzen === 'vegan-minimal') { %>
+              <div class="p-1.5 space-y-1">
+                <div class="flex gap-1">
+                  <div class="h-2 bg-green-500 rounded-full px-3"></div>
+                  <div class="h-2 bg-green-100 rounded-full px-2"></div>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center gap-1">
+                    <div class="w-4 h-4 bg-green-100 rounded-full"></div>
+                    <div class="h-1.5 bg-slate-100 rounded flex-1"></div>
+                    <div class="h-1.5 bg-green-200 rounded w-6"></div>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <div class="w-4 h-4 bg-green-100 rounded-full"></div>
+                    <div class="h-1.5 bg-slate-100 rounded flex-1"></div>
+                    <div class="h-1.5 bg-green-200 rounded w-6"></div>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <div class="w-4 h-4 bg-green-100 rounded-full"></div>
+                    <div class="h-1.5 bg-slate-100 rounded flex-1"></div>
+                    <div class="h-1.5 bg-green-200 rounded w-6"></div>
+                  </div>
+                </div>
+              </div>
+            <% } else if (k.duzen === 'sushi-kartlar') { %>
+              <div class="p-1.5 space-y-1">
+                <div class="h-3 bg-indigo-500/30 rounded w-3/4"></div>
+                <div class="grid grid-cols-2 gap-1 mt-0.5">
+                  <div class="flex gap-0.5 h-6 bg-slate-700 rounded border border-indigo-500/20">
+                    <div class="w-5 bg-slate-600 rounded-l"></div>
+                    <div class="flex-1 p-0.5"><div class="h-1 bg-indigo-300/40 rounded"></div></div>
+                  </div>
+                  <div class="flex gap-0.5 h-6 bg-slate-700 rounded border border-indigo-500/20">
+                    <div class="w-5 bg-slate-600 rounded-l"></div>
+                    <div class="flex-1 p-0.5"><div class="h-1 bg-indigo-300/40 rounded"></div></div>
+                  </div>
+                  <div class="flex gap-0.5 h-6 bg-slate-700 rounded border border-indigo-500/20">
+                    <div class="w-5 bg-slate-600 rounded-l"></div>
+                    <div class="flex-1 p-0.5"><div class="h-1 bg-indigo-300/40 rounded"></div></div>
+                  </div>
+                  <div class="flex gap-0.5 h-6 bg-slate-700 rounded border border-indigo-500/20">
+                    <div class="w-5 bg-slate-600 rounded-l"></div>
+                    <div class="flex-1 p-0.5"><div class="h-1 bg-indigo-300/40 rounded"></div></div>
+                  </div>
+                </div>
+              </div>
+            <% } else if (k.duzen === 'premium-koyu') { %>
+              <div class="p-1.5 space-y-1" style="background:rgba(7,7,20,.9)">
+                <div class="h-3 rounded w-1/2" style="background:linear-gradient(90deg,#c084fc,#f472b6);opacity:.5"></div>
+                <div class="grid grid-cols-3 gap-1 mt-0.5">
+                  <div class="h-8 rounded-lg border" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)"></div>
+                  <div class="h-8 rounded-lg border" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)"></div>
+                  <div class="h-8 rounded-lg border" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)"></div>
+                </div>
+              </div>
+            <% } else if (k.duzen === 'bistro-editoryal') { %>
+              <div class="p-1.5 space-y-1">
+                <div class="h-2 bg-zinc-800 rounded w-3/5"></div>
+                <div class="border-b-2 border-zinc-900 pb-1"></div>
+                <div class="flex justify-between items-center">
+                  <div class="h-1.5 bg-zinc-200 rounded w-1/2"></div>
+                  <div class="h-1.5 bg-zinc-700 rounded w-1/5"></div>
+                </div>
+                <div class="border-t border-zinc-100"></div>
+                <div class="flex justify-between items-center">
+                  <div class="h-1.5 bg-zinc-200 rounded w-2/5"></div>
+                  <div class="h-1.5 bg-zinc-700 rounded w-1/5"></div>
+                </div>
+                <div class="border-t border-zinc-100"></div>
+                <div class="flex justify-between items-center">
+                  <div class="h-1.5 bg-zinc-200 rounded w-3/5"></div>
+                  <div class="h-1.5 bg-zinc-700 rounded w-1/5"></div>
+                </div>
+              </div>
+            <% } else if (k.duzen === 'modern-galeri') { %>
+              <div class="p-0 space-y-0">
+                <div class="h-7 bg-gradient-to-r from-sky-500 to-sky-700"></div>
+                <div class="p-1.5 grid grid-cols-3 gap-1">
+                  <div class="h-8 bg-sky-100 rounded-lg col-span-2"></div>
+                  <div class="h-8 bg-sky-50 rounded-lg"></div>
+                  <div class="h-6 bg-sky-50 rounded-lg"></div>
+                  <div class="h-6 bg-sky-100 rounded-lg"></div>
+                  <div class="h-6 bg-sky-50 rounded-lg"></div>
+                </div>
+              </div>
             <% } %>
           </div>
 
@@ -344,8 +510,39 @@
     </div>
   </div>
 
-  <footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-400">
-    QR Menü SaaS — Restoranınız için dijital menü çözümü
+  <footer class="border-t border-slate-200 bg-slate-900 text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
+        <!-- Marka -->
+        <div>
+          <div class="text-xl font-black bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent mb-2">QR Menü</div>
+          <p class="text-sm leading-relaxed">Restoranlar ve kafeler için profesyonel dijital menü çözümü. QR kodu ile anında yayınlayın.</p>
+        </div>
+        <!-- Hızlı Bağlantılar -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-widest text-slate-300 mb-3">Hızlı Bağlantılar</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/temalar" class="hover:text-white gecis">Temalar</a></li>
+            <li><a href="/hakkimizda" class="hover:text-white gecis">Hakkımızda</a></li>
+            <li><a href="/iletisim" class="hover:text-white gecis">İletişim</a></li>
+            <li><a href="/giris" class="hover:text-white gecis">Müşteri Girişi</a></li>
+          </ul>
+        </div>
+        <!-- Yasal -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-widest text-slate-300 mb-3">Yasal Bilgiler</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/gizlilik-politikasi" class="hover:text-white gecis">Gizlilik Politikası</a></li>
+            <li><a href="/mesafeli-satis-sozlesmesi" class="hover:text-white gecis">Mesafeli Satış Sözleşmesi</a></li>
+            <li><a href="/iptal-ve-iade" class="hover:text-white gecis">İptal ve İade Politikası</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-slate-700 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <span>© <%= new Date().getFullYear() %> QR Menü — Tüm hakları saklıdır.</span>
+        <span>Güvenli ödeme · 30 gün iade garantisi</span>
+      </div>
+    </div>
   </footer>
 
   <script>

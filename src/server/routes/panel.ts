@@ -88,3 +88,136 @@ panelRouter.get(
     });
   })
 );
+
+// GET /panel/tasarimlar — Satın alınan temalarda aktif tema seçimi
+panelRouter.get(
+  '/tasarimlar',
+  asyncHandler(async (req: Request, res: Response) => {
+    const menu = await loadUserMenu(req.user!.id);
+
+    // Kullanıcının ödendi durumundaki satın alımları ve tema detayları
+    const satinAlimlar = await prisma.purchase.findMany({
+      where: { userId: req.user!.id, status: 'paid' },
+      include: { theme: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.render('panel/tasarimlar', {
+      kullanici: req.user,
+      menu,
+      satinAlimlar,
+      flash: req.query.flash || null,
+    });
+  })
+);
+
+// POST /panel/tasarim-sec — Aktif temayı güncelle
+panelRouter.post(
+  '/tasarim-sec',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { themeId } = req.body as { themeId: string };
+
+    if (!themeId) {
+      res.redirect('/panel/tasarimlar?flash=hata-no-theme');
+      return;
+    }
+
+    // Kullanıcının bu temayı satın aldığını doğrula
+    const satin = await prisma.purchase.findFirst({
+      where: { userId: req.user!.id, themeId, status: 'paid' },
+    });
+
+    if (!satin) {
+      res.redirect('/panel/tasarimlar?flash=hata-yetkisiz');
+      return;
+    }
+
+    // Menü themeId güncelle
+    await prisma.menu.update({
+      where: { userId: req.user!.id },
+      data: { themeId },
+    });
+
+    res.redirect('/panel/tasarimlar?flash=basarili');
+  })
+);
+
+// GET /panel/siparisler — Satın alım geçmişi
+panelRouter.get(
+  '/siparisler',
+  asyncHandler(async (req: Request, res: Response) => {
+    const satinAlimlar = await prisma.purchase.findMany({
+      where: { userId: req.user!.id },
+      include: { theme: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.render('panel/siparisler', {
+      kullanici: req.user,
+      satinAlimlar,
+      flash: req.query.flash || null,
+    });
+  })
+);
+
+// ─── API: Tasarım seçimi ─────────────────────────────────────────────────────
+
+// GET /api/panel/tasarimlar
+panelRouter.get(
+  '/api/tasarimlar',
+  asyncHandler(async (req: Request, res: Response) => {
+    const menu = await prisma.menu.findUnique({
+      where: { userId: req.user!.id },
+      select: { themeId: true },
+    });
+
+    const satinAlimlar = await prisma.purchase.findMany({
+      where: { userId: req.user!.id, status: 'paid' },
+      include: { theme: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.json({
+      aktifThemeId: menu?.themeId || null,
+      satinAlinanTemalar: satinAlimlar.map((s) => ({
+        purchaseId: s.id,
+        themeId: s.themeId,
+        temaAdi: s.theme.name,
+        temaSlug: s.theme.slug,
+        onizlemeFoto: s.theme.previewImage,
+        aciklama: s.theme.description,
+        satinAlinmaTarihi: s.createdAt,
+      })),
+    });
+  })
+);
+
+// POST /api/panel/tasarim-sec
+panelRouter.post(
+  '/api/tasarim-sec',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { themeId } = req.body as { themeId: string };
+
+    if (!themeId) {
+      res.status(400).json({ hata: 'themeId gerekli' });
+      return;
+    }
+
+    const satin = await prisma.purchase.findFirst({
+      where: { userId: req.user!.id, themeId, status: 'paid' },
+    });
+
+    if (!satin) {
+      res.status(403).json({ hata: 'Bu temayı satın almadınız.' });
+      return;
+    }
+
+    const menu = await prisma.menu.update({
+      where: { userId: req.user!.id },
+      data: { themeId },
+      include: { theme: true },
+    });
+
+    res.json({ mesaj: 'Tasarım güncellendi.', aktifTema: menu.theme.name });
+  })
+);

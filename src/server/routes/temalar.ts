@@ -10,16 +10,17 @@ export function getTemaKonfig(templateKey: string) {
   const configs: Record<string, {
     duzen: string; koyuMod: boolean; vurgRenk: string; aciklama: string;
   }> = {
-    tema_01: { duzen: 'klasik-liste',    koyuMod: false, vurgRenk: 'slate',   aciklama: 'Temiz ve okunması kolay klasik liste düzeni' },
-    tema_02: { duzen: 'kart-duzen',      koyuMod: false, vurgRenk: 'violet',  aciklama: 'Görsel ağırlıklı büyük kart grid yapısı' },
-    tema_03: { duzen: 'minimal',         koyuMod: false, vurgRenk: 'stone',   aciklama: 'Çok boşluk ve büyük tipografi odaklı minimal tasarım' },
-    tema_04: { duzen: 'gece-modu',       koyuMod: true,  vurgRenk: 'cyan',    aciklama: 'Neon vurgulu göz dostu koyu tema' },
-    tema_05: { duzen: 'kapakli',         koyuMod: false, vurgRenk: 'amber',   aciklama: 'Büyük hero alanı ve sekmeli kategori gezintisi' },
-    tema_06: { duzen: 'sol-menu',        koyuMod: false, vurgRenk: 'emerald', aciklama: 'Desktop\'ta sol panel kategori navigasyonu' },
-    tema_07: { duzen: 'kategori-seridi', koyuMod: false, vurgRenk: 'rose',    aciklama: 'Üstte yapışkan kayar kategori çubuğu' },
-    tema_08: { duzen: 'gorsel-odakli',   koyuMod: false, vurgRenk: 'orange',  aciklama: 'Ürün fotoğrafı ana alan, içerik alt üstte' },
-    tema_09: { duzen: 'kompakt',         koyuMod: false, vurgRenk: 'teal',    aciklama: 'Fiyat sağda, yoğun ve hızlı taranabilen liste' },
-    tema_10: { duzen: 'premium',         koyuMod: true,  vurgRenk: 'purple',  aciklama: 'Cam efekti (glassmorphism) ve yumuşak animasyonlar' },
+    tema_01: { duzen: 'koy-kahvaltisi',   koyuMod: false, vurgRenk: 'amber',  aciklama: 'Sıcak amber tonları ve rustik serif tipografi' },
+    tema_02: { duzen: 'vegan-minimal',    koyuMod: false, vurgRenk: 'green',  aciklama: 'Temiz beyaz-yeşil, yuvarlak görseller, bol boşluk' },
+    tema_03: { duzen: 'sushi-kartlar',    koyuMod: true,  vurgRenk: 'indigo', aciklama: 'Koyu zemin, indigo aksanlar, asil kart grid düzeni' },
+    tema_04: { duzen: 'premium-koyu',     koyuMod: true,  vurgRenk: 'purple', aciklama: 'Glassmorphism kartlar, mor gradient, lüks görünüm' },
+    tema_05: { duzen: 'bistro-editoryal', koyuMod: false, vurgRenk: 'zinc',   aciklama: 'Siyah-beyaz editoryal tipografi, gazete tarzı düzen' },
+    tema_06: { duzen: 'modern-galeri',    koyuMod: false, vurgRenk: 'sky',    aciklama: 'Geniş hero banner, sky mavi vurgular, galeri grid' },
+    // Legacy aliases (eski temalar geçici uyum için)
+    tema_07: { duzen: 'modern-galeri',    koyuMod: false, vurgRenk: 'sky',    aciklama: 'Modern galeri düzeni' },
+    tema_08: { duzen: 'vegan-minimal',    koyuMod: false, vurgRenk: 'green',  aciklama: 'Minimal düzen' },
+    tema_09: { duzen: 'koy-kahvaltisi',   koyuMod: false, vurgRenk: 'amber',  aciklama: 'Rustik düzen' },
+    tema_10: { duzen: 'premium-koyu',     koyuMod: true,  vurgRenk: 'purple', aciklama: 'Premium koyu düzen' },
   };
   return configs[templateKey] || configs['tema_01'];
 }

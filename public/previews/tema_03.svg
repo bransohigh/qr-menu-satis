@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- Sushi Kartlar — Koyu slate/indigo, 2 sütun yatay kartlar -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(99,102,241,.06)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <!-- Arka plan -->
+  <rect width="400" height="300" fill="#0f172a"/>
+  <rect width="400" height="300" fill="url(#grid)"/>
+  <!-- Header -->
+  <rect width="400" height="44" fill="#020617" opacity=".9"/>
+  <rect x="14" y="14" width="80" height="16" rx="4" fill="#312e81" opacity=".7"/>
+  <rect x="300" y="12" width="45" height="20" rx="10" fill="#312e81" opacity=".5"/>
+  <rect x="355" y="12" width="32" height="20" rx="10" fill="#312e81" opacity=".5"/>
+  <!-- Hero -->
+  <rect y="44" width="400" height="60" fill="#0f172a"/>
+  <rect x="14" y="54" width="6" height="6" rx="3" fill="#6366f1"/>
+  <rect x="26" y="54" width="80" height="6" rx="3" fill="#6366f1" opacity=".5"/>
+  <rect x="14" y="72" width="180" height="16" rx="4" fill="#fff" opacity=".9"/>
+  <rect x="14" y="96" width="60" height="3" fill="#6366f1"/>
+  <!-- Kategori tabs -->
+  <rect x="14" y="116" width="54" height="20" rx="10" fill="#6366f1"/>
+  <rect x="76" y="116" width="66" height="20" rx="10" fill="#1e293b"/>
+  <rect x="150" y="116" width="54" height="20" rx="10" fill="#1e293b"/>
+  <rect x="212" y="116" width="70" height="20" rx="10" fill="#1e293b"/>
+  <!-- 2-col kartlar -->
+  <rect x="14" y="146" width="178" height="68" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+  <rect x="14" y="146" width="60" height="68" rx="12" fill="#334155"/>
+  <rect x="84" y="158" width="80" height="8" rx="3" fill="#fff" opacity=".8"/>
+  <rect x="84" y="172" width="60" height="6" rx="3" fill="#64748b"/>
+  <rect x="84" y="190" width="40" height="14" rx="5" fill="#4f46e5" opacity=".7"/>
+
+  <rect x="202" y="146" width="184" height="68" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+  <rect x="202" y="146" width="60" height="68" rx="12" fill="#334155"/>
+  <rect x="272" y="158" width="90" height="8" rx="3" fill="#fff" opacity=".8"/>
+  <rect x="272" y="172" width="60" height="6" rx="3" fill="#64748b"/>
+  <rect x="272" y="190" width="40" height="14" rx="5" fill="#4f46e5" opacity=".7"/>
+
+  <rect x="14" y="224" width="178" height="68" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+  <rect x="14" y="224" width="60" height="68" rx="12" fill="#334155"/>
+  <rect x="84" y="236" width="70" height="8" rx="3" fill="#fff" opacity=".8"/>
+  <rect x="84" y="250" width="50" height="6" rx="3" fill="#64748b"/>
+  <rect x="84" y="268" width="40" height="14" rx="5" fill="#4f46e5" opacity=".7"/>
+
+  <rect x="202" y="224" width="184" height="68" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+  <rect x="202" y="224" width="60" height="68" rx="12" fill="#334155"/>
+  <rect x="272" y="236" width="100" height="8" rx="3" fill="#fff" opacity=".8"/>
+  <rect x="272" y="250" width="70" height="6" rx="3" fill="#64748b"/>
+  <rect x="272" y="268" width="40" height="14" rx="5" fill="#4f46e5" opacity=".7"/>
+
+  <text x="200" y="297" font-family="Arial,sans-serif" font-size="10" fill="#6366f1" text-anchor="middle" opacity=".8">Sushi Kartlar</text>
+</svg>

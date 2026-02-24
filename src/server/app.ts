@@ -24,6 +24,7 @@ import { fakepayRouter } from './routes/fakepay';
 import { temalarRouter } from './routes/temalar';
 import { onizlemeRouter } from './routes/onizleme';
 import { odemeRouter } from './routes/odeme';
+import { kurumsalRouter } from './routes/kurumsal';
 
 const app = express();
 const PORT = env.PORT;
@@ -98,6 +99,9 @@ app.use('/yonetim', yonetimRouter);
 app.use('/admin', adminRouter);          // geriye dönük uyumluluk → role bazlı yönlendir
 app.use('/m', publicMenuRouter);
 app.use('/preview', previewRouter);
+
+// ─── Kurumsal & Yasal sayfalar ───────────────────────────────────────────────
+app.use('/', kurumsalRouter);
 app.use('/pay', fakepayRouter);
 app.use('/api/checkout', checkoutRouter);
 app.use('/api/webhooks', checkoutRouter);

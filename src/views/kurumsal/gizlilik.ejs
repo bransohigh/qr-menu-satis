@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gizlilik Politikası — QR Menü</title>
+  <meta name="description" content="QR Menü gizlilik politikası ve KVKK aydınlatma metni."/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .yasal-icerik h2 { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: .6rem; }
+    .yasal-icerik p { color: #475569; font-size: .92rem; line-height: 1.75; margin-bottom: .8rem; }
+    .yasal-icerik ul { list-style: disc; padding-left: 1.5rem; color: #475569; font-size: .92rem; line-height: 1.75; margin-bottom: .8rem; }
+    .yasal-icerik ul li { margin-bottom: .25rem; }
+    .yasal-icerik table { width: 100%; border-collapse: collapse; font-size: .88rem; color: #475569; margin-bottom: 1rem; }
+    .yasal-icerik th { background: #f8fafc; border: 1px solid #e2e8f0; padding: .5rem .75rem; font-weight: 600; text-align: left; }
+    .yasal-icerik td { border: 1px solid #e2e8f0; padding: .5rem .75rem; }
+  </style>
+</head>
+<body class="bg-white min-h-screen">
+
+  <%- include('../partials/kurumsal-nav') %>
+
+  <!-- Başlık -->
+  <section class="bg-slate-50 border-b border-slate-200 py-10 px-4">
+    <div class="max-w-3xl mx-auto">
+      <a href="/temalar" class="text-sm text-violet-600 hover:text-violet-700 mb-3 inline-block">← Ana Sayfa</a>
+      <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Gizlilik Politikası</h1>
+      <p class="text-sm text-slate-400">Son güncelleme: <%= tarih %></p>
+    </div>
+  </section>
+
+  <!-- İçerik -->
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-10 yasal-icerik">
+
+    <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 mb-8">
+      Bu metin bilgilendirme amaçlıdır. Hukuki geçerlilik için lütfen güncel versiyonu <%= sirket.eposta %> adresinden talep edin.
+    </div>
+
+    <h2>1. Veri Sorumlusu</h2>
+    <p>
+      İşbu Aydınlatma Metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") kapsamında veri sorumlusu sıfatıyla
+      <strong><%= sirket.unvan %></strong> tarafından hazırlanmıştır.
+    </p>
+    <ul>
+      <li>Şirket Unvanı: <%= sirket.unvan %></li>
+      <li>Adres: <%= sirket.adres %></li>
+      <li>E-posta: <%= sirket.eposta %></li>
+      <li>Telefon: <%= sirket.telefon %></li>
+      <li>Vergi Dairesi / No: <%= sirket.vergiDairesi %> / <%= sirket.vergiNo %></li>
+      <% if (sirket.mersis) { %><li>MERSİS No: <%= sirket.mersis %></li><% } %>
+    </ul>
+
+    <h2>2. İşlenen Kişisel Veriler ve Amaçları</h2>
+    <p>Platformumuzu kullanmanız sürecinde aşağıdaki kategorilerde kişisel verileriniz işlenmektedir:</p>
+    <table>
+      <thead><tr><th>Veri Kategorisi</th><th>Örnek Veriler</th><th>İşleme Amacı</th></tr></thead>
+      <tbody>
+        <tr><td>Kimlik Bilgileri</td><td>Ad, soyad</td><td>Hesap oluşturma, iletişim</td></tr>
+        <tr><td>İletişim Bilgileri</td><td>E-posta adresi</td><td>Giriş, bildirim, destek</td></tr>
+        <tr><td>İşlem Güvenliği</td><td>Şifreli parola özeti</td><td>Kimlik doğrulama</td></tr>
+        <tr><td>İşlem Bilgileri</td><td>Satın alım kayıtları, tema seçimi</td><td>Abonelik yönetimi, fatura</td></tr>
+        <tr><td>Log Verileri</td><td>IP adresi, oturum bilgileri</td><td>Güvenlik, hata ayıklama</td></tr>
+        <tr><td>Çerez Verileri</td><td>Oturum token'ı</td><td>Kimlik doğrulama, UX</td></tr>
+      </tbody>
+    </table>
+
+    <h2>3. Hukuki Dayanak</h2>
+    <p>Kişisel verileriniz KVKK m.5/2 kapsamında şu hukuki dayanaklara dayanılarak işlenmektedir:</p>
+    <ul>
+      <li>Sözleşmenin kurulması ve ifası (KVKK m.5/2-c)</li>
+      <li>Meşru menfaat (KVKK m.5/2-f) — güvenlik logları, hizmet kalitesi</li>
+      <li>Kanuni yükümlülük (KVKK m.5/2-ç) — vergi ve e-ticaret mevzuatı</li>
+      <li>Açık rıza (KVKK m.5/1) — pazarlama iletişimi (tarafınızca onaylandıysa)</li>
+    </ul>
+
+    <h2>4. Veri Aktarımı</h2>
+    <p>
+      Kişisel verileriniz; hizmetlerin sunulması amacıyla ödeme altyapısı sağlayıcıları, bulut barındırma hizmeti
+      (Supabase/Railway/Vercel) ve yasal yükümlülükler kapsamında yetkili kamu kurumları ile paylaşılabilir.
+      Veriler yurt dışına aktarıldığı durumlarda KVKK m.9 kapsamındaki güvenceler sağlanır.
+    </p>
+
+    <h2>5. Çerezler</h2>
+    <p>
+      Platformumuz yalnızca oturum yönetimi için <strong>zorunlu çerezler</strong> kullanmaktadır. Bu çerezler
+      login durumunuzu korumak için HttpOnly bayraklı JWT token'ı saklar ve herhangi bir kişisel izleme amacıyla
+      kullanılmaz.
+    </p>
+
+    <h2>6. Saklama Süresi</h2>
+    <ul>
+      <li>Hesap verileri: hesabın aktif olduğu süre + 3 yıl (ticari defter yükümlülüğü)</li>
+      <li>Ödeme kayıtları: işlem tarihinden itibaren 10 yıl (Türk Ticaret Kanunu)</li>
+      <li>Log verileri: 6 ay</li>
+    </ul>
+
+    <h2>7. Haklarınız (KVKK m.11)</h2>
+    <p>KVKK kapsamında veri sorumlusuna başvurarak aşağıdaki haklarınızı kullanabilirsiniz:</p>
+    <ul>
+      <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
+      <li>İşlenmişse buna ilişkin bilgi talep etme</li>
+      <li>İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme</li>
+      <li>Yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme</li>
+      <li>Eksik veya yanlış işlenmişse düzeltilmesini talep etme</li>
+      <li>Kanundaki şartlar çerçevesinde silinmesini ya da yok edilmesini talep etme</li>
+      <li>Düzeltme/silme işlemlerinin aktarım yapıldığı üçüncü kişilere bildirilmesini isteme</li>
+      <li>Münhasıran otomatik sistemlerle analiz edilmesi suretiyle aleyhine bir sonucun ortaya çıkmasına itiraz etme</li>
+      <li>Kanuna aykırı işleme sonucunda zarara uğraması halinde zararın giderilmesini talep etme</li>
+    </ul>
+    <p>
+      Başvurularınızı <a href="mailto:<%= sirket.eposta %>" class="text-violet-600 underline"><%= sirket.eposta %></a> adresine
+      veya yukarıdaki şirket adresine yazılı olarak iletebilirsiniz.
+    </p>
+
+    <h2>8. Değişiklikler</h2>
+    <p>
+      Bu politika zaman zaman güncellenebilir. Önemli değişiklikler e-posta yoluyla bildirilir.
+      Güncel versiyona her zaman bu sayfadan ulaşabilirsiniz.
+    </p>
+
+  </main>
+
+  <%- include('../partials/kurumsal-footer') %>
+
+</body>
+</html>

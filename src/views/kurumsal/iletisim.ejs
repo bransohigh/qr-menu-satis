@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>İletişim — QR Menü</title>
+  <meta name="description" content="QR Menü destek ve satış ekibiyle iletişime geçin."/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .form-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; padding: .7rem 1rem; font-size: .9rem; outline: none; transition: border-color .15s, box-shadow .15s; }
+    .form-input:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
+    .form-label { display: block; font-size: .82rem; font-weight: 600; color: #374151; margin-bottom: .4rem; }
+  </style>
+</head>
+<body class="bg-white min-h-screen">
+
+  <%- include('../partials/kurumsal-nav') %>
+
+  <!-- HERO -->
+  <section class="bg-gradient-to-br from-violet-700 via-purple-700 to-indigo-800 text-white py-16 px-4">
+    <div class="max-w-3xl mx-auto text-center">
+      <p class="text-violet-200 text-sm font-semibold uppercase tracking-widest mb-4">İletişim</p>
+      <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-4">Size Nasıl Yardımcı Olabiliriz?</h1>
+      <p class="text-white/75">
+        Sorularınız, teknik destek ya da kurumsal çözümler için bize ulaşın. En kısa sürede geri döneceğiz.
+      </p>
+    </div>
+  </section>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-16">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-12">
+
+      <!-- Bilgiler -->
+      <div class="md:col-span-2 space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 mb-5">İletişim Bilgileri</h2>
+          <div class="space-y-5">
+            <div class="flex gap-4 items-start">
+              <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center text-lg shrink-0">📧</div>
+              <div>
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">E-posta</div>
+                <a href="mailto:<%= sirket.eposta %>" class="text-sm font-medium text-violet-700 hover:text-violet-800"><%= sirket.eposta %></a>
+              </div>
+            </div>
+            <div class="flex gap-4 items-start">
+              <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center text-lg shrink-0">📞</div>
+              <div>
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Telefon</div>
+                <a href="tel:<%= sirket.telefon.replace(/\s/g,'') %>" class="text-sm font-medium text-slate-700"><%= sirket.telefon %></a>
+              </div>
+            </div>
+            <div class="flex gap-4 items-start">
+              <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center text-lg shrink-0">📍</div>
+              <div>
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Adres</div>
+                <p class="text-sm text-slate-700 leading-relaxed"><%= sirket.adres %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+          <h3 class="text-sm font-bold text-slate-900 mb-3">Çalışma Saatleri</h3>
+          <div class="space-y-1.5 text-sm text-slate-600">
+            <div class="flex justify-between"><span>Pazartesi – Cuma</span><span class="font-medium">09:00 – 18:00</span></div>
+            <div class="flex justify-between"><span>Cumartesi</span><span class="font-medium">10:00 – 14:00</span></div>
+            <div class="flex justify-between"><span>Pazar</span><span class="font-medium text-slate-400">Kapalı</span></div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold text-slate-900 mb-3">Sosyal Medya</h3>
+          <div class="flex gap-3">
+            <a href="<%= sirket.instagram %>" target="_blank" rel="noopener" class="w-10 h-10 bg-gradient-to-br from-pink-500 to-yellow-500 rounded-xl flex items-center justify-center text-white text-lg hover:opacity-90 transition-opacity">
+              IG
+            </a>
+            <a href="<%= sirket.twitter %>" target="_blank" rel="noopener" class="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white text-xs font-bold hover:opacity-80 transition-opacity">
+              𝕏
+            </a>
+            <a href="<%= sirket.linkedin %>" target="_blank" rel="noopener" class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white text-sm font-bold hover:opacity-90 transition-opacity">
+              in
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="md:col-span-3">
+        <h2 class="text-xl font-bold text-slate-900 mb-6">Mesaj Gönderin</h2>
+
+        <% if (flash === 'gonderildi') { %>
+        <div class="bg-green-50 border border-green-200 text-green-800 rounded-xl px-4 py-3 text-sm mb-6">
+          ✓ Mesajınız alındı. En kısa sürede size dönüş yapacağız.
+        </div>
+        <% } %>
+
+        <form action="/iletisim" method="POST" class="space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label class="form-label">Adınız Soyadınız</label>
+              <input type="text" name="ad" required placeholder="Örn: Ahmet Yılmaz" class="form-input"/>
+            </div>
+            <div>
+              <label class="form-label">E-posta Adresiniz</label>
+              <input type="email" name="eposta" required placeholder="ornek@email.com" class="form-input"/>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Konu</label>
+            <select name="konu" class="form-input bg-white" required>
+              <option value="">Konu seçin...</option>
+              <option value="teknik-destek">Teknik Destek</option>
+              <option value="satis">Satış ve Fiyatlandırma</option>
+              <option value="odeme">Ödeme ve Fatura</option>
+              <option value="kurumsal">Kurumsal Çözümler</option>
+              <option value="diger">Diğer</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Mesajınız</label>
+            <textarea name="mesaj" required rows="5" placeholder="Sorularınızı veya taleplerinizi buraya yazın..." class="form-input resize-none"></textarea>
+          </div>
+          <button type="submit" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 rounded-xl transition-colors">
+            Mesajı Gönder →
+          </button>
+          <p class="text-xs text-slate-400 text-center">
+            Bu formu göndererek <a href="/gizlilik-politikasi" class="underline">Gizlilik Politikası</a>'mızı kabul etmiş sayılırsınız.
+          </p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <%- include('../partials/kurumsal-footer') %>
+
+</body>
+</html>

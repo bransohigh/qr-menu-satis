@@ -154,12 +154,60 @@ curl https://alanadi.com/saglik
 
 ---
 
+## Şirket Bilgileri Konfigürasyonu
+
+Yasal sayfalar ve footer için şirket bilgileri `src/server/config/sirket.ts` dosyasından yönetilir.
+Aşağıdaki ENV değişkenlerini `.env` dosyasına ekleyin:
+
+```env
+# Şirket Bilgileri (Yasal sayfalar ve footer için)
+SIRKET_UNVAN="Pixnova Yazılım ve Pazarlama Hizmetleri Ltd. Şti."
+SIRKET_ADRES="Levent Mah. Cömert Sok. No:5/3, Beşiktaş / İstanbul"
+SIRKET_EPOSTA="destek@qrmenu.com.tr"
+SIRKET_TELEFON="+90 212 000 00 00"
+SIRKET_VERGI_DAIRESI="Beşiktaş Vergi Dairesi"
+SIRKET_VERGI_NO="1234567890"
+SIRKET_MERSIS="0123456789000014"
+SIRKET_KEP="firma@hs01.kep.tr"       # opsiyonel
+SIRKET_INSTAGRAM="https://instagram.com/qrmenu.tr"
+SIRKET_TWITTER="https://twitter.com/qrmenutr"
+SIRKET_LINKEDIN="https://linkedin.com/company/qrmenu-tr"
+```
+
+---
+
+## Tasarım Seçimi Akışı
+
+```
+Kullanıcı tema satın alır
+        ↓
+Purchase kaydı oluşur (status: "paid")
+        ↓
+/panel/tasarimlar sayfasında satın alınan temalar görünür
+        ↓
+Kullanıcı "Bu Tasarımı Aktif Et" butonuna tıklar
+        ↓
+POST /panel/tasarim-sec { themeId }
+        ↓
+Sistem, Purchase'ta userId+themeId+status="paid" kontrolü yapar
+        ↓
+Menu.themeId güncellenir
+        ↓
+/m/:slug artık yeni tema ile render edilir
+```
+
+**API Uçları:**
+- `GET /panel/api/tasarimlar` → Satın alınan temaları JSON döner
+- `POST /panel/api/tasarim-sec` → `{ themeId }` body ile aktif temayı değiştirir
+
+---
+
 ## Rotalar
 
 | Method | Yol | Açıklama |
 |--------|-----|----------|
 | GET | `/` | → `/temalar` yönlendir |
-| GET | `/temalar` | Tema galerisi |
+| GET | `/temalar` | Tema galerisi (infinite grid hero) |
 | GET | `/temalar/:slug` | Tema detayı + satın al |
 | GET | `/giris` | Giriş / Kayıt sayfası |
 | GET | `/onizleme/:slug` | Canlı tema önizleme |
@@ -172,12 +220,23 @@ curl https://alanadi.com/saglik
 | GET | `/panel` | Müşteri paneli (giriş gerekli) |
 | GET | `/panel/kategoriler` | Kategori yönetimi |
 | GET | `/panel/urunler` | Ürün yönetimi |
+| **GET** | **`/panel/tasarimlar`** | **Tasarım Seçimi — satın alınan temalar** |
+| **GET** | **`/panel/siparisler`** | **Sipariş Geçmişi** |
+| **POST** | **`/panel/tasarim-sec`** | **Aktif temayı değiştir** |
+| **GET** | **`/panel/api/tasarimlar`** | **API: Satın alınan temalar JSON** |
+| **POST** | **`/panel/api/tasarim-sec`** | **API: Tema seç JSON** |
 | GET | `/yonetim` | Süper Admin paneli (ADMIN gerekli) |
 | GET | `/yonetim/satin-alimlar` | Satın alımlar listesi |
 | GET | `/yonetim/menuler` | Tüm menüler |
 | GET | `/yonetim/kullanicilar` | Tüm kullanıcılar |
 | GET | `/admin` | → Role göre `/yonetim` veya `/panel` yönlendir |
 | GET | `/m/:slug` | Herkese açık menü |
+| **GET** | **`/hakkimizda`** | **Hakkımızda kurumsal sayfası** |
+| **GET** | **`/iletisim`** | **İletişim sayfası + form** |
+| **POST** | **`/iletisim`** | **İletişim formu gönder** |
+| **GET** | **`/gizlilik-politikasi`** | **Gizlilik Politikası / KVKK** |
+| **GET** | **`/mesafeli-satis-sozlesmesi`** | **Mesafeli Satış Sözleşmesi** |
+| **GET** | **`/iptal-ve-iade`** | **İptal ve İade Politikası** |
 | GET | `/saglik` | Healthcheck |
 
 ---
@@ -211,7 +270,8 @@ curl https://alanadi.com/saglik
 │   └── server/
 │       ├── app.ts             # Express giriş noktası
 │       ├── config/
-│       │   └── env.ts         # Zod ile ENV doğrulama
+│       │   ├── env.ts         # Zod ile ENV doğrulama
+│       │   └── sirket.ts      # Şirket bilgileri (yasal sayfalar için)
 │       ├── middleware/
 │       │   ├── auth.ts        # JWT middleware
 │       │   └── errorHandler.ts
@@ -219,6 +279,8 @@ curl https://alanadi.com/saglik
 │       │   ├── temalar.ts     # /temalar
 │       │   ├── onizleme.ts    # /onizleme
 │       │   ├── odeme.ts       # /odeme
+│       │   ├── panel.ts       # /panel (tasarimlar + siparisler dahil)
+│       │   ├── kurumsal.ts    # /hakkimizda, /iletisim, yasal sayfalar
 │       │   ├── admin.ts
 │       │   ├── auth.ts
 │       │   ├── publicMenu.ts
@@ -228,6 +290,20 @@ curl https://alanadi.com/saglik
 │       └── services/
 │           └── prisma.ts
 ├── src/views/                 # EJS şablonları
+│   ├── kurumsal/              # Hakkımızda, İletişim, Yasal sayfalar
+│   │   ├── hakkimizda.ejs
+│   │   ├── iletisim.ejs
+│   │   ├── gizlilik.ejs
+│   │   ├── mesafeli-satis.ejs
+│   │   └── iptal-iade.ejs
+│   ├── panel/
+│   │   ├── tasarimlar.ejs     # Tasarım Seçimi
+│   │   ├── siparisler.ejs     # Sipariş Geçmişi
+│   │   └── ...
+│   └── partials/
+│       ├── kurumsal-nav.ejs   # Kurumsal sayfalar nav
+│       ├── kurumsal-footer.ejs
+│       └── ...
 ├── uploads/                   # Yüklenen görseller (git'e eklenmez)
 ├── public/
 ├── .env.example

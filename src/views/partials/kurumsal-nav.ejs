@@ -1,0 +1,23 @@
+<!-- Kurumsal Sayfalar Ortak Nav -->
+<nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+    <a href="/temalar" class="text-xl font-black bg-gradient-to-r from-violet-600 to-purple-500 bg-clip-text text-transparent">
+      QR Menü
+    </a>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="/temalar" class="font-medium text-slate-600 hover:text-slate-900 hidden sm:block">Temalar</a>
+      <a href="/hakkimizda" class="font-medium text-slate-600 hover:text-slate-900 hidden md:block">Hakkımızda</a>
+      <a href="/iletisim" class="font-medium text-slate-600 hover:text-slate-900 hidden md:block">İletişim</a>
+      <% if (typeof kullanici !== 'undefined' && kullanici) { %>
+        <% if (kullanici.role === 'ADMIN') { %>
+          <a href="/yonetim" class="bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors">Yönetim →</a>
+        <% } else { %>
+          <a href="/panel" class="bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors">Panel →</a>
+        <% } %>
+      <% } else { %>
+        <a href="/giris" class="font-medium text-violet-600 hover:text-violet-700">Giriş Yap</a>
+        <a href="/giris" class="bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors">Ücretsiz Dene</a>
+      <% } %>
+    </div>
+  </div>
+</nav>

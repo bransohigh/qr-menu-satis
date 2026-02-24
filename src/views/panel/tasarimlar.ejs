@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tasarım Seçimi — QR Menü Paneli</title>
+  <style>
+    <%- include('../partials/admin-styles') %>
+    .tema-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+    .tema-kart { background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; overflow: hidden; transition: border-color .2s, box-shadow .2s; }
+    .tema-kart:hover { border-color: #c4b5fd; box-shadow: 0 8px 24px rgba(99,102,241,.12); }
+    .tema-kart.aktif { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
+    .tema-gorsel { width: 100%; height: 160px; object-fit: cover; background: linear-gradient(135deg, #ede9fe, #ddd6fe); display: flex; align-items: center; justify-content: center; color: #7c3aed; font-size: 2rem; }
+    .tema-icerik { padding: 1rem 1.25rem; }
+    .aktif-badge { display: inline-flex; align-items: center; gap: .35rem; background: #eef2ff; color: #4f46e5; font-size: .72rem; font-weight: 700; padding: .25rem .65rem; border-radius: 999px; margin-bottom: .5rem; }
+    .aktif-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #6366f1; display: inline-block; }
+    .tema-adi { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: .25rem; }
+    .tema-aciklama { font-size: .82rem; color: #64748b; margin-bottom: .75rem; line-height: 1.5; }
+    .tema-tarih { font-size: .75rem; color: #94a3b8; margin-bottom: .85rem; }
+    .btn-aktif-et { width: 100%; padding: .6rem; background: #6366f1; color: #fff; border: none; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .btn-aktif-et:hover { background: #4f46e5; }
+    .btn-aktif-et:disabled { background: #a5b4fc; cursor: default; }
+    .bos-durum { text-align: center; padding: 3rem 1rem; color: #94a3b8; }
+    .flash-basarili { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1rem; font-size: .88rem; }
+    .flash-hata { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1rem; font-size: .88rem; }
+  </style>
+</head>
+<body>
+  <%- include('../partials/panel-nav', { active: 'tasarimlar', menu: typeof menu !== 'undefined' ? menu : null, kullanici }) %>
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Tasarım Seçimi</h1>
+      <p style="color:#64748b;font-size:.88rem;margin-top:.25rem">Satın aldığınız temalar arasından menünüzde kullanmak istediğinizi seçin.</p>
+    </div>
+
+    <% if (flash === 'basarili') { %>
+      <div class="flash-basarili">✓ Tasarım başarıyla güncellendi. Menünüz artık yeni tema ile görünecek.</div>
+    <% } else if (flash && flash.startsWith('hata')) { %>
+      <div class="flash-hata">⚠ <%= flash === 'hata-yetkisiz' ? 'Bu temayı satın almadınız.' : 'Bir hata oluştu, lütfen tekrar deneyin.' %></div>
+    <% } %>
+
+    <% if (!satinAlimlar || satinAlimlar.length === 0) { %>
+      <div class="card bos-durum">
+        <div style="font-size:2.5rem;margin-bottom:.75rem">🎨</div>
+        <h3 style="font-size:1rem;font-weight:700;color:#334155;margin-bottom:.4rem">Henüz satın alınmış tema yok</h3>
+        <p style="font-size:.875rem">Temaları inceleyip satın aldıktan sonra buradan aktif temayı seçebilirsiniz.</p>
+        <a href="/temalar" class="btn btn-primary" style="margin-top:1rem;display:inline-block">🎨 Temaları İncele</a>
+      </div>
+    <% } else { %>
+      <div class="tema-grid">
+        <% satinAlimlar.forEach(function(satin) {
+          const aktif = menu && menu.themeId === satin.themeId;
+          const tarih = new Date(satin.createdAt).toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' });
+        %>
+        <div class="tema-kart <%= aktif ? 'aktif' : '' %>">
+          <div class="tema-gorsel">
+            <% if (satin.theme.previewImage) { %>
+              <img src="<%= satin.theme.previewImage %>" alt="<%= satin.theme.name %>" style="width:100%;height:100%;object-fit:cover;"/>
+            <% } else { %>
+              🖼
+            <% } %>
+          </div>
+          <div class="tema-icerik">
+            <% if (aktif) { %>
+              <div class="aktif-badge">Seçili Tasarım</div>
+            <% } %>
+            <div class="tema-adi"><%= satin.theme.name %></div>
+            <div class="tema-aciklama"><%= satin.theme.description || 'Profesyonel QR menü teması' %></div>
+            <div class="tema-tarih">📅 Satın alındı: <%= tarih %></div>
+            <% if (aktif) { %>
+              <button class="btn-aktif-et" disabled>✓ Bu Tasarım Aktif</button>
+            <% } else { %>
+              <form method="POST" action="/panel/tasarim-sec">
+                <input type="hidden" name="themeId" value="<%= satin.themeId %>"/>
+                <button type="submit" class="btn-aktif-et">Bu Tasarımı Aktif Et</button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+
+      <div class="card" style="margin-top:1.5rem">
+        <p style="font-size:.82rem;color:#64748b">
+          💡 <strong>İpucu:</strong> Menünüzü önce 
+          <a href="/temalar" style="color:#6366f1">tüm temaları inceleyerek</a> 
+          değiştirebilirsiniz. Sipariş geçmişinizi 
+          <a href="/panel/siparisler" style="color:#6366f1">Sipariş Geçmişi</a> 
+          sayfasından takip edebilirsiniz.
+        </p>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>
