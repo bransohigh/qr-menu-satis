@@ -1,11 +1,41 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.panelRouter = void 0;
 const express_1 = require("express");
 const auth_1 = require("../middleware/auth");
 const prisma_1 = require("../services/prisma");
 const errorHandler_1 = require("../middleware/errorHandler");
+const multer_1 = __importDefault(require("multer"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
+const env_1 = require("../config/env");
 exports.panelRouter = (0, express_1.Router)();
+// ─── Multer (logo yüklemeleri) ────────────────────────────────────────────────
+const uploadDir = path_1.default.isAbsolute(env_1.env.UPLOAD_DIR)
+    ? env_1.env.UPLOAD_DIR
+    : path_1.default.join(process.cwd(), env_1.env.UPLOAD_DIR);
+const logoStorage = multer_1.default.diskStorage({
+    destination: (_req, _file, cb) => {
+        const dir = path_1.default.join(uploadDir, 'logos');
+        fs_1.default.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: (_req, file, cb) => {
+        const ext = path_1.default.extname(file.originalname).toLowerCase();
+        cb(null, `logo-${Date.now()}${ext}`);
+    },
+});
+const logoUpload = (0, multer_1.default)({
+    storage: logoStorage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+        const ok = /^image\/(png|svg\+xml|jpeg|webp)$/.test(file.mimetype);
+        cb(null, ok);
+    },
+});
 // Tüm panel rotaları kimlik doğrulama gerektiriyor
 exports.panelRouter.use(auth_1.requireAuthHtml);
 // Yardımcı: kullanıcının menüsünü yükle
@@ -165,5 +195,57 @@ exports.panelRouter.post('/api/tasarim-sec', (0, errorHandler_1.asyncHandler)(as
         include: { theme: true },
     });
     res.json({ mesaj: 'Tasarım güncellendi.', aktifTema: menu.theme.name });
+}));
+// ─── GET /panel/marka — Marka kiti sayfası ────────────────────────────────────
+exports.panelRouter.get('/marka', (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const menu = await prisma_1.prisma.menu.findUnique({
+        where: { userId: req.user.id },
+        include: { theme: true },
+    });
+    if (!menu) {
+        res.redirect('/temalar');
+        return;
+    }
+    res.render('panel/marka', {
+        kullanici: req.user,
+        menu,
+        brand: menu.brand ?? {},
+        flash: req.query.flash || null,
+    });
+}));
+// ─── GET /api/panel/marka — JSON ─────────────────────────────────────────────
+exports.panelRouter.get('/api/marka', (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const menu = await prisma_1.prisma.menu.findUnique({ where: { userId: req.user.id } });
+    if (!menu) {
+        res.status(404).json({ hata: 'Menü bulunamadı' });
+        return;
+    }
+    res.json({ logoUrl: menu.logoUrl, brand: menu.brand });
+}));
+// ─── POST /api/panel/marka — Logo + renk güncelle ────────────────────────────
+exports.panelRouter.post('/api/marka', logoUpload.single('logo'), (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const hexRe = /^#[0-9A-Fa-f]{6}$/;
+    const { primaryColor, secondaryColor, accentColor } = req.body;
+    const brand = {};
+    if (primaryColor && hexRe.test(primaryColor))
+        brand.primaryColor = primaryColor;
+    if (secondaryColor && hexRe.test(secondaryColor))
+        brand.secondaryColor = secondaryColor;
+    if (accentColor && hexRe.test(accentColor))
+        brand.accentColor = accentColor;
+    const updateData = { brand };
+    if (req.file) {
+        updateData.logoUrl = `/uploads/logos/${req.file.filename}`;
+    }
+    await prisma_1.prisma.menu.update({
+        where: { userId: req.user.id },
+        data: updateData,
+    });
+    // form submit → redirect
+    if (req.headers['content-type']?.includes('multipart/form-data') && !req.headers['accept']?.includes('json')) {
+        res.redirect('/panel/marka?flash=kaydedildi');
+        return;
+    }
+    res.json({ mesaj: 'Marka kiti güncellendi.' });
 }));
 //# sourceMappingURL=panel.js.map

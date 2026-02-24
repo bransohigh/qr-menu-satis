@@ -1,9 +1,37 @@
 import { Router, Request, Response } from 'express';
 import { requireAuthHtml } from '../middleware/auth';
 import { prisma } from '../services/prisma';
-import { asyncHandler } from '../middleware/errorHandler';
+import { asyncHandler, createError } from '../middleware/errorHandler';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { env } from '../config/env';
 
 export const panelRouter = Router();
+
+// ─── Multer (logo yüklemeleri) ────────────────────────────────────────────────
+const uploadDir = path.isAbsolute(env.UPLOAD_DIR)
+  ? env.UPLOAD_DIR
+  : path.join(process.cwd(), env.UPLOAD_DIR);
+const logoStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    const dir = path.join(uploadDir, 'logos');
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `logo-${Date.now()}${ext}`);
+  },
+});
+const logoUpload = multer({
+  storage: logoStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const ok = /^image\/(png|svg\+xml|jpeg|webp)$/.test(file.mimetype);
+    cb(null, ok);
+  },
+});
 
 // Tüm panel rotaları kimlik doğrulama gerektiriyor
 panelRouter.use(requireAuthHtml);
@@ -219,5 +247,65 @@ panelRouter.post(
     });
 
     res.json({ mesaj: 'Tasarım güncellendi.', aktifTema: menu.theme.name });
+  })
+);
+
+// ─── GET /panel/marka — Marka kiti sayfası ────────────────────────────────────
+panelRouter.get(
+  '/marka',
+  asyncHandler(async (req: Request, res: Response) => {
+    const menu = await prisma.menu.findUnique({
+      where: { userId: req.user!.id },
+      include: { theme: true },
+    });
+    if (!menu) { res.redirect('/temalar'); return; }
+    res.render('panel/marka', {
+      kullanici: req.user,
+      menu,
+      brand: (menu.brand as Record<string, string> | null) ?? {},
+      flash: req.query.flash || null,
+    });
+  })
+);
+
+// ─── GET /api/panel/marka — JSON ─────────────────────────────────────────────
+panelRouter.get(
+  '/api/marka',
+  asyncHandler(async (req: Request, res: Response) => {
+    const menu = await prisma.menu.findUnique({ where: { userId: req.user!.id } });
+    if (!menu) { res.status(404).json({ hata: 'Menü bulunamadı' }); return; }
+    res.json({ logoUrl: menu.logoUrl, brand: menu.brand });
+  })
+);
+
+// ─── POST /api/panel/marka — Logo + renk güncelle ────────────────────────────
+panelRouter.post(
+  '/api/marka',
+  logoUpload.single('logo'),
+  asyncHandler(async (req: Request, res: Response) => {
+    const hexRe = /^#[0-9A-Fa-f]{6}$/;
+    const { primaryColor, secondaryColor, accentColor } = req.body as Record<string, string>;
+
+    const brand: Record<string, string> = {};
+    if (primaryColor && hexRe.test(primaryColor)) brand.primaryColor = primaryColor;
+    if (secondaryColor && hexRe.test(secondaryColor)) brand.secondaryColor = secondaryColor;
+    if (accentColor && hexRe.test(accentColor)) brand.accentColor = accentColor;
+
+    const updateData: Record<string, unknown> = { brand };
+    if (req.file) {
+      updateData.logoUrl = `/uploads/logos/${req.file.filename}`;
+    }
+
+    await prisma.menu.update({
+      where: { userId: req.user!.id },
+      data: updateData as Parameters<typeof prisma.menu.update>[0]['data'],
+    });
+
+    // form submit → redirect
+    if (req.headers['content-type']?.includes('multipart/form-data') && !req.headers['accept']?.includes('json')) {
+      res.redirect('/panel/marka?flash=kaydedildi');
+      return;
+    }
+    res.json({ mesaj: 'Marka kiti güncellendi.' });
   })
 );

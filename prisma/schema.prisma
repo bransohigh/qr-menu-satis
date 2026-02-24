@@ -8,98 +8,110 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model categories {
-  id         String     @id
-  menu_id    String
-  name       String
-  sort_order Int        @default(0)
-  created_at DateTime   @default(now())
-  slug       String     @default("")
-  menus      menus      @relation(fields: [menu_id], references: [id], onDelete: Cascade)
-  products   products[]
+/// Row level security enabled on the underlying table. Visit https://pris.ly/d/row-level-security for more info.
+model Category {
+  id        String    @id
+  menuId    String    @map("menu_id")
+  name      String
+  sortOrder Int       @default(0) @map("sort_order")
+  createdAt DateTime  @default(now()) @map("created_at")
+  slug      String    @default("")
+  menu      Menu      @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  products  Product[]
 
-  @@unique([menu_id, slug])
+  @@unique([menuId, slug])
+  @@map("categories")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model menus {
-  id            String       @id
-  user_id       String       @unique
-  theme_id      String
-  slug          String       @unique
-  business_name String?
-  created_at    DateTime     @default(now())
-  updated_at    DateTime
-  categories    categories[]
-  themes        themes       @relation(fields: [theme_id], references: [id])
-  users         users        @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  products      products[]
+/// Row level security enabled on the underlying table. Visit https://pris.ly/d/row-level-security for more info.
+model Menu {
+  id           String     @id
+  userId       String     @unique @map("user_id")
+  themeId      String     @map("theme_id")
+  slug         String     @unique
+  businessName String?    @map("business_name")
+  logoUrl      String?    @map("logo_url")
+  brand        Json?      @map("brand")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @map("updated_at")
+  categories   Category[]
+  theme        Theme      @relation(fields: [themeId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products     Product[]
+
+  @@map("menus")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model products {
-  id          String     @id
-  menu_id     String
-  category_id String
+/// Row level security enabled on the underlying table. Visit https://pris.ly/d/row-level-security for more info.
+model Product {
+  id          String   @id
+  menuId      String   @map("menu_id")
+  categoryId  String   @map("category_id")
   name        String
-  description String     @default("")
-  price       Decimal    @db.Decimal(10, 2)
-  image_url   String?
-  created_at  DateTime   @default(now())
-  slug        String     @default("")
-  views       Int        @default(0)
-  categories  categories @relation(fields: [category_id], references: [id], onDelete: Cascade)
-  menus       menus      @relation(fields: [menu_id], references: [id], onDelete: Cascade)
+  description String   @default("")
+  price       Decimal  @db.Decimal(10, 2)
+  imageUrl    String?  @map("image_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  slug        String   @default("")
+  views       Int      @default(0)
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  menu        Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
 
-  @@unique([menu_id, slug])
+  @@unique([menuId, slug])
+  @@map("products")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model purchases {
-  id           String   @id
-  user_id      String
-  theme_id     String
-  amount       Decimal  @db.Decimal(10, 2)
-  currency     String   @default("USD")
-  status       String   @default("pending")
-  provider     String   @default("fakepay")
-  provider_ref String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now())
-  themes       themes   @relation(fields: [theme_id], references: [id])
-  users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+/// Row level security enabled on the underlying table. Visit https://pris.ly/d/row-level-security for more info.
+model Purchase {
+  id          String   @id
+  userId      String   @map("user_id")
+  themeId     String   @map("theme_id")
+  amount      Decimal  @db.Decimal(10, 2)
+  currency    String   @default("USD")
+  status      String   @default("pending")
+  provider    String   @default("fakepay")
+  providerRef String?  @map("provider_ref")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+  theme       Theme    @relation(fields: [themeId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status])
-  @@index([theme_id])
-  @@index([user_id])
+  @@index([themeId])
+  @@index([userId])
+  @@map("purchases")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model themes {
-  id            String      @id
-  name          String
-  slug          String      @unique
-  template_key  String      @unique
-  preview_image String
-  description   String      @default("")
-  created_at    DateTime    @default(now())
-  price         Decimal     @default(29.99) @db.Decimal(10, 2)
-  currency      String      @default("USD")
-  features      String[]    @default([])
-  menus         menus[]
-  purchases     purchases[]
+/// Row level security enabled on the underlying table. Visit https://pris.ly/d/row-level-security for more info.
+model Theme {
+  id           String     @id
+  name         String
+  slug         String     @unique
+  templateKey  String     @unique @map("template_key")
+  previewImage String     @map("preview_image")
+  description  String     @default("")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  price        Decimal    @default(29.99) @db.Decimal(10, 2)
+  currency     String     @default("USD")
+  features     String[]   @default([])
+  isNew        Boolean    @default(false) @map("is_new")
+  menus        Menu[]
+  purchases    Purchase[]
+
+  @@map("themes")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model users {
-  id            String      @id
-  email         String      @unique
-  password_hash String
-  created_at    DateTime    @default(now())
-  role          Role        @default(MUSTERI)
-  menus         menus?
-  purchases     purchases[]
+/// Row level security enabled on the underlying table. Visit https://pris.ly/d/row-level-security for more info.
+model User {
+  id           String     @id
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  role         Role       @default(MUSTERI)
+  menu         Menu?
+  purchases    Purchase[]
+
+  @@map("users")
 }
 
 enum Role {

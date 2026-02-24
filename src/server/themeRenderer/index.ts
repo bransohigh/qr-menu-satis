@@ -1,12 +1,40 @@
 import { Category, Menu, Product, Theme } from '@prisma/client';
 
+export interface BrandKit {
+  primaryColor?: string;
+  secondaryColor?: string;
+  accentColor?: string;
+}
+
 export interface ThemeData {
   menu: Menu & { theme: Theme; categories: Category[]; products: Product[] };
   categories: Category[];
   productsByCategory: Record<string, Product[]>;
+  brand?: BrandKit;
 }
 
 type ProductWithCategory = Product & { category?: Category };
+
+/** Marka renk CSS değişkenleri */
+function brandVars(brand?: BrandKit): string {
+  const p = brand?.primaryColor;
+  const s = brand?.secondaryColor;
+  const a = brand?.accentColor;
+  const vars: string[] = [];
+  if (p) vars.push(`--brand-primary:${p};`);
+  if (s) vars.push(`--brand-secondary:${s};`);
+  if (a) vars.push(`--brand-accent:${a};`);
+  return vars.join(' ');
+}
+
+/** Logo veya işletme adı header bloğu */
+function logoOrName(menu: Menu, cls = ''): string {
+  const logoUrl = (menu as Menu & { logoUrl?: string }).logoUrl;
+  if (logoUrl) {
+    return `<img src="${escHtml(logoUrl)}" alt="${escHtml(menu.businessName || 'Logo')}" class="${cls || 'site-logo'}" style="max-height:48px;object-fit:contain;"/>`;
+  }
+  return `<span class="${cls || 'site-name'}">${escHtml(menu.businessName || 'Menü')}</span>`;
+}
 
 /**
  * Shared HTML wrapper used by all themes.
@@ -16,17 +44,19 @@ function wrapHtml(
   bodyClass: string,
   cssVars: string,
   extraCss: string,
-  body: string
+  body: string,
+  brand?: BrandKit
 ): string {
+  const bv = brandVars(brand);
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>${escHtml(title)}</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { ${cssVars} }
+    :root { ${bv} ${cssVars} }
     body { font-family: system-ui, -apple-system, sans-serif; }
     ${extraCss}
   </style>
@@ -586,6 +616,191 @@ function theme10({ menu, categories, productsByCategory }: ThemeData): string {
   );
 }
 
+// ─── TEMA YENİ_01: Sushi Modern ───────────────────────────────────────────────
+function themeYeni01({ menu, categories, productsByCategory, brand }: ThemeData): string {
+  const emojiMap: Record<string, string> = {
+    sushi: '🍣', ramen: '🍜', sake: '🍶', içecek: '🥤', izgara: '🔥',
+    tatlı: '🍮', salata: '🥗', çorba: '🍲', burger: '🍔', pizza: '🍕',
+  };
+  function catEmoji(name: string) {
+    const lower = name.toLowerCase();
+    for (const [k, v] of Object.entries(emojiMap)) { if (lower.includes(k)) return v; }
+    return '🍽';
+  }
+  const tabsHtml = categories.map(c =>
+    `<button onclick="showCat('${c.id}')" class="tab-btn flex flex-col items-center gap-1 px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20 transition min-w-[70px]" id="btn-${c.id}">
+       <span class="text-2xl">${catEmoji(c.name)}</span>
+       <span class="text-xs font-semibold text-white truncate max-w-[64px]">${c.name}</span>
+     </button>`
+  ).join('');
+  const cardsHtml = categories.map(c => {
+    const prods = productsByCategory[c.id] ?? [];
+    const cards = prods.map(p =>
+      `<div class="bg-white rounded-2xl overflow-hidden shadow-md flex flex-col">
+         ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" class="w-full h-36 object-cover">` : `<div class="w-full h-36 bg-gray-100 flex items-center justify-center text-4xl">${catEmoji(c.name)}</div>`}
+         <div class="p-3 flex flex-col flex-1">
+           <p class="font-bold text-sm text-gray-800 leading-tight">${p.name}</p>
+           ${p.description ? `<p class="text-xs text-gray-500 mt-1 line-clamp-2">${p.description}</p>` : ''}
+           <div class="mt-auto pt-2 flex items-center justify-between">
+             <span class="font-bold text-sm" style="color:var(--primary)">${Number(p.price).toFixed(2)} ₺</span>
+             <button class="w-7 h-7 rounded-full flex items-center justify-center text-white text-lg font-bold" style="background:var(--primary)">+</button>
+           </div>
+         </div>
+       </div>`
+    ).join('');
+    return `<div id="cat-${c.id}" class="cat-panel hidden"><div class="grid grid-cols-2 gap-3">${cards}</div></div>`;
+  }).join('');
+
+  const extra = `<style>
+    body { background: linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%); min-height:100vh; }
+    .tab-btn.active { background: var(--primary) !important; }
+    .cat-panel.active { display:block; }
+  </style>
+  <script>
+    function showCat(id) {
+      document.querySelectorAll('.cat-panel').forEach(p=>p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      const p = document.getElementById('cat-'+id);
+      const b = document.getElementById('btn-'+id);
+      if(p) p.classList.add('active');
+      if(b) b.classList.add('active');
+    }
+    const firstCat = document.querySelector('.cat-panel');
+    const firstBtn = document.querySelector('.tab-btn');
+    if(firstCat) firstCat.classList.add('active');
+    if(firstBtn) firstBtn.classList.add('active');
+  </script>`;
+
+  const firstCatId = categories[0]?.id ?? '';
+  const body = `
+    <div class="max-w-sm mx-auto px-4 pb-10 pt-6">
+      <div class="flex items-center justify-between mb-5">
+        <div>${logoOrName(menu, 'h-10 w-auto rounded-lg')}</div>
+        <h1 class="text-white font-bold text-lg">${menu.businessName ?? menu.slug}</h1>
+      </div>
+      <div class="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">${tabsHtml}</div>
+      ${cardsHtml}
+    </div>
+    ${extra}`;
+  return wrapHtml(menu.businessName ?? menu.slug, '', '', '', body, brand);
+}
+
+// ─── TEMA YENİ_02: Kafe Vegan Minimal ──────────────────────────────────────────
+function themeYeni02({ menu, categories, productsByCategory, brand }: ThemeData): string {
+  const pillsHtml = categories.map((c, i) =>
+    `<button onclick="scrollTo2('${c.id}')" class="pill-btn whitespace-nowrap px-5 py-2 rounded-full text-sm font-semibold border-2 transition ${i === 0 ? 'text-white' : 'bg-white border-gray-200 text-gray-700 hover:border-current'}" style="${i === 0 ? 'background:var(--primary);border-color:var(--primary)' : ''}">${c.name}</button>`
+  ).join('');
+  const listHtml = categories.map(c => {
+    const prods = productsByCategory[c.id] ?? [];
+    const items = prods.map(p =>
+      `<div class="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm">
+         ${p.imageUrl
+           ? `<img src="${p.imageUrl}" alt="${p.name}" class="w-16 h-16 rounded-full object-cover flex-shrink-0">`
+           : `<div class="w-16 h-16 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center text-2xl">🥗</div>`}
+         <div class="flex-1 min-w-0">
+           <p class="font-semibold text-gray-900 truncate">${p.name}</p>
+           ${p.description ? `<p class="text-xs text-gray-500 mt-0.5 line-clamp-2">${p.description}</p>` : ''}
+         </div>
+         <div class="flex flex-col items-end gap-2 flex-shrink-0">
+           <span class="font-bold" style="color:var(--primary)">${Number(p.price).toFixed(2)} ₺</span>
+           <button class="w-8 h-8 rounded-full text-white flex items-center justify-center text-xl font-bold" style="background:var(--primary)">+</button>
+         </div>
+       </div>`
+    ).join('');
+    return `<section id="sec-${c.id}" class="mb-8">
+      <h2 class="text-lg font-bold text-gray-900 mb-3">${c.name}</h2>
+      <div class="flex flex-col gap-3">${items}</div>
+    </section>`;
+  }).join('');
+
+  const extra = `<script>
+    function scrollTo2(id) {
+      const el = document.getElementById('sec-'+id);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  </script>`;
+
+  const body = `
+    <div style="background:linear-gradient(180deg, var(--primary) 0%, var(--primary) 180px, #f8f8f6 180px)" class="min-h-screen">
+      <div class="max-w-lg mx-auto px-4 pt-10 pb-16">
+        <div class="mb-6 text-center">
+          ${logoOrName(menu, 'h-14 w-auto mx-auto mb-2 rounded-xl')}
+          <h1 class="text-3xl font-bold text-white">${menu.businessName ?? menu.slug} Menüsü</h1>
+        </div>
+        <input type="text" placeholder="Ürün ara…" oninput="filterItems2(this.value)"
+          class="w-full px-4 py-3 rounded-2xl bg-white shadow-md text-gray-800 placeholder-gray-400 mb-6 outline-none text-sm">
+        <div class="flex gap-2 overflow-x-auto pb-2 mb-8 scrollbar-hide">${pillsHtml}</div>
+        <div id="menu-list-2">${listHtml}</div>
+      </div>
+    </div>
+    <script>
+      function filterItems2(q) {
+        const items = document.querySelectorAll('#menu-list-2 [data-name]');
+        items.forEach(el => { el.parentElement.style.display = el.dataset.name.toLowerCase().includes(q.toLowerCase()) ? '' : 'none'; });
+      }
+    </script>
+    ${extra}`;
+  return wrapHtml(menu.businessName ?? menu.slug, '', '', '', body, brand);
+}
+
+// ─── TEMA YENİ_03: Restoran Kategori Akışı ─────────────────────────────────────
+function themeYeni03({ menu, categories, productsByCategory, brand }: ThemeData): string {
+  const sectionsHtml = categories.map(c => {
+    const prods = productsByCategory[c.id] ?? [];
+    const cards = prods.map(p =>
+      `<div class="bg-white rounded-2xl overflow-hidden shadow-sm mb-4">
+         ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" class="w-full h-48 object-cover">` : ''}
+         <div class="p-4">
+           <div class="flex items-start justify-between gap-3">
+             <div>
+               <p class="font-bold text-gray-900">${p.name}</p>
+               ${p.description ? `<p class="text-sm text-gray-500 mt-1 line-clamp-3">${p.description}</p>` : ''}
+             </div>
+             <span class="font-bold text-lg whitespace-nowrap" style="color:var(--primary)">${Number(p.price).toFixed(2)} ₺</span>
+           </div>
+           <button class="mt-3 w-full py-2.5 rounded-xl text-white font-semibold text-sm transition hover:opacity-90" style="background:var(--primary)">Sepete Ekle</button>
+         </div>
+       </div>`
+    ).join('');
+    return `<section class="mb-10">
+      <div class="flex items-center gap-3 mb-4">
+        <h2 class="text-2xl font-black text-gray-900">${c.name}</h2>
+        <div class="flex-1 h-0.5 rounded" style="background:var(--primary); opacity:0.3"></div>
+      </div>
+      ${cards}
+    </section>`;
+  }).join('');
+
+  const body = `
+    <div class="min-h-screen" style="background:#f5f5f0">
+      <div style="background:linear-gradient(135deg, var(--primary) 0%, var(--secondary,#374151) 100%)" class="sticky top-0 z-10 px-4 py-4 shadow-md">
+        <div class="max-w-2xl mx-auto flex items-center gap-3">
+          ${logoOrName(menu, 'h-9 w-auto rounded-lg flex-shrink-0')}
+          <input type="text" placeholder="Ne aramıştınız?" oninput="filterItems3(this.value)"
+            class="flex-1 px-4 py-2.5 rounded-xl bg-white/20 text-white placeholder-white/70 outline-none text-sm backdrop-blur-sm">
+        </div>
+      </div>
+      <div class="max-w-2xl mx-auto px-4 py-6">
+        ${sectionsHtml}
+      </div>
+    </div>
+    <script>
+      function filterItems3(q) {
+        document.querySelectorAll('section').forEach(sec => {
+          let vis = 0;
+          sec.querySelectorAll('.bg-white').forEach(card => {
+            const name = card.querySelector('p')?.textContent ?? '';
+            const show = name.toLowerCase().includes(q.toLowerCase());
+            card.style.display = show ? '' : 'none';
+            if(show) vis++;
+          });
+          sec.style.display = vis > 0 ? '' : 'none';
+        });
+      }
+    </script>`;
+  return wrapHtml(menu.businessName ?? menu.slug, '', '', '', body, brand);
+}
+
 // ─── Theme Registry ───────────────────────────────────────────────────────────
 const THEMES: Record<string, (data: ThemeData) => string> = {
   theme_01: theme01,
@@ -598,12 +813,23 @@ const THEMES: Record<string, (data: ThemeData) => string> = {
   theme_08: theme08,
   theme_09: theme09,
   theme_10: theme10,
+  // ── Yeni tema key'leri (eski tema_XX aliasları) ──
+  tema_01: theme01, tema_02: theme02, tema_03: theme03,
+  tema_04: theme04, tema_05: theme05, tema_06: theme06,
+  tema_07: theme07, tema_08: theme08, tema_09: theme09,
+  tema_10: theme10, tema_11: theme04, tema_12: theme02,
+  tema_13: theme03, tema_14: theme01, tema_15: theme05, tema_16: theme06,
+  // ── ZIP'ten port edilen yeni temalar ──────────────────────────────────────
+  yeni_01: themeYeni01,
+  yeni_02: themeYeni02,
+  yeni_03: themeYeni03,
 };
 
 export function renderTheme(templateKey: string, data: ThemeData): string {
   const renderer = THEMES[templateKey];
   if (!renderer) {
-    return wrapHtml('Menu', '', '', '', '<p style="text-align:center;padding:2rem">Theme not found.</p>');
+    return wrapHtml('Menü', '', '', '', '<p style="text-align:center;padding:2rem;color:#888">Tema bulunamadı.</p>');
   }
   return renderer(data);
 }
+

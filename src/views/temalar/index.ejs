@@ -141,8 +141,8 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-12" id="temalar-bolumu">
   <%
     var yeniKeys = ['tema_11','tema_12','tema_13','tema_14','tema_15','tema_16'];
-    var yeniTemalar = temalar.filter(function(t){ return yeniKeys.indexOf(t.templateKey) !== -1; });
-    var digerTemalar = temalar.filter(function(t){ return yeniKeys.indexOf(t.templateKey) === -1; });
+    var yeniTemalar = temalar.filter(function(t){ return t.isNew || yeniKeys.indexOf(t.templateKey) !== -1; });
+    var digerTemalar = temalar.filter(function(t){ return !t.isNew && yeniKeys.indexOf(t.templateKey) === -1; });
   %>
 
   <!-- ─── YENİ TEMALAR ──────────────────────────────────────────────────── -->

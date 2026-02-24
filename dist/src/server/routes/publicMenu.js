@@ -5,6 +5,7 @@ const express_1 = require("express");
 const prisma_1 = require("../services/prisma");
 const errorHandler_1 = require("../middleware/errorHandler");
 const temalar_1 = require("./temalar");
+const themeRenderer_1 = require("../themeRenderer");
 exports.publicMenuRouter = (0, express_1.Router)();
 // Shared: load a menu by slug with categories and products
 async function loadMenu(slug) {
@@ -31,11 +32,24 @@ exports.publicMenuRouter.get('/:slug', (0, errorHandler_1.asyncHandler)(async (r
     for (const cat of menu.categories) {
         productsByCategory[cat.id] = menu.products.filter((p) => p.categoryId === cat.id);
     }
+    const templateKey = menu.theme?.templateKey ?? 'tema_01';
+    // Yeni temalar (yeni_01/02/03) themeRenderer ile sunulur
+    if (templateKey.startsWith('yeni_')) {
+        const brand = menu.brand ?? undefined;
+        const html = (0, themeRenderer_1.renderTheme)(templateKey, {
+            menu: menu,
+            categories: menu.categories,
+            productsByCategory: productsByCategory,
+            brand,
+        });
+        res.send(html);
+        return;
+    }
     res.render('menu/home', {
         menu,
         categories: menu.categories,
         productsByCategory,
-        konfig: (0, temalar_1.getTemaKonfig)(menu.theme?.templateKey || 'tema_01'),
+        konfig: (0, temalar_1.getTemaKonfig)(templateKey),
         baseUrl: `/m/${menu.slug}`,
         title: menu.businessName || 'Menü',
     });

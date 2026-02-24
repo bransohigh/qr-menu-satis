@@ -115,6 +115,38 @@ const themes = [
         description: 'Sarı enerjik vurgular ve galeri grid düzeni. Burger restoranları ve fast food mekanları için.',
         price: 349, currency: 'TRY',
         features: ['Sarı vurgular', 'Galeri grid', 'Hero banner', 'Enerjik tasarım', 'Animasyonlar'],
+        isNew: false,
+    },
+    // ── Yeni ZIP'ten Ported Temalar ───────────────────────────────────────────
+    {
+        name: 'Sushi Modern',
+        slug: 'sushi-modern',
+        templateKey: 'yeni_01',
+        previewImage: '/previews/yeni_01.svg',
+        description: 'Uygulama hissi veren mobil-öncelikli tasarım. İkonlu kategori navigasyonu, 2 kolon kart grid ve koyu/açık mod desteği.',
+        price: 499, currency: 'TRY',
+        features: ['Mobil-öncelikli', 'İkonlu kategoriler', '2 kolon kart grid', 'Koyu/Açık mod', 'Arama çubuğu'],
+        isNew: true,
+    },
+    {
+        name: 'Kafe Vegan Minimal',
+        slug: 'kafe-vegan-minimal',
+        templateKey: 'yeni_02',
+        previewImage: '/previews/yeni_02.svg',
+        description: 'Hero başlık, pill kategori seçici, liste kartlar. Sağlıklı yaşam ve vegan mekanlar için temiz minimalist tasarım.',
+        price: 399, currency: 'TRY',
+        features: ['Hero başlık', 'Pill kategoriler', 'Liste düzeni', 'Temiz minimal', 'Koyu/Açık mod'],
+        isNew: true,
+    },
+    {
+        name: 'Restoran Kategori Akışı',
+        slug: 'restoran-kategori-akisi',
+        templateKey: 'yeni_03',
+        previewImage: '/previews/yeni_03.svg',
+        description: 'Kategoriye göre büyük bölümlü akış. Geniş ürün kartları, güçlü arama ve masa/servis hissi veren düzen.',
+        price: 449, currency: 'TRY',
+        features: ['Kategori bölümleri', 'Büyük kartlar', 'Tam arama', 'Desktop max-2xl', 'Koyu/Açık mod'],
+        isNew: true,
     },
 ];
 async function main() {
@@ -139,11 +171,12 @@ async function main() {
                     description: theme.description, price: theme.price,
                     currency: theme.currency, features: theme.features,
                     previewImage: theme.previewImage,
+                    isNew: theme.isNew ?? false,
                 },
             });
         }
         else {
-            await prisma.theme.create({ data: theme });
+            await prisma.theme.create({ data: { ...theme, isNew: theme.isNew ?? false } });
         }
     }
     console.log(`✅ ${themes.length} tema oluşturuldu/güncellendi`);

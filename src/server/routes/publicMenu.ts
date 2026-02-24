@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { prisma } from '../services/prisma';
 import { asyncHandler } from '../middleware/errorHandler';
 import { getTemaKonfig } from './temalar';
+import { renderTheme, BrandKit } from '../themeRenderer';
 
 export const publicMenuRouter = Router();
 
@@ -35,11 +36,26 @@ publicMenuRouter.get(
       productsByCategory[cat.id] = menu.products.filter((p) => p.categoryId === cat.id);
     }
 
+    const templateKey = menu.theme?.templateKey ?? 'tema_01';
+
+    // Yeni temalar (yeni_01/02/03) themeRenderer ile sunulur
+    if (templateKey.startsWith('yeni_')) {
+      const brand = (menu.brand as BrandKit | null) ?? undefined;
+      const html = renderTheme(templateKey, {
+        menu: menu as any,
+        categories: menu.categories as any,
+        productsByCategory: productsByCategory as any,
+        brand,
+      });
+      res.send(html);
+      return;
+    }
+
     res.render('menu/home', {
       menu,
       categories: menu.categories,
       productsByCategory,
-      konfig: getTemaKonfig(menu.theme?.templateKey || 'tema_01'),
+      konfig: getTemaKonfig(templateKey),
       baseUrl: `/m/${menu.slug}`,
       title: menu.businessName || 'Menü',
     });
