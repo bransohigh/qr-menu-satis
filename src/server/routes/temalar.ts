@@ -21,6 +21,13 @@ export function getTemaKonfig(templateKey: string) {
     tema_08: { duzen: 'vegan-minimal',    koyuMod: false, vurgRenk: 'green',  aciklama: 'Minimal düzen' },
     tema_09: { duzen: 'koy-kahvaltisi',   koyuMod: false, vurgRenk: 'amber',  aciklama: 'Rustik düzen' },
     tema_10: { duzen: 'premium-koyu',     koyuMod: true,  vurgRenk: 'purple', aciklama: 'Premium koyu düzen' },
+    // Yeni temalar (tema_11 – tema_16)
+    tema_11: { duzen: 'premium-koyu',     koyuMod: true,  vurgRenk: 'rose',   aciklama: 'Lüks koyu zemin, gül rengi vurgular, premium restoran teması' },
+    tema_12: { duzen: 'vegan-minimal',    koyuMod: false, vurgRenk: 'stone',  aciklama: 'Sade bej-taş tonları, minimal kafe tasarımı' },
+    tema_13: { duzen: 'sushi-kartlar',    koyuMod: true,  vurgRenk: 'red',    aciklama: 'Asya estetiği, kırmızı vurgular, koyu kartlı grid' },
+    tema_14: { duzen: 'koy-kahvaltisi',   koyuMod: false, vurgRenk: 'orange', aciklama: 'Turuncu kasaba dokunuşları, köy büfesi sıcaklığı' },
+    tema_15: { duzen: 'bistro-editoryal', koyuMod: false, vurgRenk: 'pink',   aciklama: 'Pembe pastel vurgular, şık pastane editoryal düzeni' },
+    tema_16: { duzen: 'modern-galeri',    koyuMod: false, vurgRenk: 'yellow', aciklama: 'Sarı enerjik vurgular, adrenalinli burger menü tasarımı' },
   };
   return configs[templateKey] || configs['tema_01'];
 }

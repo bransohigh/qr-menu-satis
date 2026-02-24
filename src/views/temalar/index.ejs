@@ -99,36 +99,31 @@
     <div class="relative max-w-3xl mx-auto">
       <div class="inline-flex items-center gap-2 bg-white/15 text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-white/20 backdrop-blur-sm">
         <span class="w-1.5 h-1.5 rounded-full bg-green-400 inline-block animate-pulse"></span>
-        10 profesyonel tema • Ömür boyu lisans
+        12 profesyonel tema • Ömür boyu lisans
       </div>
       <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-5 leading-tight">
-        QR Menü Temalarıyla<br/>
+        QR Menü ile<br/>
         <span class="text-purple-200">Dijital Menünüz Hazır</span>
       </h1>
-      <p class="text-white/75 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
-        Temayı seçin, ürün ve kategorileri girin, QR ile anında yayınlayın.
+      <p class="text-white/75 text-lg mb-8 max-w-xl mx-auto leading-relaxed">
+        Tasarımınızı seçin, ürün ve kategorilerinizi ekleyin, QR kod ile anında yayınlayın.
       </p>
       <!-- Butonlar -->
-      <div class="flex flex-col sm:flex-row gap-3 justify-center mb-10">
-        <a href="#tema-grid" class="bg-white text-violet-800 font-bold px-7 py-3 rounded-xl hover:bg-violet-50 transition-colors shadow-lg">
+      <div class="flex flex-col sm:flex-row gap-3 justify-center mb-4">
+        <a href="#temalar-bolumu" class="bg-white text-violet-800 font-bold px-7 py-3 rounded-xl hover:bg-violet-50 transition-colors shadow-lg">
           Temaları İncele
         </a>
-        <% if (kullanici) { %>
-          <% if (kullanici.role === 'ADMIN') { %>
-            <a href="/yonetim" class="border border-white/30 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition-colors backdrop-blur-sm">
-              Yönetim Paneli →
-            </a>
-          <% } else { %>
-            <a href="/panel" class="border border-white/30 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition-colors backdrop-blur-sm">
-              Panelim →
-            </a>
-          <% } %>
+        <% if (kullanici && kullanici.role === 'ADMIN') { %>
+          <a href="/yonetim" class="border border-white/30 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition-colors backdrop-blur-sm">
+            Panele Git →
+          </a>
         <% } else { %>
-          <a href="/giris" class="border border-white/30 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition-colors backdrop-blur-sm">
-            Ücretsiz Başla →
+          <a href="/panel" class="border border-white/30 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition-colors backdrop-blur-sm">
+            Panele Git →
           </a>
         <% } %>
       </div>
+      <p class="text-white/35 text-xs mb-6">Piex Creative tarafından geliştirilmiştir.</p>
       <!-- Arama -->
       <div class="max-w-md mx-auto">
         <div class="relative">
@@ -143,15 +138,156 @@
   </section>
 
   <!-- ── TEMA KARTLARI ───────────────────────────────────────────────────── -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-12" id="temalar-bolumu">
+  <%
+    var yeniKeys = ['tema_11','tema_12','tema_13','tema_14','tema_15','tema_16'];
+    var yeniTemalar = temalar.filter(function(t){ return yeniKeys.indexOf(t.templateKey) !== -1; });
+    var digerTemalar = temalar.filter(function(t){ return yeniKeys.indexOf(t.templateKey) === -1; });
+  %>
 
+  <!-- ─── YENİ TEMALAR ──────────────────────────────────────────────────── -->
+  <% if (yeniTemalar.length > 0) { %>
+  <div class="mb-14">
+    <div class="flex items-center gap-3 mb-6">
+      <h2 class="text-xl font-bold text-slate-800">✨ Yeni Temalar</h2>
+      <span class="bg-gradient-to-r from-violet-500 to-purple-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full tracking-widest uppercase">Yeni</span>
+      <p class="text-sm text-slate-400 ml-auto hidden sm:block">Piex Creative güvencesiyle</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <% yeniTemalar.forEach(function(tema) {
+        const k = getTemaKonfig(tema.templateKey);
+        const duzenRenk = {
+          'koy-kahvaltisi':   'bg-amber-100 text-amber-700',
+          'vegan-minimal':    'bg-green-100 text-green-700',
+          'sushi-kartlar':    'bg-indigo-900 text-indigo-300',
+          'premium-koyu':     'bg-purple-950 text-purple-300',
+          'bistro-editoryal': 'bg-zinc-100 text-zinc-700',
+          'modern-galeri':    'bg-sky-100 text-sky-700',
+        }[k.duzen] || 'bg-slate-100 text-slate-700';
+        const duzenAdi = {
+          'koy-kahvaltisi':   'Köy Kahvaltısı',
+          'vegan-minimal':    'Vegan Minimal',
+          'sushi-kartlar':    'Sushi Kartlar',
+          'premium-koyu':     'Premium Koyu',
+          'bistro-editoryal': 'Bistro Editoryal',
+          'modern-galeri':    'Modern Galeri',
+        }[k.duzen] || k.duzen;
+    %>
+    <div class="tema-kart kart-yukselt bg-white rounded-2xl overflow-hidden shadow-sm border border-violet-100 ring-1 ring-violet-100 flex flex-col relative"
+         data-tema-adi="<%= tema.name.toLowerCase() %>">
+      <!-- Yeni rozeti -->
+      <span class="absolute top-3 left-3 z-10 bg-gradient-to-r from-violet-500 to-purple-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">Yeni</span>
+      <a href="/onizleme/<%= tema.slug %>" class="block relative bg-gradient-to-br
+        <% if(k.koyuMod){ %>from-slate-800 to-slate-900<% } else { %>from-slate-100 to-slate-200<% } %>
+        h-44 overflow-hidden group">
+        <div class="absolute inset-2 rounded-xl overflow-hidden shadow-lg
+          <% if(k.koyuMod){ %>bg-slate-900<% } else { %>bg-white<% } %>">
+          <div class="h-5 <% if(k.koyuMod){ %>bg-slate-800<% } else { %>bg-slate-50<% } %> flex items-center px-2 gap-1 border-b <% if(k.koyuMod){ %>border-slate-700<% } else { %>border-slate-200<% } %>">
+            <div class="w-1.5 h-1.5 rounded-full bg-red-400"></div>
+            <div class="w-1.5 h-1.5 rounded-full bg-yellow-400"></div>
+            <div class="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+            <div class="flex-1 h-1.5 <% if(k.koyuMod){ %>bg-slate-700<% } else { %>bg-slate-200<% } %> rounded-full mx-2"></div>
+          </div>
+          <% if (k.duzen === 'premium-koyu') { %>
+            <div class="p-1.5 space-y-1" style="background:rgba(7,7,20,.9)">
+              <div class="h-3 rounded w-1/2" style="background:linear-gradient(90deg,#fb7185,#f43f5e);opacity:.5"></div>
+              <div class="grid grid-cols-3 gap-1 mt-0.5">
+                <div class="h-8 rounded-lg border" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)"></div>
+                <div class="h-8 rounded-lg border" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)"></div>
+                <div class="h-8 rounded-lg border" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)"></div>
+              </div>
+            </div>
+          <% } else if (k.duzen === 'vegan-minimal') { %>
+            <div class="p-1.5 space-y-1">
+              <div class="flex gap-1"><div class="h-2 bg-stone-500 rounded-full px-3"></div><div class="h-2 bg-stone-100 rounded-full px-2"></div></div>
+              <div class="space-y-1">
+                <div class="flex items-center gap-1"><div class="w-4 h-4 bg-stone-100 rounded-full"></div><div class="h-1.5 bg-slate-100 rounded flex-1"></div><div class="h-1.5 bg-stone-200 rounded w-6"></div></div>
+                <div class="flex items-center gap-1"><div class="w-4 h-4 bg-stone-100 rounded-full"></div><div class="h-1.5 bg-slate-100 rounded flex-1"></div><div class="h-1.5 bg-stone-200 rounded w-6"></div></div>
+                <div class="flex items-center gap-1"><div class="w-4 h-4 bg-stone-100 rounded-full"></div><div class="h-1.5 bg-slate-100 rounded flex-1"></div><div class="h-1.5 bg-stone-200 rounded w-6"></div></div>
+              </div>
+            </div>
+          <% } else if (k.duzen === 'sushi-kartlar') { %>
+            <div class="p-1.5 space-y-1">
+              <div class="h-3 bg-red-500/30 rounded w-3/4"></div>
+              <div class="grid grid-cols-2 gap-1 mt-0.5">
+                <div class="flex gap-0.5 h-6 bg-slate-700 rounded border border-red-500/20"><div class="w-5 bg-slate-600 rounded-l"></div><div class="flex-1 p-0.5"><div class="h-1 bg-red-300/40 rounded"></div></div></div>
+                <div class="flex gap-0.5 h-6 bg-slate-700 rounded border border-red-500/20"><div class="w-5 bg-slate-600 rounded-l"></div><div class="flex-1 p-0.5"><div class="h-1 bg-red-300/40 rounded"></div></div></div>
+                <div class="flex gap-0.5 h-6 bg-slate-700 rounded border border-red-500/20"><div class="w-5 bg-slate-600 rounded-l"></div><div class="flex-1 p-0.5"><div class="h-1 bg-red-300/40 rounded"></div></div></div>
+                <div class="flex gap-0.5 h-6 bg-slate-700 rounded border border-red-500/20"><div class="w-5 bg-slate-600 rounded-l"></div><div class="flex-1 p-0.5"><div class="h-1 bg-red-300/40 rounded"></div></div></div>
+              </div>
+            </div>
+          <% } else if (k.duzen === 'koy-kahvaltisi') { %>
+            <div class="p-0 space-y-0">
+              <div class="h-6 bg-gradient-to-r from-orange-500 to-orange-600"></div>
+              <div class="p-1.5 space-y-1">
+                <div class="flex gap-1 h-5 bg-white rounded border border-orange-100"><div class="w-6 bg-orange-50 rounded-l"></div><div class="flex-1 p-1 space-y-0.5"><div class="h-1.5 bg-orange-200 rounded w-3/4"></div><div class="h-1 bg-slate-100 rounded w-1/2"></div></div></div>
+                <div class="flex gap-1 h-5 bg-white rounded border border-orange-100"><div class="w-6 bg-orange-50 rounded-l"></div><div class="flex-1 p-1 space-y-0.5"><div class="h-1.5 bg-orange-200 rounded w-4/5"></div><div class="h-1 bg-slate-100 rounded w-2/5"></div></div></div>
+              </div>
+            </div>
+          <% } else if (k.duzen === 'bistro-editoryal') { %>
+            <div class="p-1.5 space-y-1">
+              <div class="h-2 bg-pink-700 rounded w-3/5"></div>
+              <div class="border-b-2 border-pink-900/20 pb-1"></div>
+              <div class="flex justify-between items-center"><div class="h-1.5 bg-zinc-200 rounded w-1/2"></div><div class="h-1.5 bg-pink-300 rounded w-1/5"></div></div>
+              <div class="border-t border-zinc-100"></div>
+              <div class="flex justify-between items-center"><div class="h-1.5 bg-zinc-200 rounded w-2/5"></div><div class="h-1.5 bg-pink-300 rounded w-1/5"></div></div>
+              <div class="border-t border-zinc-100"></div>
+              <div class="flex justify-between items-center"><div class="h-1.5 bg-zinc-200 rounded w-3/5"></div><div class="h-1.5 bg-pink-300 rounded w-1/5"></div></div>
+            </div>
+          <% } else if (k.duzen === 'modern-galeri') { %>
+            <div class="p-0 space-y-0">
+              <div class="h-7 bg-gradient-to-r from-yellow-400 to-yellow-500"></div>
+              <div class="p-1.5 grid grid-cols-3 gap-1">
+                <div class="h-8 bg-yellow-100 rounded-lg col-span-2"></div>
+                <div class="h-8 bg-yellow-50 rounded-lg"></div>
+                <div class="h-6 bg-yellow-50 rounded-lg"></div>
+                <div class="h-6 bg-yellow-100 rounded-lg"></div>
+                <div class="h-6 bg-yellow-50 rounded-lg"></div>
+              </div>
+            </div>
+          <% } %>
+        </div>
+        <div class="absolute inset-0 bg-marka-600/0 group-hover:bg-marka-600/10 gecis flex items-center justify-center">
+          <span class="opacity-0 group-hover:opacity-100 gecis bg-white text-marka-700 font-semibold text-xs px-3 py-1.5 rounded-full shadow-lg">Önizle →</span>
+        </div>
+      </a>
+      <div class="p-4 flex flex-col flex-1">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <h3 class="font-bold text-slate-900 text-base leading-tight"><%= tema.name %></h3>
+          <span class="text-base font-extrabold text-marka-600 shrink-0">₺<%= Number(tema.price).toFixed(0) %></span>
+        </div>
+        <span class="inline-block self-start text-[10px] font-semibold px-2 py-0.5 rounded-full mb-2 <%= duzenRenk %>"><%= duzenAdi %></span>
+        <% if (tema.features && tema.features.length > 0) { %>
+        <ul class="space-y-1 mb-4 flex-1">
+          <% tema.features.slice(0,3).forEach(function(f) { %>
+          <li class="flex items-center gap-1.5 text-xs text-slate-500">
+            <svg class="w-3 h-3 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+            <%= f %>
+          </li>
+          <% }); %>
+        </ul>
+        <% } else { %><div class="flex-1"></div><% } %>
+        <div class="flex gap-2">
+          <a href="/onizleme/<%= tema.slug %>" class="flex-1 text-center border-2 border-marka-200 text-marka-700 hover:bg-marka-50 font-semibold text-xs py-2.5 rounded-xl gecis">Önizle</a>
+          <button onclick="satinAlBaslat('<%= tema.id %>', '<%= tema.slug %>')" class="flex-1 bg-marka-600 hover:bg-marka-700 text-white font-semibold text-xs py-2.5 rounded-xl gecis shadow-sm">Satın Al</button>
+        </div>
+        <a href="/temalar/<%= tema.slug %>" class="block text-center text-[11px] text-slate-400 hover:text-marka-600 mt-1 gecis">Detaylar →</a>
+      </div>
+    </div>
+    <% }); %>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- ─── DİĞER TEMALAR ─────────────────────────────────────────────────── -->
+  <div>
     <div class="flex items-center justify-between mb-8">
-      <h2 class="text-xl font-bold text-slate-800">Tüm Temalar <span id="tema-sayisi" class="text-slate-400 font-normal text-base ml-1">(<%= temalar.length %>)</span></h2>
+      <h2 class="text-xl font-bold text-slate-800">Tüm Temalar <span id="tema-sayisi" class="text-slate-400 font-normal text-base ml-1">(<%= digerTemalar.length %>)</span></h2>
       <p class="text-sm text-slate-400 hidden sm:block">Önce önizleyin, beğendiğinizi satın alın</p>
     </div>
 
     <div id="tema-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <% temalar.forEach(function(tema) {
+      <% digerTemalar.forEach(function(tema) {
         const k = getTemaKonfig(tema.templateKey);
         const duzenRenk = {
           'klasik-liste':     'bg-slate-100 text-slate-700',
@@ -479,6 +615,7 @@
       <p class="text-slate-500 text-lg font-semibold">Tema bulunamadı</p>
       <p class="text-slate-400 text-sm mt-1">Farklı bir arama terimi deneyin</p>
     </div>
+  </div><!-- /diğer temalar -->
   </main>
 
   <!-- ── ÖZELLIKLER ŞERIDI ────────────────────────────────────────────────── -->
@@ -515,7 +652,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
         <!-- Marka -->
         <div>
-          <div class="text-xl font-black bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent mb-2">QR Menü</div>
+        <div class="text-xl font-black bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent mb-2">Piex Creative</div>
           <p class="text-sm leading-relaxed">Restoranlar ve kafeler için profesyonel dijital menü çözümü. QR kodu ile anında yayınlayın.</p>
         </div>
         <!-- Hızlı Bağlantılar -->
@@ -539,7 +676,7 @@
         </div>
       </div>
       <div class="border-t border-slate-700 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-        <span>© <%= new Date().getFullYear() %> QR Menü — Tüm hakları saklıdır.</span>
+        <span>© <%= new Date().getFullYear() %> Piex Creative — Tüm hakları saklıdır.</span>
         <span>Güvenli ödeme · 30 gün iade garantisi</span>
       </div>
     </div>

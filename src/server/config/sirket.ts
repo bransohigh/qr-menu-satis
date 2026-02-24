@@ -16,7 +16,7 @@
  */
 
 export const sirket = {
-  unvan:         process.env.SIRKET_UNVAN         || 'Pixnova Yazılım ve Pazarlama Hizmetleri Ltd. Şti.',
+  unvan:         process.env.SIRKET_UNVAN         || 'Piex Creative',
   adres:         process.env.SIRKET_ADRES         || 'Levent Mah. Cömert Sok. No:5/3, Beşiktaş / İstanbul',
   eposta:        process.env.SIRKET_EPOSTA        || 'destek@qrmenu.com.tr',
   telefon:       process.env.SIRKET_TELEFON       || '+90 212 000 00 00',

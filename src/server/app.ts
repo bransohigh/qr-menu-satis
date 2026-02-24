@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { env, isProd } from './config/env';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
@@ -106,6 +106,11 @@ app.use('/pay', fakepayRouter);
 app.use('/api/checkout', checkoutRouter);
 app.use('/api/webhooks', checkoutRouter);
 app.use('/checkout', checkoutRouter);
+
+// ─── 404 Catch-all ──────────────────────────────────────────────────────────
+app.use((_req: Request, res: Response) => {
+  res.status(404).render('hata/404');
+});
 
 // ─── Global error handler ────────────────────────────────────────────────────
 app.use(errorHandler);

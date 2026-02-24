@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- Pastane Şık — Pembe pastel, editoryal -->
+  <rect width="400" height="300" fill="#fff"/>
+  <!-- Nav -->
+  <rect width="400" height="44" fill="#fff" stroke="#fce7f3" stroke-width="1"/>
+  <rect x="14" y="12" width="110" height="20" rx="4" fill="#fce7f3"/>
+  <text x="69" y="26" font-size="12" fill="#9d174d" font-family="Arial" text-anchor="middle" font-weight="bold">🍰 Pastane</text>
+  <rect x="320" y="12" width="66" height="20" rx="10" fill="#ec4899"/>
+  <text x="353" y="26" font-size="9" fill="#fff" font-family="Arial" text-anchor="middle">Sipariş Ver</text>
+  <!-- Editoryal başlık çizgisi -->
+  <rect y="44" width="400" height="3" fill="#ec4899"/>
+  <text x="14" y="70" font-size="18" fill="#1f2937" font-family="Georgia,serif" font-weight="bold">Tatlı Dünyası</text>
+  <rect x="14" y="76" width="370" height="1" fill="#fce7f3" stroke-width="0.5"/>
+  <!-- Ürün satırları (editoryal liste) -->
+  <rect x="14" y="85" width="372" height="1" fill="#fce7f3"/>
+  <text x="14" y="104" font-size="12" fill="#111827" font-family="Arial" font-weight="bold">Çikolatalı Sufle</text>
+  <rect x="14" y="108" width="200" height="6" rx="2" fill="#f9a8d4" opacity=".5"/>
+  <text x="370" y="100" font-size="12" fill="#ec4899" font-family="Arial" text-anchor="end" font-weight="bold">₺120</text>
+  <rect x="14" y="117" width="372" height="1" fill="#fce7f3"/>
+
+  <text x="14" y="136" font-size="12" fill="#111827" font-family="Arial" font-weight="bold">Cheesecake</text>
+  <rect x="14" y="140" width="160" height="6" rx="2" fill="#f9a8d4" opacity=".5"/>
+  <text x="370" y="132" font-size="12" fill="#ec4899" font-family="Arial" text-anchor="end" font-weight="bold">₺95</text>
+  <rect x="14" y="149" width="372" height="1" fill="#fce7f3"/>
+
+  <text x="14" y="168" font-size="12" fill="#111827" font-family="Arial" font-weight="bold">Profiterol</text>
+  <rect x="14" y="172" width="180" height="6" rx="2" fill="#f9a8d4" opacity=".5"/>
+  <text x="370" y="164" font-size="12" fill="#ec4899" font-family="Arial" text-anchor="end" font-weight="bold">₺85</text>
+  <rect x="14" y="181" width="372" height="1" fill="#fce7f3"/>
+
+  <text x="14" y="200" font-size="12" fill="#111827" font-family="Arial" font-weight="bold">Künefe</text>
+  <rect x="14" y="204" width="140" height="6" rx="2" fill="#f9a8d4" opacity=".5"/>
+  <text x="370" y="196" font-size="12" fill="#ec4899" font-family="Arial" text-anchor="end" font-weight="bold">₺75</text>
+  <rect x="14" y="213" width="372" height="1" fill="#fce7f3"/>
+
+  <text x="14" y="232" font-size="12" fill="#111827" font-family="Arial" font-weight="bold">Tiramisu</text>
+  <rect x="14" y="236" width="160" height="6" rx="2" fill="#f9a8d4" opacity=".5"/>
+  <text x="370" y="228" font-size="12" fill="#ec4899" font-family="Arial" text-anchor="end" font-weight="bold">₺110</text>
+  <rect x="14" y="245" width="372" height="1" fill="#fce7f3"/>
+
+  <rect y="258" width="400" height="3" fill="#ec4899"/>
+  <text x="200" y="281" font-family="Georgia,serif" font-size="10" fill="#9d174d" text-anchor="middle" opacity=".8">Pastane Şık</text>
+  <text x="200" y="297" font-family="Arial,sans-serif" font-size="8" fill="#d1d5db" text-anchor="middle">Piex Creative</text>
+</svg>

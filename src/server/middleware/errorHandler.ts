@@ -7,11 +7,11 @@ export interface AppError extends Error {
 
 /**
  * Global error handler middleware.
- * Catches all errors passed through next(err) and returns a consistent JSON response.
+ * HTML istekleri için 404 sayfası render eder; API istekleri için JSON döner.
  */
 export function errorHandler(
   err: AppError,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction
 ): void {
@@ -19,6 +19,12 @@ export function errorHandler(
   const message = err.message || 'Internal Server Error';
 
   console.error(`[ERROR] ${statusCode} - ${message}`, err.stack);
+
+  // HTML isteği ve 404 ise Türkçe sayfa göster
+  if (statusCode === 404 && req.accepts('html')) {
+    res.status(404).render('hata/404');
+    return;
+  }
 
   res.status(statusCode).json({
     error: {

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- Burger Modern — Sarı vurgular, galeri grid -->
+  <defs>
+    <linearGradient id="yg16" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="#f8fafc"/>
+  <!-- Hero banner sarı -->
+  <rect width="400" height="72" fill="url(#yg16)"/>
+  <rect x="14" y="14" width="120" height="24" rx="6" fill="rgba(0,0,0,.15)"/>
+  <text x="74" y="30" font-size="13" fill="#fff" font-family="Arial" text-anchor="middle" font-weight="bold">🍔 Burger</text>
+  <text x="74" y="44" font-size="8" fill="rgba(255,255,255,.8)" font-family="Arial" text-anchor="middle">Modern</text>
+  <text x="250" y="35" font-size="22" fill="rgba(255,255,255,.2)" font-family="Arial" text-anchor="middle">●</text>
+  <text x="300" y="35" font-size="22" fill="rgba(255,255,255,.15)" font-family="Arial" text-anchor="middle">●</text>
+  <text x="350" y="35" font-size="22" fill="rgba(255,255,255,.1)" font-family="Arial" text-anchor="middle">●</text>
+  <!-- Kategori şeridi -->
+  <rect y="72" width="400" height="30" fill="#fff" stroke="#fef08a" stroke-width="1"/>
+  <rect x="14" y="79" width="60" height="16" rx="8" fill="#eab308"/>
+  <text x="44" y="91" font-size="8" fill="#fff" font-family="Arial" text-anchor="middle">Burgerlar</text>
+  <rect x="81" y="79" width="55" height="16" rx="8" fill="#fef9c3"/>
+  <text x="108" y="91" font-size="8" fill="#a16207" font-family="Arial" text-anchor="middle">Patatesler</text>
+  <rect x="143" y="79" width="55" height="16" rx="8" fill="#fef9c3"/>
+  <text x="170" y="91" font-size="8" fill="#a16207" font-family="Arial" text-anchor="middle">İçecekler</text>
+  <!-- Galeri grid 3 sütun -->
+  <rect x="14" y="112" width="116" height="80" rx="10" fill="#fef9c3" stroke="#fde047" stroke-width="1"/>
+  <text x="72" y="152" font-size="28" fill="#eab308" text-anchor="middle">🍔</text>
+  <rect x="14" y="196" width="116" height="10" rx="3" fill="#1e293b" opacity=".5" transform="translate(0,-1)"/>
+  <rect x="24" y="196" width="70" height="8" rx="2" fill="#1e293b" opacity=".4"/>
+  <text x="72" y="204" font-size="7" fill="#78716c" font-family="Arial" text-anchor="middle">Klasik Burger</text>
+
+  <rect x="142" y="112" width="116" height="80" rx="10" fill="#fde047" stroke="#eab308" stroke-width="1" opacity=".7"/>
+  <text x="200" y="152" font-size="28" fill="#ca8a04" text-anchor="middle">🌮</text>
+  <rect x="152" y="196" width="80" height="8" rx="2" fill="#1e293b" opacity=".4"/>
+  <text x="200" y="204" font-size="7" fill="#78716c" font-family="Arial" text-anchor="middle">Crispy Burger</text>
+
+  <rect x="270" y="112" width="116" height="80" rx="10" fill="#fef9c3" stroke="#fde047" stroke-width="1"/>
+  <text x="328" y="152" font-size="28" fill="#eab308" text-anchor="middle">🍟</text>
+  <rect x="280" y="196" width="70" height="8" rx="2" fill="#1e293b" opacity=".4"/>
+  <text x="328" y="204" font-size="7" fill="#78716c" font-family="Arial" text-anchor="middle">Patates Kızartma</text>
+
+  <!-- 2. sıra -->
+  <rect x="14" y="210" width="183" height="70" rx="10" fill="#fff" stroke="#fde047" stroke-width="1"/>
+  <rect x="14" y="210" width="183" height="32" rx="10" fill="#fef9c3"/>
+  <rect x="24" y="248" width="100" height="8" rx="3" fill="#1e293b" opacity=".4"/>
+  <rect x="24" y="262" width="60" height="6" rx="2" fill="#ca8a04" opacity=".4"/>
+
+  <rect x="203" y="210" width="183" height="70" rx="10" fill="#fff" stroke="#fde047" stroke-width="1"/>
+  <rect x="203" y="210" width="183" height="32" rx="10" fill="#fef9c3"/>
+  <rect x="213" y="248" width="110" height="8" rx="3" fill="#1e293b" opacity=".4"/>
+  <rect x="213" y="262" width="65" height="6" rx="2" fill="#ca8a04" opacity=".4"/>
+
+  <text x="200" y="296" font-family="Arial,sans-serif" font-size="10" fill="#a16207" text-anchor="middle" opacity=".8">Burger Modern</text>
+</svg>
