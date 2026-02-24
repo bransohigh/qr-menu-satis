@@ -1,4 +1,5 @@
 // Hostinger lsnode.js wrapper — .env'yi mutlak yol ile yükler
+// restart: 2026-02-25
 process.on('uncaughtException', (err) => {
   console.error('[FATAL] uncaughtException:', err.message);
   console.error(err.stack);
