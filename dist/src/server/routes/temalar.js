@@ -10,16 +10,24 @@ exports.temalarRouter = (0, express_1.Router)();
 // ─── Yardımcı: Tema konfigürasyonu ──────────────────────────────────────────
 function getTemaKonfig(templateKey) {
     const configs = {
-        tema_01: { duzen: 'klasik-liste', koyuMod: false, vurgRenk: 'slate', aciklama: 'Temiz ve okunması kolay klasik liste düzeni' },
-        tema_02: { duzen: 'kart-duzen', koyuMod: false, vurgRenk: 'violet', aciklama: 'Görsel ağırlıklı büyük kart grid yapısı' },
-        tema_03: { duzen: 'minimal', koyuMod: false, vurgRenk: 'stone', aciklama: 'Çok boşluk ve büyük tipografi odaklı minimal tasarım' },
-        tema_04: { duzen: 'gece-modu', koyuMod: true, vurgRenk: 'cyan', aciklama: 'Neon vurgulu göz dostu koyu tema' },
-        tema_05: { duzen: 'kapakli', koyuMod: false, vurgRenk: 'amber', aciklama: 'Büyük hero alanı ve sekmeli kategori gezintisi' },
-        tema_06: { duzen: 'sol-menu', koyuMod: false, vurgRenk: 'emerald', aciklama: 'Desktop\'ta sol panel kategori navigasyonu' },
-        tema_07: { duzen: 'kategori-seridi', koyuMod: false, vurgRenk: 'rose', aciklama: 'Üstte yapışkan kayar kategori çubuğu' },
-        tema_08: { duzen: 'gorsel-odakli', koyuMod: false, vurgRenk: 'orange', aciklama: 'Ürün fotoğrafı ana alan, içerik alt üstte' },
-        tema_09: { duzen: 'kompakt', koyuMod: false, vurgRenk: 'teal', aciklama: 'Fiyat sağda, yoğun ve hızlı taranabilen liste' },
-        tema_10: { duzen: 'premium', koyuMod: true, vurgRenk: 'purple', aciklama: 'Cam efekti (glassmorphism) ve yumuşak animasyonlar' },
+        tema_01: { duzen: 'koy-kahvaltisi', koyuMod: false, vurgRenk: 'amber', aciklama: 'Sıcak amber tonları ve rustik serif tipografi' },
+        tema_02: { duzen: 'vegan-minimal', koyuMod: false, vurgRenk: 'green', aciklama: 'Temiz beyaz-yeşil, yuvarlak görseller, bol boşluk' },
+        tema_03: { duzen: 'sushi-kartlar', koyuMod: true, vurgRenk: 'indigo', aciklama: 'Koyu zemin, indigo aksanlar, asil kart grid düzeni' },
+        tema_04: { duzen: 'premium-koyu', koyuMod: true, vurgRenk: 'purple', aciklama: 'Glassmorphism kartlar, mor gradient, lüks görünüm' },
+        tema_05: { duzen: 'bistro-editoryal', koyuMod: false, vurgRenk: 'zinc', aciklama: 'Siyah-beyaz editoryal tipografi, gazete tarzı düzen' },
+        tema_06: { duzen: 'modern-galeri', koyuMod: false, vurgRenk: 'sky', aciklama: 'Geniş hero banner, sky mavi vurgular, galeri grid' },
+        // Legacy aliases (eski temalar geçici uyum için)
+        tema_07: { duzen: 'modern-galeri', koyuMod: false, vurgRenk: 'sky', aciklama: 'Modern galeri düzeni' },
+        tema_08: { duzen: 'vegan-minimal', koyuMod: false, vurgRenk: 'green', aciklama: 'Minimal düzen' },
+        tema_09: { duzen: 'koy-kahvaltisi', koyuMod: false, vurgRenk: 'amber', aciklama: 'Rustik düzen' },
+        tema_10: { duzen: 'premium-koyu', koyuMod: true, vurgRenk: 'purple', aciklama: 'Premium koyu düzen' },
+        // Yeni temalar (tema_11 – tema_16)
+        tema_11: { duzen: 'premium-koyu', koyuMod: true, vurgRenk: 'rose', aciklama: 'Lüks koyu zemin, gül rengi vurgular, premium restoran teması' },
+        tema_12: { duzen: 'vegan-minimal', koyuMod: false, vurgRenk: 'stone', aciklama: 'Sade bej-taş tonları, minimal kafe tasarımı' },
+        tema_13: { duzen: 'sushi-kartlar', koyuMod: true, vurgRenk: 'red', aciklama: 'Asya estetiği, kırmızı vurgular, koyu kartlı grid' },
+        tema_14: { duzen: 'koy-kahvaltisi', koyuMod: false, vurgRenk: 'orange', aciklama: 'Turuncu kasaba dokunuşları, köy büfesi sıcaklığı' },
+        tema_15: { duzen: 'bistro-editoryal', koyuMod: false, vurgRenk: 'pink', aciklama: 'Pembe pastel vurgular, şık pastane editoryal düzeni' },
+        tema_16: { duzen: 'modern-galeri', koyuMod: false, vurgRenk: 'yellow', aciklama: 'Sarı enerjik vurgular, adrenalinli burger menü tasarımı' },
     };
     return configs[templateKey] || configs['tema_01'];
 }

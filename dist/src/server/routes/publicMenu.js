@@ -4,6 +4,7 @@ exports.publicMenuRouter = void 0;
 const express_1 = require("express");
 const prisma_1 = require("../services/prisma");
 const errorHandler_1 = require("../middleware/errorHandler");
+const temalar_1 = require("./temalar");
 exports.publicMenuRouter = (0, express_1.Router)();
 // Shared: load a menu by slug with categories and products
 async function loadMenu(slug) {
@@ -34,8 +35,9 @@ exports.publicMenuRouter.get('/:slug', (0, errorHandler_1.asyncHandler)(async (r
         menu,
         categories: menu.categories,
         productsByCategory,
+        konfig: (0, temalar_1.getTemaKonfig)(menu.theme?.templateKey || 'tema_01'),
         baseUrl: `/m/${menu.slug}`,
-        title: menu.businessName || 'Menu',
+        title: menu.businessName || 'Menü',
     });
 }));
 // GET /m/:slug/c/:categorySlug — Category page
@@ -56,8 +58,9 @@ exports.publicMenuRouter.get('/:slug/c/:categorySlug', (0, errorHandler_1.asyncH
         category,
         categories: menu.categories,
         products,
+        konfig: (0, temalar_1.getTemaKonfig)(menu.theme?.templateKey || 'tema_01'),
         baseUrl: `/m/${menu.slug}`,
-        title: `${category.name} — ${menu.businessName || 'Menu'}`,
+        title: `${category.name} — ${menu.businessName || 'Menü'}`,
     });
 }));
 // GET /m/:slug/p/:productSlug — Product detail page (increments views)
@@ -83,8 +86,9 @@ exports.publicMenuRouter.get('/:slug/p/:productSlug', (0, errorHandler_1.asyncHa
         product,
         category,
         categories: menu.categories,
+        konfig: (0, temalar_1.getTemaKonfig)(menu.theme?.templateKey || 'tema_01'),
         baseUrl: `/m/${menu.slug}`,
-        title: `${product.name} — ${menu.businessName || 'Menu'}`,
+        title: `${product.name} — ${menu.businessName || 'Menü'}`,
     });
 }));
 //# sourceMappingURL=publicMenu.js.map

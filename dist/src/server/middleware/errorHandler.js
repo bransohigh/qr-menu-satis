@@ -5,12 +5,17 @@ exports.asyncHandler = asyncHandler;
 exports.createError = createError;
 /**
  * Global error handler middleware.
- * Catches all errors passed through next(err) and returns a consistent JSON response.
+ * HTML istekleri için 404 sayfası render eder; API istekleri için JSON döner.
  */
-function errorHandler(err, _req, res, _next) {
+function errorHandler(err, req, res, _next) {
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Internal Server Error';
     console.error(`[ERROR] ${statusCode} - ${message}`, err.stack);
+    // HTML isteği ve 404 ise Türkçe sayfa göster
+    if (statusCode === 404 && req.accepts('html')) {
+        res.status(404).render('hata/404');
+        return;
+    }
     res.status(statusCode).json({
         error: {
             message,

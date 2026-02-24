@@ -5,9 +5,9 @@ export interface AppError extends Error {
 }
 /**
  * Global error handler middleware.
- * Catches all errors passed through next(err) and returns a consistent JSON response.
+ * HTML istekleri için 404 sayfası render eder; API istekleri için JSON döner.
  */
-export declare function errorHandler(err: AppError, _req: Request, res: Response, _next: NextFunction): void;
+export declare function errorHandler(err: AppError, req: Request, res: Response, _next: NextFunction): void;
 /**
  * Wraps async route handlers to forward errors to next().
  */

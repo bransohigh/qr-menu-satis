@@ -28,6 +28,7 @@ const fakepay_1 = require("./routes/fakepay");
 const temalar_1 = require("./routes/temalar");
 const onizleme_1 = require("./routes/onizleme");
 const odeme_1 = require("./routes/odeme");
+const kurumsal_1 = require("./routes/kurumsal");
 const app = (0, express_1.default)();
 const PORT = env_1.env.PORT;
 // ─── Reverse proxy (Hostinger, Nginx vb.) ───────────────────────────────────
@@ -90,10 +91,16 @@ app.use('/yonetim', yonetim_1.yonetimRouter);
 app.use('/admin', admin_1.adminRouter); // geriye dönük uyumluluk → role bazlı yönlendir
 app.use('/m', publicMenu_1.publicMenuRouter);
 app.use('/preview', preview_1.previewRouter);
+// ─── Kurumsal & Yasal sayfalar ───────────────────────────────────────────────
+app.use('/', kurumsal_1.kurumsalRouter);
 app.use('/pay', fakepay_1.fakepayRouter);
 app.use('/api/checkout', checkout_1.checkoutRouter);
 app.use('/api/webhooks', checkout_1.checkoutRouter);
 app.use('/checkout', checkout_1.checkoutRouter);
+// ─── 404 Catch-all ──────────────────────────────────────────────────────────
+app.use((_req, res) => {
+    res.status(404).render('hata/404');
+});
 // ─── Global error handler ────────────────────────────────────────────────────
 app.use(errorHandler_1.errorHandler);
 // ─── Start server ────────────────────────────────────────────────────────────
